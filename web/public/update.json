@@ -1,7 +1,7 @@
 {
-  "version": "0.4.36",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.36/SharedWingsX-Setup-0.4.36.exe",
-  "notes": "MSFS 2020/2024 lamps live only in the footer.",
+  "version": "0.4.37",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.37/SharedWingsX-Setup-0.4.37.exe",
+  "notes": "BluNova startup woosh with the boot plane; sound stops when the splash ends.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

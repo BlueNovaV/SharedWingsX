@@ -130,7 +130,7 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   left: -32%;
   width: 280px;
   height: 196px;
-  animation: boot-fly 7s linear both;
+  animation: boot-fly 7s cubic-bezier(0.22, 0.48, 0.38, 0.96) both;
   pointer-events: none;
   will-change: transform, opacity;
 }
@@ -139,19 +139,32 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   height: 100%;
   display: block;
   object-fit: contain;
+  transform-origin: 52% 58%;
+  animation: boot-bank 7s ease-in-out both;
   filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
 }
 @keyframes boot-fly {
   0% {
-    transform: translate(0, 18vh);
+    transform: translate3d(-6vw, 26vh, 0);
     opacity: 0;
   }
-  6% { opacity: 1; }
-  94% { opacity: 1; }
+  8% { opacity: 1; }
+  40% {
+    transform: translate3d(36vw, 6vh, 0);
+  }
+  72% {
+    transform: translate3d(78vw, -22vh, 0);
+  }
   100% {
-    transform: translate(118vw, -58vh);
+    transform: translate3d(118vw, -64vh, 0);
     opacity: 0;
   }
+}
+@keyframes boot-bank {
+  0% { transform: rotate(-6deg) scale(0.9); }
+  36% { transform: rotate(-20deg) scale(1.02); }
+  68% { transform: rotate(8deg) scale(1.05); }
+  100% { transform: rotate(18deg) scale(0.88); }
 }
 .boot-panel {
   position: relative;

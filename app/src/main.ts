@@ -38,7 +38,7 @@ let cardScrollMem: Record<string, number> = {};
 
 function restartCssAnimations(scope: ParentNode): void {
   const nodes = scope.querySelectorAll<HTMLElement>(
-    ".boot-craft, .boot-grid, .boot-glow, .boot-runway span, .boot-bar span, .boot-ring, .boot-steps li",
+    ".boot-craft, .boot-plane, .boot-grid, .boot-glow, .boot-runway span, .boot-bar span, .boot-ring, .boot-steps li",
   );
   for (const el of Array.from(nodes)) {
     el.style.animation = "none";
@@ -53,9 +53,23 @@ function playBootWhoosh(): void {
   if (!(audio instanceof HTMLAudioElement)) return;
   bootWhooshPlayed = true;
   audio.loop = false;
-  audio.volume = 0.8;
+  audio.volume = 0.85;
   audio.currentTime = 0;
   void audio.play().catch(() => {});
+}
+
+function fadeBootWhoosh(): void {
+  const audio = document.querySelector("#boot-whoosh");
+  if (!(audio instanceof HTMLAudioElement) || audio.paused) return;
+  const start = audio.volume;
+  const t0 = performance.now();
+  const tick = (now: number): void => {
+    const t = Math.min(1, (now - t0) / 720);
+    audio.volume = Math.max(0, start * (1 - t));
+    if (t < 1 && !audio.paused) requestAnimationFrame(tick);
+    else stopBootWhoosh();
+  };
+  requestAnimationFrame(tick);
 }
 
 function stopBootWhoosh(): void {
@@ -435,7 +449,7 @@ function header(): string {
   return `
     <header class="bar">
       <div class="bar-left">
-        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.36")}</span></p>
+        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.37")}</span></p>
       </div>
       ${flightBarHtml()}
       <div class="bar-right">
@@ -810,7 +824,7 @@ function renderBoard(): void {
             <button type="button" id="pick">Find again</button>
           </div>
           ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found automatically. Click Browse on the MSFS 2020 row.</p>` : ""}
-          <p class="hint">Version ${escapeHtml(update?.current || "0.4.36")}${
+          <p class="hint">Version ${escapeHtml(update?.current || "0.4.37")}${
             !update
               ? " · checking…"
               : update.outdated
@@ -928,10 +942,13 @@ async function boot(): Promise<void> {
     restartCssAnimations(document);
     playBootWhoosh();
     window.setTimeout(() => {
-      stopBootWhoosh();
+      fadeBootWhoosh();
       splash?.classList.add("out");
     }, 7000);
-    window.setTimeout(() => splash?.remove(), 7800);
+    window.setTimeout(() => {
+      stopBootWhoosh();
+      splash?.remove();
+    }, 7800);
   };
   if (document.visibilityState === "visible") startSplash();
   else {
