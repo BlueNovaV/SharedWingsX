@@ -118,7 +118,7 @@
               </div>
             </header>
             <div class="deck-banner" aria-hidden="true">
-              <div class="banner-media"></div>
+              <img class="banner-media" src="./brand/banner.jpg" alt="" />
               <div class="banner-shade"></div>
               <div class="banner-glow"></div>
               <div class="banner-sweep"></div>
@@ -130,7 +130,21 @@
             <div class="board">
               <section class="card">
                 <h2><span>01</span> Join</h2>
-                <p class="hint">You started this deck. Share the code under Host. Guests do not start a deck.</p>
+                <p class="choice-lab">Session code</p>
+                <p class="hint">Paste the six-character code from the host. Spaces and dashes are stripped. Last code is remembered.</p>
+                <div class="field">
+                  <input class="code-one" maxlength="8" value="K7MP2Q" readonly tabindex="-1" aria-label="Session code" />
+                </div>
+                <p class="choice-lab">Seat</p>
+                <div class="choice seats">
+                  <label><span class="swx-radio on"></span> First Officer</label>
+                  <label><span class="swx-radio"></span> Jumpseat L</label>
+                  <label><span class="swx-radio"></span> Jumpseat R</label>
+                </div>
+                <p class="hint grow">Works over the internet. The host clicks Start deck and keeps SharedWingsX open. You do not need to be in the aircraft first.</p>
+                <div class="card-foot">
+                  <span class="btn-join">Connect</span>
+                </div>
               </section>
               <section class="card">
                 <h2><span>02</span> Host</h2>
@@ -146,7 +160,7 @@
               <section class="card">
                 <h2><span>03</span> Crew</h2>
                 <div class="cabin">
-                  <div class="cabin-photo"></div>
+                  <img class="cabin-photo" src="./brand/cabin-deck.jpg" alt="" />
                   <div class="cabin-vignette"></div>
                   <div class="cabin-seats">
                     <div class="seat-3d left you"><span class="seat-code">Captain</span><span class="seat-who">Jordy</span></div>
