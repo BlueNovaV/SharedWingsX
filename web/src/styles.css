@@ -171,7 +171,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 40%;
+  object-position: center 32%;
 }
 .hero-fallback { z-index: 0; opacity: 0; }
 .hero-fallback.show { z-index: 1; opacity: 1; }
@@ -185,20 +185,6 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .night-pan { animation: none; }
   .swx .banner-media { animation: none; }
-}
-.runway-glow {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse 70% 28% at 50% 78%, rgba(255, 210, 140, 0.22), transparent 62%),
-    linear-gradient(180deg, rgba(8, 12, 22, 0.15) 0%, transparent 40%);
-  animation: lights 3.6s ease-in-out infinite;
-}
-@keyframes lights {
-  0%, 100% { opacity: 0.55; }
-  50% { opacity: 1; }
 }
 .shade {
   position: absolute;
