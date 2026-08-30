@@ -725,6 +725,7 @@ function renderBoard(): void {
         <div class="banner-glow"></div>
         <div class="banner-sweep"></div>
         <div class="banner-copy">
+          <p class="banner-kicker">Shared flight deck</p>
           <p class="banner-title">SharedWingsX</p>
         </div>
       </div>
@@ -828,7 +829,7 @@ function renderBoard(): void {
       <footer class="status">
         <span class="sim-lamps status-item" data-sim-lamps>${simLampsHtml()}</span>
         <span class="status-item"><span class="dot ${live && state?.path === "direct" ? "ok" : live ? "warn" : ""}"></span><span>${live ? escapeHtml(pathLabel(state?.path ?? "")) : "Path automatic"}</span></span>
-        <span class="status-copy">© 2026 BluNova Virtual Airlines by Jordy. All rights reserved.</span>
+        <span class="status-copy">© BluNova Virtual Airlines by Jordy · All rights reserved</span>
       </footer>
     </div>`;
 

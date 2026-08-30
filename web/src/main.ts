@@ -50,7 +50,7 @@ const en: Record<string, string> = {
   q8a: "Load the same flight plan in both FMCs (SimBrief on both PCs). SharedWingsX does not clone the whole payware CDU. The first officer sees the same radios, squawk and MCP as they move. VATSIM/IVAO: captain runs vPilot or Altitude; first officer is observer. smartCARS, Volanta and similar trackers run on the captain’s sim (one flight). SharedWingsX does not replace those apps; they sit next to it.",
   q9: "Windows says the download is unsafe?",
   q9a: "SharedWingsX is made by BluNova Virtual Airlines. SmartScreen shows Unknown publisher until Setup is signed with a Windows code-signing certificate in that company name. Until then: More info, then Run anyway.",
-  copy: "© 2026 BluNova Virtual Airlines by Jordy. All rights reserved.",
+  copy: "© BluNova Virtual Airlines by Jordy. All rights reserved.",
 };
 
 const nl: Record<string, string> = {
@@ -105,7 +105,7 @@ const nl: Record<string, string> = {
   q8a: "Zet hetzelfde flightplan in beide FMC’s (SimBrief op beide pc’s). SharedWingsX kopieert de hele payware-CDU niet. De FO ziet wel dezelfde radio’s, squawk en MCP. VATSIM/IVAO: captain draait vPilot of Altitude; FO als observer. smartCARS, Volanta en soortgelijke trackers op de captain-sim (één vlucht). SharedWingsX vervangt die apps niet.",
   q9: "Windows zegt dat de download onveilig is?",
   q9a: "SharedWingsX is van BluNova Virtual Airlines. SmartScreen toont Onbekende uitgever tot de Setup is ondertekend met een Windows code-signingcertificaat op die bedrijfsnaam. Tot die tijd: Meer info, daarna Toch uitvoeren.",
-  copy: "© 2026 BluNova Virtual Airlines by Jordy. Alle rechten voorbehouden.",
+  copy: "© BluNova Virtual Airlines by Jordy. Alle rechten voorbehouden.",
 };
 
 function apply(lang: "nl" | "en"): void {
