@@ -1,6 +1,7 @@
 const en: Record<string, string> = {
   navHow: "How it works",
   navAircraft: "Aircraft",
+  navApp: "The app",
   navFaq: "Questions",
   eyebrow: "MSFS 2020 and 2024, Windows and Linux",
   heroTitle: "One cockpit. Two people.",
@@ -8,7 +9,7 @@ const en: Record<string, string> = {
     "Shared cockpit as a product, not a zip treasure hunt. One app, one session code, captain and first officer in the same seats.",
   cta: "Download",
   cta2: "Download SharedWingsX",
-  ctaSub: "Windows installer · ~95 MB",
+  ctaSub: "Windows installer · 0.4.44 · ~95 MB",
   heroMeta: "Windows and Linux, no account",
   strip1: "No Community drag-drop",
   strip2: "No port forwarding",
@@ -31,11 +32,14 @@ const en: Record<string, string> = {
   s4t: "Crew",
   s4: "You see each other in the seat. You hand over flying on the person.",
   sHint: "No Visual C++, no WebView2. Pick the Community folder only if MSFS has never been launched.",
+  appTitle: "The Windows app",
+  appCopy:
+    "This is SharedWingsX. Host starts a deck, a six-character code appears, the other seats join. MSFS 2020 and 2024 lamps sit in the footer. Same version on every PC.",
   faqTitle: "Questions",
   q1: "Is SharedWingsX free?",
-  q1a: "Yes. Download the Windows Setup or the Linux zip. No account, no subscription. MSFS itself is Windows-only; Linux can host or join a deck, but SimConnect needs Windows.",
+  q1a: "Yes. Download the Windows Setup (~95 MB) or the Linux zip. No account, no subscription. MSFS itself is Windows-only; Linux can host or join a deck, but SimConnect needs Windows.",
   q2: "Does the other person need SharedWingsX too?",
-  q2a: "Yes. Everyone uses the same version. The host starts a deck and shares the six-character session code.",
+  q2a: "Yes. Everyone uses the same version (currently 0.4.44). The host starts a deck and shares the six-character session code.",
   q3: "How does it work?",
   q3a: "SharedWingsX syncs the cockpit between both pilots. Captain left, first officer right. Radios and ATC for both; you hand over flying on the person.",
   q4: "Does it work on VATSIM or IVAO?",
@@ -49,13 +53,14 @@ const en: Record<string, string> = {
   q8: "Flight plan, VATSIM, smartCARS, Volanta?",
   q8a: "Load the same flight plan in both FMCs (SimBrief on both PCs). SharedWingsX does not clone the whole payware CDU. The first officer sees the same radios, squawk and MCP as they move. VATSIM/IVAO: captain runs vPilot or Altitude; first officer is observer. smartCARS, Volanta and similar trackers run on the captain’s sim (one flight). SharedWingsX does not replace those apps; they sit next to it.",
   q9: "Windows says the download is unsafe?",
-  q9a: "SharedWingsX is made by BluNova Virtual Airlines. SmartScreen shows Unknown publisher until Setup is signed with a Windows code-signing certificate in that company name. Until then: More info, then Run anyway.",
+  q9a: "SharedWingsX is made by BluNova Virtual Airlines. SmartScreen shows Unknown publisher until Setup is signed with a Windows code-signing certificate in that company name. Until then: More info, then Run anyway. The installer is about 95 MB — a 12 KB file is not the app. Discord: discord.gg/bluenovav · info@blunovav.com",
   copy: "© BluNova Virtual Airlines by Jordy. All rights reserved.",
 };
 
 const nl: Record<string, string> = {
   navHow: "Gebruik",
   navAircraft: "Toestellen",
+  navApp: "De app",
   navFaq: "FAQ",
   eyebrow: "Microsoft Flight Simulator 2020 & 2024",
   heroTitle: "Eén cockpit.<br />Twee mensen.",
@@ -63,7 +68,7 @@ const nl: Record<string, string> = {
     "Shared cockpit als product, niet als zip-avontuur. Eén Windows-app, één code, captain en first officer in dezelfde stoelen.",
   cta: "Download",
   cta2: "Download SharedWingsX",
-  ctaSub: "Windows-installer · ~95 MB",
+  ctaSub: "Windows-installer · 0.4.44 · ~95 MB",
   heroMeta: "Windows en Linux, geen account",
   strip1: "Geen Community-sleep",
   strip2: "Geen poorten openzetten",
@@ -86,11 +91,14 @@ const nl: Record<string, string> = {
   s4t: "Crew",
   s4: "Je ziet elkaar in de stoel. Besturing geef je op de persoon.",
   sHint: "Geen Visual C++, geen WebView2. Community-map alleen kiezen als MSFS nog nooit is gestart.",
+  appTitle: "De Windows-app",
+  appCopy:
+    "Dit is SharedWingsX. De host start een deck, er verschijnt een code van zes tekens, de andere stoelen joinen. MSFS 2020- en 2024-lampjes staan onderin. Iedereen dezelfde versie.",
   faqTitle: "Vragen",
   q1: "Is SharedWingsX gratis?",
-  q1a: "Ja. Download de Windows-Setup of de Linux-zip. Geen account. MSFS zelf is Windows-only; Linux kan een deck hosten of joinen, SimConnect heeft Windows nodig.",
+  q1a: "Ja. Download de Windows-Setup (~95 MB) of de Linux-zip. Geen account. MSFS zelf is Windows-only; Linux kan een deck hosten of joinen, SimConnect heeft Windows nodig.",
   q2: "Moet de ander SharedWingsX ook hebben?",
-  q2a: "Ja. Iedereen dezelfde versie. De host start een deck en deelt de sessiecode van zes tekens.",
+  q2a: "Ja. Iedereen dezelfde versie (nu 0.4.44). De host start een deck en deelt de sessiecode van zes tekens.",
   q3: "Hoe werkt het?",
   q3a: "SharedWingsX synct de cockpit. Captain links, first officer rechts. Radios en ATC voor beide; besturing geef je op de persoon.",
   q4: "VATSIM of IVAO?",
@@ -104,7 +112,7 @@ const nl: Record<string, string> = {
   q8: "Flightplan, VATSIM, smartCARS, Volanta?",
   q8a: "Zet hetzelfde flightplan in beide FMC’s (SimBrief op beide pc’s). SharedWingsX kopieert de hele payware-CDU niet. De FO ziet wel dezelfde radio’s, squawk en MCP. VATSIM/IVAO: captain draait vPilot of Altitude; FO als observer. smartCARS, Volanta en soortgelijke trackers op de captain-sim (één vlucht). SharedWingsX vervangt die apps niet.",
   q9: "Windows zegt dat de download onveilig is?",
-  q9a: "SharedWingsX is van BluNova Virtual Airlines. SmartScreen toont Onbekende uitgever tot de Setup is ondertekend met een Windows code-signingcertificaat op die bedrijfsnaam. Tot die tijd: Meer info, daarna Toch uitvoeren.",
+  q9a: "SharedWingsX is van BluNova Virtual Airlines. SmartScreen toont Onbekende uitgever tot de Setup is ondertekend met een Windows code-signingcertificaat op die bedrijfsnaam. Tot die tijd: Meer info, daarna Toch uitvoeren. De installer is ongeveer 95 MB — een bestand van 12 KB is de app niet. Discord: discord.gg/bluenovav · info@blunovav.com",
   copy: "© BluNova Virtual Airlines by Jordy. Alle rechten voorbehouden.",
 };
 
@@ -148,4 +156,22 @@ document.getElementById("lang")?.addEventListener("click", () => {
   lang = lang === "nl" ? "en" : "nl";
   apply(lang);
 });
+
+void fetch("./update.json")
+  .then((res) => (res.ok ? res.json() : null))
+  .then((info: { version?: string } | null) => {
+    const version = String(info?.version ?? "").trim();
+    if (!version) return;
+    en.ctaSub = `Windows installer · ${version} · ~95 MB`;
+    nl.ctaSub = `Windows-installer · ${version} · ~95 MB`;
+    en.q2a = `Yes. Everyone uses the same version (currently ${version}). The host starts a deck and shares the six-character session code.`;
+    nl.q2a = `Ja. Iedereen dezelfde versie (nu ${version}). De host start een deck en deelt de sessiecode van zes tekens.`;
+    document.querySelectorAll("[data-rel-ver]").forEach((el) => {
+      el.textContent = version;
+    });
+    apply(lang);
+  })
+  .catch(() => {
+    /* keep HTML fallback */
+  });
 
