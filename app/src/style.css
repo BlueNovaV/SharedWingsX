@@ -132,7 +132,7 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   width: 150px;
   height: 150px;
   margin-top: -75px;
-  animation: boot-fly 7s linear both;
+  animation: boot-fly 6.4s linear both;
   pointer-events: none;
 }
 .boot-plane {
@@ -149,12 +149,19 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
     opacity: 0;
   }
   8% { opacity: 1; }
-  24% { transform: translate3d(16vw, -22vh, 0); }
-  50% { transform: translate3d(44vw, -26vh, 0); }
-  76% { transform: translate3d(78vw, -22vh, 0); }
-  90% { opacity: 1; }
+  22% { transform: translate3d(14vw, -22vh, 0); }
+  46% { transform: translate3d(42vw, -26vh, 0); }
+  68% { transform: translate3d(78vw, -16vh, 0); }
+  82% {
+    transform: translate3d(118vw, 0, 0);
+    opacity: 1;
+  }
+  88% {
+    transform: translate3d(128vw, 0, 0);
+    opacity: 0;
+  }
   100% {
-    transform: translate3d(110vw, 0, 0);
+    transform: translate3d(128vw, 0, 0);
     opacity: 0;
   }
 }
