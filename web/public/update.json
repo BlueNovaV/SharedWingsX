@@ -1,7 +1,7 @@
 {
-  "version": "0.4.40",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.40/SharedWingsX-Setup-0.4.40.exe",
-  "notes": "Boot plane takes a smooth arch over the logo, not through it.",
+  "version": "0.4.41",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.41/SharedWingsX-Setup-0.4.41.exe",
+  "notes": "Boot plane stays in the sky above the logo from left-center to right-center.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

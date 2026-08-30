@@ -126,14 +126,12 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
 .boot-runway span:nth-child(8) { animation-delay: 2.5s; }
 .boot-craft {
   position: absolute;
-  top: 0;
   left: 0;
-  z-index: 6;
+  top: 40%;
+  z-index: 8;
   width: 150px;
   height: 150px;
-  offset-path: path("M -90 400 C 200 385, 380 92, 640 86 C 900 86, 1080 385, 1370 410");
-  offset-rotate: 0deg;
-  offset-anchor: center;
+  margin-top: -75px;
   animation: boot-fly 7s linear both;
   pointer-events: none;
 }
@@ -142,18 +140,21 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   height: 150px;
   display: block;
   object-fit: contain;
-  transform: rotate(-10deg);
-  image-rendering: auto;
+  object-position: center top;
+  transform: rotate(-8deg);
 }
 @keyframes boot-fly {
   0% {
-    offset-distance: 0%;
+    transform: translate3d(-22vw, 0, 0);
     opacity: 0;
   }
-  7% { opacity: 1; }
+  8% { opacity: 1; }
+  24% { transform: translate3d(16vw, -22vh, 0); }
+  50% { transform: translate3d(44vw, -26vh, 0); }
+  76% { transform: translate3d(78vw, -22vh, 0); }
   90% { opacity: 1; }
   100% {
-    offset-distance: 100%;
+    transform: translate3d(110vw, 0, 0);
     opacity: 0;
   }
 }
