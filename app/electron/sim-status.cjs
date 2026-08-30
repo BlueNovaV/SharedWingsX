@@ -26,7 +26,8 @@ function detectSims() {
     (n) => n === "flightsimulator2024.exe" || n.includes("flightsimulator2024") || n === "msfs2024.exe",
   );
   let msfs2020 = names.some((n) => n === "flightsimulator.exe");
-  if (msfs2020 && !msfs2024) {
+  if (msfs2024) msfs2020 = false;
+  else if (msfs2020) {
     try {
       const verbose = execFileSync("tasklist", ["/FI", "IMAGENAME eq FlightSimulator.exe", "/V", "/FO", "CSV", "/NH"], {
         encoding: "utf8",

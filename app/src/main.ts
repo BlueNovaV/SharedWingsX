@@ -167,13 +167,22 @@ function cockpitView(): string {
     </div>`;
 }
 
-function simLampsHtml(): string {
+function simOn2020(): boolean {
   const id = state?.identity;
-  const live = Boolean(id?.connected && !id.mock);
-  const product = id?.simProduct;
-  const on20 = live && (product === "MSFS2020" || (!product && simProc.msfs2020 && !simProc.msfs2024));
-  const on24 = live && (product === "MSFS2024" || (!product && simProc.msfs2024 && !simProc.msfs2020));
-  return `<span class="lamp${on20 ? " on" : ""}"><span class="dot${on20 ? " live" : ""}"></span><span class="lamp-lab">MSFS 2020</span></span><span class="lamp${on24 ? " on" : ""}"><span class="dot${on24 ? " live" : ""}"></span><span class="lamp-lab">MSFS 2024</span></span>`;
+  if (id?.connected && !id.mock && id.simProduct) return id.simProduct === "MSFS2020";
+  return Boolean(simProc.msfs2020 && !simProc.msfs2024);
+}
+
+function simOn2024(): boolean {
+  const id = state?.identity;
+  if (id?.connected && !id.mock && id.simProduct) return id.simProduct === "MSFS2024";
+  return Boolean(simProc.msfs2024);
+}
+
+function simLampsHtml(): string {
+  const y20 = simOn2020();
+  const y24 = simOn2024();
+  return `<span class="lamp${y20 ? " on" : ""}"><span class="dot${y20 ? " live" : ""}"></span><span class="lamp-lab">MSFS 2020</span></span><span class="lamp${y24 ? " on" : ""}"><span class="dot${y24 ? " live" : ""}"></span><span class="lamp-lab">MSFS 2024</span></span>`;
 }
 
 function paintSimLamps(): void {
@@ -646,8 +655,6 @@ function bindBoard(): void {
   root.querySelectorAll(".js-leave").forEach((el) => el.addEventListener("click", leaveDeck));
   bindCode();
   bindUpdate();
-}
-
 }
 
 function flightBarHtml(): string {
