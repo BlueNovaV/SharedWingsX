@@ -145,18 +145,21 @@ if (localSite) {
 }
 const hero = document.querySelector<HTMLVideoElement>(".hero-video");
 const fallback = document.querySelector(".hero-fallback");
-hero?.addEventListener("error", () => fallback?.classList.add("show"));
-void hero?.play()?.catch(() => fallback?.classList.add("show"));
-document.querySelectorAll<HTMLVideoElement>(".swx .banner-media").forEach((el) => {
-  void el.play()?.catch(() => {
-    /* keep poster */
-  });
-});
-if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  hero?.pause();
-  fallback?.classList.add("show");
-  document.querySelectorAll<HTMLVideoElement>(".swx .banner-media").forEach((el) => el.pause());
+function startBgVideo(el: HTMLVideoElement, onFail?: () => void): void {
+  el.muted = true;
+  el.defaultMuted = true;
+  el.playsInline = true;
+  el.loop = true;
+  const go = (): void => {
+    void el.play().catch(() => onFail?.());
+  };
+  if (el.readyState >= 2) go();
+  else el.addEventListener("canplay", go, { once: true });
+  el.addEventListener("error", () => onFail?.());
 }
+hero?.addEventListener("playing", () => fallback?.classList.remove("show"));
+if (hero) startBgVideo(hero, () => fallback?.classList.add("show"));
+document.querySelectorAll<HTMLVideoElement>(".swx .banner-media").forEach((el) => startBgVideo(el));
 let lang: "nl" | "en" = "en";
 apply("en");
 document.getElementById("lang")?.addEventListener("click", () => {
