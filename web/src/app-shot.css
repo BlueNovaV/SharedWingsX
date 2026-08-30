@@ -177,6 +177,7 @@
   object-position: center 42%;
   z-index: 0;
   animation: swx-banner-drift 22s ease-in-out infinite alternate;
+  image-rendering: auto;
 }
 @keyframes swx-banner-drift {
   0% { transform: translate3d(0, 0, 0) scale(1); }

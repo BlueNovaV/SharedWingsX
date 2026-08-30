@@ -159,7 +159,6 @@ function startBgVideo(el: HTMLVideoElement, onFail?: () => void): void {
 }
 hero?.addEventListener("playing", () => fallback?.classList.remove("show"));
 if (hero) startBgVideo(hero, () => fallback?.classList.add("show"));
-document.querySelectorAll<HTMLVideoElement>(".swx .banner-media").forEach((el) => startBgVideo(el));
 let lang: "nl" | "en" = "en";
 apply("en");
 document.getElementById("lang")?.addEventListener("click", () => {
