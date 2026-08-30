@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en" translate="no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="google" content="notranslate" />
+    <title>SharedWingsX</title>
+    <link rel="icon" href="./brand/logo.png" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="boot" class="boot">
+      <div class="boot-sky"></div>
+      <div class="boot-grid"></div>
+      <div class="boot-glow boot-glow-a"></div>
+      <div class="boot-glow boot-glow-b"></div>
+      <div class="boot-craft" aria-hidden="true">
+        <img class="boot-plane" src="./brand/boot-plane.gif" alt="" />
+      </div>
+      <div class="boot-runway" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="boot-panel">
+        <div class="boot-mark-wrap">
+          <span class="boot-ring"></span>
+          <span class="boot-ring boot-ring-2"></span>
+          <img class="boot-mark" src="./brand/logo.png" alt="" />
+        </div>
+        <p class="boot-name">SharedWingsX</p>
+        <p class="boot-tag">Shared flight deck</p>
+        <div class="boot-bar" aria-hidden="true"><span></span></div>
+        <ol class="boot-steps">
+          <li>Engine</li>
+          <li>SimConnect</li>
+          <li>Flight deck</li>
+        </ol>
+        <p class="boot-hint">Microsoft Flight Simulator 2020 · 2024</p>
+      </div>
+    </div>
+    <div id="app"></div>
+    <audio id="boot-whoosh" src="./brand/boot-whoosh.mp3" preload="auto"></audio>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

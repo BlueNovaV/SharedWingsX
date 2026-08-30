@@ -1,0 +1,30 @@
+{
+  "name": "twinseat",
+  "private": true,
+  "version": "0.4.34",
+  "description": "SharedWingsX shared flight deck, BluNova Virtual Airlines",
+  "author": "BluNova Virtual Airlines",
+  "workspaces": [
+    "protocol",
+    "bridge",
+    "relay",
+    "app",
+    "web"
+  ],
+  "scripts": {
+    "dev": "npm run build -w @twinseat/protocol && concurrently -n relay,bridge,app -c cyan,magenta,green \"npm run dev -w @twinseat/relay\" \"npm run dev -w @twinseat/bridge\" \"npm run dev -w @twinseat/app\"",
+    "build": "npm run build -w @twinseat/protocol && npm run build -w @twinseat/relay && npm run build -w @twinseat/bridge && npm run build -w @twinseat/app",
+    "test": "npm run test -w @twinseat/protocol && npm run test -w @twinseat/bridge",
+    "desktop": "npm run build -w @twinseat/protocol && npm run desktop -w @twinseat/app",
+    "dist:win": "node scripts/write-logo-png.mjs && node scripts/write-ico.mjs && node scripts/write-community-thumb.mjs && npm run build -w @twinseat/protocol && npm run dist:win -w @twinseat/app && node scripts/electron-builder-linux.mjs && node scripts/copy-download.mjs && npm run build -w @twinseat/web && node scripts/publish-web.mjs",
+    "dist:linux": "node scripts/write-logo-png.mjs && node scripts/write-ico.mjs && npm run build -w @twinseat/protocol && npm run dist:linux -w @twinseat/app && node scripts/copy-download.mjs",
+    "site:prepare": "node scripts/copy-download.mjs",
+    "site": "npm run site:prepare && npm run dev -w @twinseat/web",
+    "site:build": "npm run site:prepare && npm run build -w @twinseat/web",
+    "site:publish": "npm run site:build && node scripts/publish-web.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.8.3"
+  }
+}

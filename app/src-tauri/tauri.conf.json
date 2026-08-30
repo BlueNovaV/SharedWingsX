@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "SharedWingsX",
+  "version": "0.1.0",
+  "identifier": "app.sharedwingsx.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev -w @twinseat/app",
+    "beforeBuildCommand": "npm run build -w @twinseat/app",
+    "devUrl": "http://127.0.0.1:17322",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "SharedWingsX",
+        "width": 1180,
+        "height": 820
+      }
+    ]
+  }
+}

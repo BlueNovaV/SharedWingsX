@@ -1,0 +1,44 @@
+{
+  "content": [
+    {
+      "path": "ContentInfo/twinseat-presence/Thumbnail.jpg",
+      "size": 6882,
+      "date": 1788110292387
+    },
+    {
+      "path": "ModelBehaviorDefs/TwinSeat/Presence.xml",
+      "size": 548,
+      "date": 1788065671636
+    },
+    {
+      "path": "modules/.gitkeep",
+      "size": 2,
+      "date": 1788065671636
+    },
+    {
+      "path": "modules/README.md",
+      "size": 362,
+      "date": 1788065671633
+    },
+    {
+      "path": "SimObjects/Misc/twinseat_avatar/model/model.cfg",
+      "size": 34,
+      "date": 1788065671633
+    },
+    {
+      "path": "SimObjects/Misc/twinseat_avatar/model/TwinSeatAvatar.gltf",
+      "size": 1280,
+      "date": 1788065671636
+    },
+    {
+      "path": "SimObjects/Misc/twinseat_avatar/model/TwinSeatAvatar.xml",
+      "size": 158,
+      "date": 1788065671636
+    },
+    {
+      "path": "SimObjects/Misc/twinseat_avatar/sim.cfg",
+      "size": 225,
+      "date": 1788065671635
+    }
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "name": "@twinseat/app",
+  "version": "0.4.34",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.cjs",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "bundle:engine": "esbuild electron/boot.ts --bundle --platform=node --format=cjs --outfile=electron/engine.cjs --packages=bundle",
+    "desktop": "npm run build && npm run bundle:engine && electron electron/main.cjs",
+    "icons": "node ../scripts/write-ico.mjs",
+    "dist:win": "npm run icons && npm run build && npm run bundle:engine && node ../scripts/electron-builder-win.mjs",
+    "dist:linux": "npm run icons && npm run build && npm run bundle:engine && node ../scripts/electron-builder-linux.mjs"
+  },
+  "description": "SharedWingsX shared flight deck by BluNova Virtual Airlines",
+  "author": "BluNova Virtual Airlines",
+  "devDependencies": {
+    "electron": "37.10.3",
+    "electron-builder": "^26.0.12",
+    "esbuild": "^0.25.9",
+    "png-to-ico": "^3.0.2",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  },
+  "build": {
+    "electronVersion": "37.10.3",
+    "appId": "app.sharedwingsx.desktop",
+    "productName": "SharedWingsX",
+    "icon": "icon.ico",
+    "copyright": "Copyright © BluNova Virtual Airlines",
+    "extraMetadata": {
+      "name": "SharedWingsX",
+      "author": {
+        "name": "BluNova Virtual Airlines",
+        "url": "https://sharedwingsx.app"
+      }
+    },
+    "artifactName": "SharedWingsX-${version}.${ext}",
+    "directories": {
+      "output": "../release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/main.cjs",
+      "electron/preload.cjs",
+      "electron/engine.cjs",
+      "electron/community.cjs",
+      "electron/update.cjs",
+      "electron/site.cjs",
+      "electron/sim-status.cjs"
+    ],
+    "extraResources": [
+      {
+        "from": "../packs",
+        "to": "packs",
+        "filter": [
+          "*.json",
+          "!schema.json"
+        ]
+      },
+      {
+        "from": "../community/twinseat-presence",
+        "to": "community/twinseat-presence"
+      }
+    ],
+    "win": {
+      "icon": "icon.ico",
+      "requestedExecutionLevel": "asInvoker",
+      "signAndEditExecutable": true,
+      "signExecutable": false,
+      "signtoolOptions": {
+        "publisherName": "BluNova Virtual Airlines",
+        "signingHashAlgorithms": ["sha256"],
+        "rfc3161TimeStampServer": "http://timestamp.digicert.com"
+      },
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "artifactName": "SharedWingsX-Setup-${version}.exe",
+      "shortcutName": "SharedWingsX",
+      "uninstallDisplayName": "SharedWingsX",
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "installerHeaderIcon": "icon.ico"
+    },
+    "portable": {
+      "artifactName": "SharedWingsX-${version}-portable.exe"
+    },
+    "linux": {
+      "icon": "icon.png",
+      "category": "Game",
+      "synopsis": "Shared flight deck for Microsoft Flight Simulator",
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["x64"]
+        },
+        {
+          "target": "zip",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "appImage": {
+      "artifactName": "SharedWingsX-${version}.AppImage"
+    }
+  }
+}

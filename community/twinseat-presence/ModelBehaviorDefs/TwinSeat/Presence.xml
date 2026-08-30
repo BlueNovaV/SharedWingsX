@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ModelBehaviors>
+  <Include File="Asobo\\Generic.xml"/>
+  <Template Name="TWINSEAT_Presence">
+    <Parameters Type="Default">
+      <HEAD_YAW>L:TWINSEAT_REMOTE_HEAD_YAW</HEAD_YAW>
+      <HEAD_PITCH>L:TWINSEAT_REMOTE_HEAD_PITCH</HEAD_PITCH>
+    </Parameters>
+    <UseTemplate Name="ASOBO_GT_Anim">
+      <ANIM_NAME>head_yaw</ANIM_NAME>
+      <ANIM_LENGTH>100</ANIM_LENGTH>
+      <ANIM_CODE>(L:TWINSEAT_REMOTE_HEAD_YAW, number) 50 +</ANIM_CODE>
+    </UseTemplate>
+  </Template>
+</ModelBehaviors>

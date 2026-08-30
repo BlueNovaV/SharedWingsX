@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SharedWingsX | Shared cockpit for MSFS</title>
+    <meta
+      name="description"
+      content="SharedWingsX is shared cockpit for MSFS 2020 and 2024. One Windows app, one code, two seats."
+    />
+    <meta name="theme-color" content="#05070a" />
+    <link rel="icon" href="/brand/logo.png?v=4" type="image/png" />
+    <link rel="icon" href="/brand/mark.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href="#top">
+        <img src="/brand/logo.png?v=4" width="36" height="36" alt="SharedWingsX" />
+        SharedWingsX
+      </a>
+      <nav>
+        <a href="#aircraft" data-i="navAircraft">Aircraft</a>
+        <a href="#how" data-i="navHow">How it works</a>
+        <a href="#faq" data-i="navFaq">Questions</a>
+        <button type="button" class="lang" id="lang">NL</button>
+        <a class="btn" href="/downloads/SharedWingsX-Setup-0.4.34.exe" download>
+          <img src="/brand/logo.png?v=4" width="18" height="18" alt="" />
+          <span data-i="cta">Download</span>
+          <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M12 4v11m0 0 5-5m-5 5-5-5M5 19h14"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      </nav>
+    </header>
+
+    <section class="stage" id="top">
+      <div class="hero-bg" aria-hidden="true">
+        <video
+          class="photo hero-video"
+          autoplay
+          muted
+          loop
+          playsinline
+          poster="/brand/hero-night.png?v=1"
+        >
+          <source src="/brand/hero-cockpit-night.mp4" type="video/mp4" />
+        </video>
+        <img class="photo still night-pan hero-fallback" src="/brand/hero-night.png?v=1" alt="" />
+        <div class="runway-glow"></div>
+      </div>
+      <div class="shade"></div>
+      <div class="stage-inner">
+        <p class="eyebrow" data-i="eyebrow">Microsoft Flight Simulator 2020 &amp; 2024</p>
+        <h1 data-i="heroTitle">One cockpit.<br />Two people.</h1>
+        <p class="lede" data-i="heroLede">
+          Shared cockpit as a product, not a zip treasure hunt. One Windows app, one code, captain and first officer
+          in the same seats.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-lg" href="/downloads/SharedWingsX-Setup-0.4.34.exe" download>
+            <span class="btn-mark">
+              <img src="/brand/logo.png?v=4" width="28" height="28" alt="" />
+            </span>
+            <span class="btn-copy">
+              <span data-i="cta2">Download SharedWingsX</span>
+              <small data-i="ctaSub">Windows installer · ~80 MB</small>
+            </span>
+            <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M12 4v11m0 0 5-5m-5 5-5-5M5 19h14"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
+          <span data-i="heroMeta">Windows and Linux, no account</span>
+        </div>
+        <p class="cta-linux">
+          <a href="/downloads/SharedWingsX-0.4.34-linux-x64.zip" download>Linux (x64 zip)</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="strip">
+      <div class="wrap strip-row">
+        <p data-i="strip1">No Community drag-drop</p>
+        <p data-i="strip2">No port forwarding</p>
+        <p data-i="strip3">PMDG to stock, same app</p>
+        <p data-i="strip4">Presence in the other seat</p>
+      </div>
+    </section>
+
+    <section class="block" id="aircraft">
+      <div class="wrap split">
+        <div>
+          <h2 data-i="airTitle">Built to fly anything MSFS will load</h2>
+        </div>
+        <div>
+          <p class="copy" data-i="airCopy">
+            Universal SimConnect layer for every MSFS aircraft: PMDG 737, 777, 747, Fenix, iFly, Asobo. Dedicated
+            packs for C172 and 787-10. Aircraft files stay untouched. Payware CDU/FMS is not pixel-perfect; flight
+            controls, thrust, gear, flaps, radios and ATC sync.
+          </p>
+          <ul class="lines">
+            <li><b data-i="airUni">Universal</b> <span data-i="airUniSub">Every MSFS title via SimConnect</span></li>
+            <li><b>Asobo C172</b> <span data-i="airC172">Dedicated pack</span></li>
+            <li><b>Asobo 787-10</b> <span data-i="air787">Dedicated pack</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="block dim" id="how">
+      <div class="wrap">
+        <h2 data-i="howTitle">Four steps. No installer theatre.</h2>
+        <ol class="timeline">
+          <li>
+            <span class="step-n">01</span>
+            <span class="step-ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="4" y="3.5" width="16" height="17" rx="2.5" stroke="currentColor" stroke-width="1.6" />
+                <path d="M8 8h8M8 12h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </span>
+            <h3 data-i="s1t">App</h3>
+            <p data-i="s1">SharedWingsX-Setup.exe. Presence is copied into Community for you.</p>
+          </li>
+          <li>
+            <span class="step-n">02</span>
+            <span class="step-ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 16.5 12 5l8 11.5"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linejoin="round"
+                />
+                <path d="M7.5 16.5h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </span>
+            <h3 data-i="s2t">Sim</h3>
+            <p data-i="s2">Same aircraft, same spawn, multiplayer off.</p>
+          </li>
+          <li>
+            <span class="step-n">03</span>
+            <span class="step-ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <rect x="5" y="5" width="14" height="14" rx="3" stroke="currentColor" stroke-width="1.6" />
+                <path d="M9 10h6M9 14h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </span>
+            <h3 data-i="s3t">Code</h3>
+            <p data-i="s3">One starts a deck. The other types six letters.</p>
+          </li>
+          <li>
+            <span class="step-n">04</span>
+            <span class="step-ico" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <circle cx="9" cy="9" r="2.4" stroke="currentColor" stroke-width="1.6" />
+                <circle cx="15.5" cy="9" r="2.4" stroke="currentColor" stroke-width="1.6" />
+                <path
+                  d="M5.5 18c.6-2.4 2.4-3.6 4.5-3.6s3.9 1.2 4.5 3.6M14 14.4c1.6 0 3.1.7 3.8 2.1"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </span>
+            <h3 data-i="s4t">Crew</h3>
+            <p data-i="s4">You see each other in the seat. You hand over flying on the person.</p>
+          </li>
+        </ol>
+        <p class="fine" data-i="sHint">No Visual C++, no WebView2. Pick the Community folder only if MSFS has never been launched.</p>
+      </div>
+    </section>
+
+    <section class="block" id="faq">
+      <div class="wrap split">
+        <h2 data-i="faqTitle">Questions</h2>
+        <div class="faq">
+          <details open>
+            <summary data-i="q1">Is SharedWingsX free?</summary>
+            <p data-i="q1a">Yes. Download the Windows build. No account, no subscription.</p>
+          </details>
+          <details>
+            <summary data-i="q2">Does the other person need SharedWingsX too?</summary>
+            <p data-i="q2a">Yes. Everyone uses the same EXE. Nobody picks extra definition files.</p>
+          </details>
+          <details>
+            <summary data-i="q3">How does it work?</summary>
+            <p data-i="q3a">
+              SharedWingsX syncs the cockpit between both pilots. Captain left, first officer right. Radios and ATC for
+              both; you hand over flying on the person.
+            </p>
+          </details>
+          <details>
+            <summary data-i="q4">Does it work on VATSIM or IVAO?</summary>
+            <p data-i="q4a">
+              Yes. SharedWingsX is not vPilot or Altitude. The captain logs into the network as usual. The first officer
+              connects as observer (same callsign, extra letter, observer mode). Radios in the sim sync through
+              SharedWingsX. Turn AI traffic off so you both see the same picture. One person files the plan: the host.
+            </p>
+          </details>
+          <details>
+            <summary data-i="q6">Do I need to open ports?</summary>
+            <p data-i="q6a">
+              No. No router, no port forwarding. SharedWingsX tries a direct link first. If that fails it falls back to the
+              cloud on its own. You only share the code in the app.
+            </p>
+          </details>
+          <details>
+            <summary data-i="q5">PMDG, Fenix, and the rest?</summary>
+            <p data-i="q5a">
+              Yes through the universal layer: PMDG, Fenix, and the rest of MSFS. Flight controls, thrust, gear,
+              flaps, radios and ATC sync. Payware CDU/FMS buttons are not 100%. Dedicated packs follow for those.
+            </p>
+          </details>
+          <details>
+            <summary data-i="q7">Why other shared cockpits make the aircraft fight?</summary>
+            <p data-i="q7a">
+              SharedWingsX is not Microsoft Flight Simulator multiplayer. Keep MSFS multiplayer off so you do not get two
+              airframes in one world. Only the captain writes flying controls. The first officer has radios, MCP and
+              overhead. Shared switches use a short last-mover lock so both sims do not pull the same lever. Jump
+              seats watch only. You still need the same aircraft, same spawn and the same weather/time. Payware FMS
+              internals are not a second pixel-perfect box.
+            </p>
+          </details>
+          <details>
+            <summary data-i="q8">Flight plan, VATSIM, smartCARS, Volanta?</summary>
+            <p data-i="q8a">
+              Load the same flight plan in both FMCs (SimBrief on both PCs). SharedWingsX does not clone the whole payware
+              CDU. The first officer sees the same radios, squawk and MCP as they move. VATSIM/IVAO: captain runs
+              vPilot or Altitude; first officer is observer. smartCARS, Volanta and similar trackers run on the
+              captain’s sim (one flight). SharedWingsX does not replace those apps; they sit next to it.
+            </p>
+          </details>
+          <details>
+            <summary data-i="q9">Windows says the download is unsafe?</summary>
+            <p data-i="q9a">
+              SharedWingsX is made by BluNova Virtual Airlines. SmartScreen shows Unknown publisher until Setup is signed
+              with a Windows code-signing certificate in that company name. Until then: More info, then Run anyway.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap foot">
+        <img src="/brand/logo.png?v=4" width="28" height="28" alt="" />
+        <span>SharedWingsX</span>
+        <span class="credit">© BluNova Virtual Airlines · Night landing clip: jan tisler, <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a></span>
+      </div>
+    </footer>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,59 @@
+name: Publish site and Setup
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: publish-site
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pages.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Build installer and website
+        env:
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npm run dist:win
+      - name: Version
+        id: ver
+        shell: pwsh
+        run: |
+          $v = node -p "require('./app/package.json').version"
+          echo "VERSION=$v" >> $env:GITHUB_OUTPUT
+      - name: Attach Setup to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.VERSION }}
+          name: SharedWingsX ${{ steps.ver.outputs.VERSION }}
+          files: |
+            web/public/downloads/SharedWingsX-Setup.exe
+            web/public/downloads/SharedWingsX-Setup-${{ steps.ver.outputs.VERSION }}.exe
+            web/public/update.json
+          make_latest: true
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+      - id: pages
+        uses: actions/deploy-pages@v4

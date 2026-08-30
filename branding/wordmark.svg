@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" role="img" aria-label="TwinSeat">
+  <rect x="8" y="16" width="128" height="128" rx="28" fill="#141820"/>
+  <rect x="34" y="36" width="32" height="88" rx="16" fill="#F3F5F8"/>
+  <rect x="78" y="36" width="32" height="88" rx="16" fill="#F3F5F8"/>
+  <text x="160" y="104" fill="#F3F5F8" font-family="Inter, Segoe UI, sans-serif" font-size="72" font-weight="600" letter-spacing="-2.5">TwinSeat</text>
+</svg>

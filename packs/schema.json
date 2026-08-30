@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://twinseat.app/schema/aircraft-pack.json",
+  "title": "SharedWingsX aircraft pack",
+  "type": "object",
+  "required": ["id", "name", "support", "titleMatchers", "sharedLockMs", "presence", "variables"],
+  "properties": {
+    "id": { "type": "string" },
+    "name": { "type": "string" },
+    "support": { "enum": ["full", "offset", "overlay"] },
+    "sim": {
+      "type": "array",
+      "items": { "enum": ["MSFS2020", "MSFS2024"] }
+    },
+    "titleMatchers": { "type": "array", "items": { "type": "string" } },
+    "fallback": { "type": "boolean" },
+    "sharedLockMs": { "type": "integer" },
+    "minDeltaMs": { "type": "integer" },
+    "presence": { "type": "object" },
+    "variables": { "type": "array" }
+  }
+}

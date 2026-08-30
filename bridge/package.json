@@ -1,0 +1,22 @@
+{
+  "name": "@twinseat/bridge",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test dist/pack.test.js dist/sim-mock.test.js dist/airports.test.js"
+  },
+  "dependencies": {
+    "@twinseat/protocol": "0.1.0",
+    "node-simconnect": "^4.2.0",
+    "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.1",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3"
+  }
+}

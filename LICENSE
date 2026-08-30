@@ -1,0 +1,15 @@
+Copyright (c) 2026 TwinSeat.
+
+All rights reserved.
+
+This software is proprietary. You may not copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of this software except as
+expressly permitted in a separate written license agreement with the
+copyright holder.
+
+This product is independent of BlueNova, YourControls, and Microsoft.
+Microsoft Flight Simulator is a trademark of Microsoft.
+
+End-user terms for the published Windows application are in EULA.md.
+Do not combine this codebase with GPL shared-cockpit software (including
+YourControls) in a way that would contaminate TwinSeat's license.

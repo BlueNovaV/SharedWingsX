@@ -1,0 +1,70 @@
+{
+  "id": "asobo-787-10",
+  "name": "Asobo Boeing 787-10",
+  "support": "offset",
+  "sim": ["MSFS2020", "MSFS2024"],
+  "titleMatchers": [
+    "787-10 Asobo",
+    "Asobo Boeing 787",
+    "Boeing 787-10 Asobo"
+  ],
+  "sharedLockMs": 450,
+  "minDeltaMs": 40,
+  "notes": "Stock 787-10. Copilot mesh uses calibrated offset when PILOT_1 is missing. FMS internals are not fully exposed via SimConnect. Treat FMS as overlay/crew procedure, not a guaranteed sync surface.",
+  "presence": {
+    "support": "offset",
+    "selfSeatDefault": "left",
+    "nodes": {
+      "left": "PILOT_0",
+      "right": "PILOT_1",
+      "jumpLeft": "PILOT_2",
+      "jumpRight": "PILOT_3"
+    },
+    "remoteSeat": {
+      "offset": { "x": 0.62, "y": 0.14, "z": 0.18 },
+      "pbh": { "pitch": 0, "bank": 0, "heading": 0 }
+    },
+    "seats": {
+      "left": { "offset": { "x": -0.62, "y": 0.14, "z": 0.18 }, "node": "PILOT_0" },
+      "right": { "offset": { "x": 0.62, "y": 0.14, "z": 0.18 }, "node": "PILOT_1" },
+      "jumpLeft": { "offset": { "x": -0.42, "y": 0.16, "z": -1.15 }, "node": "PILOT_2" },
+      "jumpRight": { "offset": { "x": 0.42, "y": 0.16, "z": -1.15 }, "node": "PILOT_3" }
+    },
+    "hideLocalAvatar": true
+  },
+  "variables": [
+    { "id": 1, "name": "YOKE POSITION X", "sim": "YOKE POSITION X", "unit": "Position", "domain": "flying", "sync": true, "epsilon": 0.008 },
+    { "id": 2, "name": "YOKE POSITION Y", "sim": "YOKE POSITION Y", "unit": "Position", "domain": "flying", "sync": true, "epsilon": 0.008 },
+    { "id": 3, "name": "RUDDER PEDAL POSITION", "sim": "RUDDER PEDAL POSITION", "unit": "Position", "domain": "flying", "sync": true, "epsilon": 0.01 },
+    { "id": 4, "name": "THROTTLE 1", "sim": "GENERAL ENG THROTTLE LEVER POSITION:1", "unit": "Percent", "domain": "flying", "sync": true, "epsilon": 0.35 },
+    { "id": 5, "name": "THROTTLE 2", "sim": "GENERAL ENG THROTTLE LEVER POSITION:2", "unit": "Percent", "domain": "flying", "sync": true, "epsilon": 0.35 },
+    { "id": 6, "name": "TILLER", "sim": "RUDDER PEDAL POSITION", "unit": "Position", "domain": "flying", "sync": true, "epsilon": 0.02 },
+    { "id": 7, "name": "BRAKE LEFT", "sim": "BRAKE LEFT POSITION", "unit": "Position", "domain": "flying", "sync": true, "epsilon": 0.02 },
+    { "id": 8, "name": "BRAKE RIGHT", "sim": "BRAKE RIGHT POSITION", "unit": "Position", "domain": "flying", "sync": true, "epsilon": 0.02 },
+    { "id": 9, "name": "ELEVATOR TRIM", "sim": "ELEVATOR TRIM POSITION", "unit": "Radians", "domain": "flying", "sync": true, "epsilon": 0.002 },
+    { "id": 20, "name": "COM1 ACTIVE", "sim": "COM ACTIVE FREQUENCY:1", "unit": "MHz", "domain": "atc", "sync": true, "epsilon": 0.005 },
+    { "id": 21, "name": "COM2 ACTIVE", "sim": "COM ACTIVE FREQUENCY:2", "unit": "MHz", "domain": "atc", "sync": true, "epsilon": 0.005 },
+    { "id": 22, "name": "TRANSPONDER", "sim": "TRANSPONDER CODE:1", "unit": "BCO16", "domain": "atc", "sync": true, "epsilon": 0.5 },
+    { "id": 29, "name": "COM1 TRANSMIT", "sim": "COM TRANSMIT:1", "unit": "Bool", "domain": "atc", "sync": true, "epsilon": 0.5 },
+    { "id": 30, "name": "COM1 RECEIVE", "sim": "COM RECEIVE:1", "unit": "Bool", "domain": "atc", "sync": true, "epsilon": 0.5 },
+    { "id": 50, "name": "ATC CLEARED IFR", "sim": "ATC CLEARED IFR", "unit": "Bool", "domain": "atc", "sync": true, "epsilon": 0.5 },
+    { "id": 51, "name": "ATC CLEARED TAXI", "sim": "ATC CLEARED TAXI", "unit": "Bool", "domain": "atc", "sync": true, "epsilon": 0.5 },
+    { "id": 52, "name": "ATC CLEARED TAKEOFF", "sim": "ATC CLEARED TAKEOFF", "unit": "Bool", "domain": "atc", "sync": true, "epsilon": 0.5 },
+    { "id": 53, "name": "ATC CLEARED LANDING", "sim": "ATC CLEARED LANDING", "unit": "Bool", "domain": "atc", "sync": true, "epsilon": 0.5 },
+    { "id": 24, "name": "AP HEADING", "sim": "AUTOPILOT HEADING LOCK DIR", "unit": "Degrees", "domain": "monitoring", "sync": true, "epsilon": 0.4 },
+    { "id": 25, "name": "AP ALT", "sim": "AUTOPILOT ALTITUDE LOCK VAR", "unit": "Feet", "domain": "monitoring", "sync": true, "epsilon": 5 },
+    { "id": 26, "name": "AP MASTER", "sim": "AUTOPILOT MASTER", "unit": "Bool", "domain": "monitoring", "sync": true, "epsilon": 0.5 },
+    { "id": 27, "name": "AP VS", "sim": "AUTOPILOT VERTICAL HOLD VAR", "unit": "Feet/minute", "domain": "monitoring", "sync": true, "epsilon": 20 },
+    { "id": 28, "name": "AP SPEED", "sim": "AUTOPILOT AIRSPEED HOLD VAR", "unit": "Knots", "domain": "monitoring", "sync": true, "epsilon": 0.5 },
+    { "id": 40, "name": "PARKING BRAKE", "sim": "BRAKE PARKING POSITION", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
+    { "id": 41, "name": "FLAPS", "sim": "FLAPS HANDLE INDEX", "unit": "Number", "domain": "shared", "sync": true, "epsilon": 0.5 },
+    { "id": 42, "name": "GEAR", "sim": "GEAR HANDLE POSITION", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
+    { "id": 43, "name": "SPOILERS", "sim": "SPOILERS HANDLE POSITION", "unit": "Percent", "domain": "shared", "sync": true, "epsilon": 1 },
+    { "id": 44, "name": "LIGHT LANDING", "sim": "LIGHT LANDING", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
+    { "id": 45, "name": "LIGHT BEACON", "sim": "LIGHT BEACON", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
+    { "id": 46, "name": "LIGHT NAV", "sim": "LIGHT NAV", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
+    { "id": 47, "name": "LIGHT TAXI", "sim": "LIGHT TAXI", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
+    { "id": 90, "name": "N1 1", "sim": "TURB ENG N1:1", "unit": "Percent", "domain": "flying", "sync": false, "epsilon": 1 },
+    { "id": 91, "name": "N1 2", "sim": "TURB ENG N1:2", "unit": "Percent", "domain": "flying", "sync": false, "epsilon": 1 }
+  ]
+}

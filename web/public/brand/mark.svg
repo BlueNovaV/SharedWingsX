@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="SharedWingsX">
+  <rect width="256" height="256" rx="52" fill="#0B1220"/>
+  <path fill="#F4F1EA" d="M128 28c8 0 14 18 16 48h-32c2-30 8-48 16-48z"/>
+  <path fill="#F4F1EA" d="M24 108h208c0 10-18 18-40 22H64c-22-4-40-12-40-22z"/>
+  <path fill="#F4F1EA" d="M112 128h32v88c0 10-6 16-16 16s-16-6-16-16z"/>
+  <path fill="#F4F1EA" d="M88 196h80l8 18H80z"/>
+  <circle cx="112" cy="64" r="9" fill="#2EE0C0"/>
+  <circle cx="144" cy="64" r="9" fill="#2EE0C0"/>
+</svg>
