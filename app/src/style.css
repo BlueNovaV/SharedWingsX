@@ -397,9 +397,6 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.bar .sim-lamps {
-  -webkit-app-region: drag;
-}
 .board, .card, .deck-banner, .status, .code-one {
   -webkit-app-region: no-drag;
 }

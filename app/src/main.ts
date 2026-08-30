@@ -435,8 +435,7 @@ function header(): string {
   return `
     <header class="bar">
       <div class="bar-left">
-        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.35")}</span></p>
-        <div class="sim-lamps" data-sim-lamps>${simLampsHtml()}</div>
+        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.36")}</span></p>
       </div>
       ${flightBarHtml()}
       <div class="bar-right">
@@ -811,7 +810,7 @@ function renderBoard(): void {
             <button type="button" id="pick">Find again</button>
           </div>
           ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found automatically. Click Browse on the MSFS 2020 row.</p>` : ""}
-          <p class="hint">Version ${escapeHtml(update?.current || "0.4.35")}${
+          <p class="hint">Version ${escapeHtml(update?.current || "0.4.36")}${
             !update
               ? " · checking…"
               : update.outdated
