@@ -38,7 +38,7 @@ let cardScrollMem: Record<string, number> = {};
 
 function restartCssAnimations(scope: ParentNode): void {
   const nodes = scope.querySelectorAll<HTMLElement>(
-    ".boot-craft, .boot-plane, .boot-grid, .boot-glow, .boot-runway span, .boot-bar span, .boot-ring, .boot-steps li",
+    ".boot-craft, .boot-grid, .boot-glow, .boot-runway span, .boot-bar span, .boot-ring, .boot-steps li",
   );
   for (const el of Array.from(nodes)) {
     el.style.animation = "none";
@@ -449,7 +449,7 @@ function header(): string {
   return `
     <header class="bar">
       <div class="bar-left">
-        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.37")}</span></p>
+        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.38")}</span></p>
       </div>
       ${flightBarHtml()}
       <div class="bar-right">
@@ -824,7 +824,7 @@ function renderBoard(): void {
             <button type="button" id="pick">Find again</button>
           </div>
           ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found automatically. Click Browse on the MSFS 2020 row.</p>` : ""}
-          <p class="hint">Version ${escapeHtml(update?.current || "0.4.37")}${
+          <p class="hint">Version ${escapeHtml(update?.current || "0.4.38")}${
             !update
               ? " · checking…"
               : update.outdated

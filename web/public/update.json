@@ -1,7 +1,7 @@
 {
-  "version": "0.4.37",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.37/SharedWingsX-Setup-0.4.37.exe",
-  "notes": "BluNova startup woosh with the boot plane; sound stops when the splash ends.",
+  "version": "0.4.38",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.38/SharedWingsX-Setup-0.4.38.exe",
+  "notes": "Boot plane flies in one continuous pass at native GIF sharpness.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }
