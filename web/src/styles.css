@@ -173,8 +173,8 @@ body {
   object-fit: cover;
   object-position: center 42%;
 }
-.hero-fallback { z-index: 0; }
-.hero-fallback.show { z-index: 1; }
+.hero-fallback { z-index: 0; opacity: 0; }
+.hero-fallback.show { z-index: 1; opacity: 1; }
 .night-pan {
   animation: night-drift 28s ease-in-out infinite alternate;
 }
@@ -184,8 +184,9 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-video { display: none; }
-  .hero-fallback { z-index: 1; }
+  .hero-fallback { z-index: 1; opacity: 1; }
   .night-pan { animation: none; }
+  .swx .banner-media { animation: none; }
 }
 .runway-glow {
   position: absolute;

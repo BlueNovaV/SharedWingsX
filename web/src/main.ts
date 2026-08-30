@@ -146,9 +146,16 @@ if (localSite) {
 const hero = document.querySelector<HTMLVideoElement>(".hero-video");
 const fallback = document.querySelector(".hero-fallback");
 hero?.addEventListener("error", () => fallback?.classList.add("show"));
+void hero?.play()?.catch(() => fallback?.classList.add("show"));
+document.querySelectorAll<HTMLVideoElement>(".swx .banner-media").forEach((el) => {
+  void el.play()?.catch(() => {
+    /* keep poster */
+  });
+});
 if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
   hero?.pause();
   fallback?.classList.add("show");
+  document.querySelectorAll<HTMLVideoElement>(".swx .banner-media").forEach((el) => el.pause());
 }
 let lang: "nl" | "en" = "en";
 apply("en");
