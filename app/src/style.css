@@ -128,9 +128,10 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   position: absolute;
   top: 0;
   left: 0;
+  z-index: 6;
   width: 150px;
   height: 150px;
-  offset-path: path("M -110 430 C 250 290, 430 250, 580 400 C 740 560, 1040 500, 1340 430");
+  offset-path: path("M -90 400 C 200 385, 380 92, 640 86 C 900 86, 1080 385, 1370 410");
   offset-rotate: 0deg;
   offset-anchor: center;
   animation: boot-fly 7s linear both;
@@ -158,6 +159,7 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
 }
 .boot-panel {
   position: relative;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -1,7 +1,7 @@
 {
-  "version": "0.4.39",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.39/SharedWingsX-Setup-0.4.39.exe",
-  "notes": "Boot plane enters left-center, arcs up then down, and leaves right-center.",
+  "version": "0.4.40",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.40/SharedWingsX-Setup-0.4.40.exe",
+  "notes": "Boot plane takes a smooth arch over the logo, not through it.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }
