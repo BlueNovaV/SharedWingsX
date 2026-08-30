@@ -104,6 +104,8 @@ export class TwinSeatSession {
   private lastFreezePulse = 0;
   private lastHelloAt = 0;
   private lastSnapAt = 0;
+  private lastPresenceAt = 0;
+  private roomHost = false;
   private lastRemote = new Map<number, number>();
   private homeRelayHttp: string;
   private useHttp = false;
@@ -208,7 +210,7 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.43 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.44 open.",
       );
     }
     throw new Error("Could not reach SharedWingsX internet. Both PCs need internet, then try Connect again.");
@@ -350,12 +352,13 @@ export class TwinSeatSession {
     return this.roster.find((p) => p.id === this.selfId) ?? this.roster.find((p) => p.name === this.displayName);
   }
 
-  /** Host aircraft is the only one that flies. Everyone else is locked onto it. */
+  /** The player who started the deck owns the aircraft. Others follow. */
   private iAmPoseSource(): boolean {
+    if (this.roomHost) return true;
     const me = this.meOnRoster();
     if (me?.host) return true;
-    if (this.roster.some((p) => p.host && p.id !== this.selfId && p.name !== this.displayName)) return false;
-    return this.role === "pf" && (me?.seat === "left" || !me?.seat);
+    if (this.roster.some((p) => p.host)) return false;
+    return false;
   }
 
   private shouldHoldFollower(): boolean {
@@ -458,6 +461,7 @@ export class TwinSeatSession {
     }
     if (msg.type === "hosted" || msg.type === "joined") {
       this.lastError = "";
+      this.roomHost = msg.type === "hosted";
       this.room = String(msg.code);
       this.selfId = String(msg.id);
       this.roster = (msg.roster as UiState["roster"]) ?? [];
@@ -544,10 +548,10 @@ export class TwinSeatSession {
 
     if (header.type === MessageType.Hello) {
       const hello = decodeHello(game);
-      if (hello.packId !== this.pack.id || !titleMatches(this.pack, hello.aircraftTitle)) {
+      if (hello.packId !== this.pack.id && hello.packId !== "generic-msfs" && this.pack.id !== "generic-msfs") {
         return;
       }
-      this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
+      if (this.iAmPoseSource()) this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
       return;
     }
 
@@ -635,18 +639,18 @@ export class TwinSeatSession {
     const inWorld = Boolean(pose);
     const hold = this.shouldHoldFollower();
     const enteredWorld = inWorld && !this.wasInWorld;
-    if (hold && (enteredWorld || now - this.lastFreezePulse > 1000)) {
-      this.sim.setPhysicsHold(true, true);
-      this.lastFreezePulse = now;
-    } else {
-      this.sim.setPhysicsHold(hold);
-    }
 
     if (hold) {
       for (const [id, value] of this.lastRemote) {
         applyRemoteVar(this.sim, this.pack, id, value);
       }
       if (this.lastHostPose) this.sim.applyWorldPose(this.lastHostPose);
+    }
+    if (hold && (enteredWorld || now - this.lastFreezePulse > 1000)) {
+      this.sim.setPhysicsHold(true, true);
+      this.lastFreezePulse = now;
+    } else if (!hold) {
+      this.sim.setPhysicsHold(false);
     }
     this.wasInWorld = inWorld;
 
@@ -663,6 +667,8 @@ export class TwinSeatSession {
         this.sendGame(encodeSimEvent(this.seq++, { eventId: def.id, data: ev.data }));
       }
       const cam = this.sim.camera();
+      if (now - this.lastPresenceAt > 100) {
+        this.lastPresenceAt = now;
         const offset = seatOffset(this.pack, this.seat);
         this.sendGame(
           encodePresencePose(this.seq++, {
@@ -677,6 +683,7 @@ export class TwinSeatSession {
             seat: this.seat,
           }),
         );
+      }
     }
 
     const delta = this.collectOwnedDeltas(now);
@@ -684,7 +691,7 @@ export class TwinSeatSession {
       this.sendGame(encodeDelta(this.seq++, delta));
     }
 
-    if (this.room && this.roster.length > 1 && now - this.lastSnapAt > 400) {
+    if (this.room && this.roster.length > 1 && this.iAmPoseSource() && now - this.lastSnapAt > 200) {
       this.lastSnapAt = now;
       this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
     }
@@ -715,12 +722,12 @@ export class TwinSeatSession {
 
   private snapshotVars(now = Date.now()) {
     return this.pack.variables
-      .filter(
-        (v) =>
-          v.sync &&
-          !this.remoteHeld.has(v.id) &&
-          canWrite(this.displayName, this.role, v.domain, v.id, now, this.locks),
-      )
+      .filter((v) => {
+        if (!v.sync) return false;
+        if (this.iAmPoseSource()) return true;
+        if (this.remoteHeld.has(v.id)) return false;
+        return canWrite(this.displayName, this.role, v.domain, v.id, now, this.locks);
+      })
       .map((v) => ({ id: v.id, value: this.sim.read(v) }));
   }
 
@@ -728,7 +735,7 @@ export class TwinSeatSession {
     const out: { id: number; value: number }[] = [];
     for (const v of this.pack.variables) {
       if (!v.sync) continue;
-      if (!canWrite(this.displayName, this.role, v.domain, v.id, now, this.locks)) continue;
+      if (!this.iAmPoseSource() && !canWrite(this.displayName, this.role, v.domain, v.id, now, this.locks)) continue;
       const value = this.sim.read(v);
       const prev = this.lastEmit.get(v.id);
       if (!prev) {
@@ -767,6 +774,7 @@ export class TwinSeatSession {
 
   leave(): void {
     this.closingSelf = true;
+    this.roomHost = false;
     this.room = "";
     this.selfId = "";
     this.roster = [];

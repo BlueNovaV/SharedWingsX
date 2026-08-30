@@ -167,16 +167,17 @@ function cockpitView(): string {
     </div>`;
 }
 
-function simOn2020(): boolean {
+function simOn2024(): boolean {
+  if (simProc.msfs2024) return true;
   const id = state?.identity;
-  if (id?.connected && !id.mock && id.simProduct) return id.simProduct === "MSFS2020";
-  return Boolean(simProc.msfs2020 && !simProc.msfs2024);
+  return Boolean(id?.connected && !id.mock && id.simProduct === "MSFS2024");
 }
 
-function simOn2024(): boolean {
+function simOn2020(): boolean {
+  if (simOn2024()) return false;
+  if (simProc.msfs2020) return true;
   const id = state?.identity;
-  if (id?.connected && !id.mock && id.simProduct) return id.simProduct === "MSFS2024";
-  return Boolean(simProc.msfs2024);
+  return Boolean(id?.connected && !id.mock && id.simProduct === "MSFS2020");
 }
 
 function simLampsHtml(): string {
@@ -193,8 +194,8 @@ function paintSimLamps(): void {
 
 function applySimHint(): void {
   if (state?.room) return;
-  if (simProc.msfs2020 && !simProc.msfs2024) simYear = "MSFS2020";
-  else if (simProc.msfs2024 && !simProc.msfs2020) simYear = "MSFS2024";
+  if (simOn2024()) simYear = "MSFS2024";
+  else if (simOn2020()) simYear = "MSFS2020";
   else return;
   const a = document.querySelector<HTMLInputElement>('input[name="sim"][value="MSFS2020"]');
   const b = document.querySelector<HTMLInputElement>('input[name="sim"][value="MSFS2024"]');
@@ -451,7 +452,7 @@ function header(): string {
   return `
     <header class="bar">
       <div class="bar-left">
-        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.43")}</span></p>
+        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.44")}</span></p>
       </div>
       ${flightBarHtml()}
       <div class="bar-right">
@@ -811,7 +812,7 @@ function renderBoard(): void {
             <button type="button" id="pick">Find again</button>
           </div>
           ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found automatically. Click Browse on the MSFS 2020 row.</p>` : ""}
-          <p class="hint">Version ${escapeHtml(update?.current || "0.4.43")}${
+          <p class="hint">Version ${escapeHtml(update?.current || "0.4.44")}${
             !update
               ? " · checking…"
               : update.outdated
@@ -987,7 +988,7 @@ async function boot(): Promise<void> {
     if (msg.type === "state") {
       state = msg.state;
       if (!state.room) {
-        const next = `lobby|${state.identity.inWorld ? "1" : "0"}|${state.identity.aircraftTitle}|${state.identity.airportIcao ?? ""}|${state.identity.mock ? "m" : "l"}`;
+        const next = `lobby|${state.identity.inWorld ? "1" : "0"}|${state.identity.aircraftTitle}|${state.identity.airportIcao ?? ""}|${state.identity.mock ? "m" : "l"}|${state.identity.simProduct}`;
         const leftRoom = Boolean(lastLiveKey) && !lastLiveKey.startsWith("lobby");
         busy = false;
         if (leftRoom || lastLiveKey !== next) {
@@ -1011,6 +1012,7 @@ async function boot(): Promise<void> {
         state.identity.aircraftTitle,
         state.identity.airportIcao ?? "",
         state.identity.mock ? "mock" : "live",
+        state.identity.simProduct,
       ].join("|");
       if (key !== lastLiveKey) {
         lastLiveKey = key;

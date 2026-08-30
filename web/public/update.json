@@ -1,7 +1,7 @@
 {
-  "version": "0.4.43",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.43/SharedWingsX-Setup-0.4.43.exe",
-  "notes": "Aircraft line only in the top bar. Connected sim lamp is green.",
+  "version": "0.4.44",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.44/SharedWingsX-Setup-0.4.44.exe",
+  "notes": "Guest follows the host aircraft. MSFS 2024 lamp uses the running sim, not the 2020 name.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

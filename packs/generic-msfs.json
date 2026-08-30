@@ -76,6 +76,7 @@
     { "id": 47, "name": "LIGHT TAXI", "sim": "LIGHT TAXI", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
     { "id": 48, "name": "LIGHT STROBE", "sim": "LIGHT STROBE", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
     { "id": 49, "name": "AVIONICS MASTER", "sim": "AVIONICS MASTER SWITCH", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
+    { "id": 55, "name": "BATTERY MASTER", "sim": "ELECTRICAL MASTER BATTERY", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
     { "id": 90, "name": "N1 1", "sim": "TURB ENG N1:1", "unit": "Percent", "domain": "flying", "sync": false, "epsilon": 1 }
   ]
 }

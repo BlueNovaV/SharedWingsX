@@ -43,7 +43,7 @@ export async function connectMsfs(pack: AircraftPack): Promise<SimBackend | null
         setTimeout(() => reject(new Error("SimConnect timeout")), 2500);
       }),
     ]);
-    return new MsfsSim(pack, opened.handle, opened.recvOpen.applicationName ?? "MSFS");
+    return new MsfsSim(pack, opened.handle, opened.recvOpen);
   } catch {
     return null;
   }
@@ -56,6 +56,9 @@ class MsfsSim implements SimBackend {
   roll = 0;
   private title = "";
   private appName: string;
+  private appMajor = 0;
+  private appMinor = 0;
+  private appBuild = 0;
   private outbound: { name: string; data: number }[] = [];
   private eventsMapped = new Set<string>();
   private writing = new Set<number>();
@@ -84,10 +87,18 @@ class MsfsSim implements SimBackend {
   private nextFireId = FIRE_BASE;
   private lastAxis = new Map<string, number>();
 
-  constructor(pack: AircraftPack, handle: SimConnectConnection, appName: string) {
+  constructor(pack: AircraftPack, handle: SimConnectConnection, recvOpen: {
+    applicationName?: string;
+    applicationVersionMajor?: number;
+    applicationVersionMinor?: number;
+    applicationBuildMajor?: number;
+  }) {
     this.pack = pack;
     this.handle = handle;
-    this.appName = appName;
+    this.appName = recvOpen.applicationName ?? "MSFS";
+    this.appMajor = Number(recvOpen.applicationVersionMajor) || 0;
+    this.appMinor = Number(recvOpen.applicationVersionMinor) || 0;
+    this.appBuild = Number(recvOpen.applicationBuildMajor) || 0;
     this.synced = pack.variables.filter((v) => v.sync);
     for (const v of pack.variables) this.values.set(v.id, 0);
 
@@ -259,7 +270,13 @@ class MsfsSim implements SimBackend {
 
   identity(): SimIdentity {
     const name = this.appName.toLowerCase();
-    const simProduct = name.includes("2024") || name.includes("limitless") ? "MSFS2024" : "MSFS2020";
+    const simProduct =
+      name.includes("2024") ||
+      name.includes("limitless") ||
+      this.appMajor >= 12 ||
+      this.appBuild >= 12
+        ? "MSFS2024"
+        : "MSFS2020";
     const ready = this.spawned();
     const ap = ready ? nearestAirport(this.lat, this.lon, 80) : null;
     return {
@@ -267,7 +284,7 @@ class MsfsSim implements SimBackend {
       mock: false,
       inWorld: ready && !this.closed,
       aircraftTitle: this.closed ? "" : this.aircraftLine(),
-      simBuild: this.appName,
+      simBuild: `${this.appName} ${this.appMajor}.${this.appMinor}.${this.appBuild}`.trim(),
       simProduct,
       liveryHash: "",
       airportIcao: ap?.icao ?? "",
@@ -280,7 +297,7 @@ class MsfsSim implements SimBackend {
   }
 
   worldPose(): WorldPose | null {
-    if (!this.spawned()) return null;
+    if (!this.hasPosition()) return null;
     return {
       lat: this.lat,
       lon: this.lon,
