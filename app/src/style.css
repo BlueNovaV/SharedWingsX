@@ -435,7 +435,11 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   line-height: 1;
   display: block;
 }
-.lamp.on { color: #f6f1e8; }
+.lamp.on { color: #eaf8ee; }
+.lamp .dot.live {
+  background: #2fd36a;
+  box-shadow: 0 0 8px rgba(47, 211, 106, 0.9), inset 0 0 0 1px #9af0b8;
+}
 .pill {
   margin: 0;
   color: #d8d2c8;

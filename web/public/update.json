@@ -1,7 +1,7 @@
 {
-  "version": "0.4.42",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.42/SharedWingsX-Setup-0.4.42.exe",
-  "notes": "Boot plane finishes flying off-screen before the splash fades.",
+  "version": "0.4.43",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.43/SharedWingsX-Setup-0.4.43.exe",
+  "notes": "Aircraft line only in the top bar. Connected sim lamp is green.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

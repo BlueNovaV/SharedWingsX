@@ -167,20 +167,13 @@ function cockpitView(): string {
     </div>`;
 }
 
-function simOn2020(): boolean {
-  const id = state?.identity;
-  return simProc.msfs2020 || Boolean(id?.connected && !id.mock && id.simProduct === "MSFS2020");
-}
-
-function simOn2024(): boolean {
-  const id = state?.identity;
-  return simProc.msfs2024 || Boolean(id?.connected && !id.mock && id.simProduct === "MSFS2024");
-}
-
 function simLampsHtml(): string {
-  const y20 = simOn2020();
-  const y24 = simOn2024();
-  return `<span class="lamp${y20 ? " on" : ""}"><span class="dot${y20 ? " ok" : ""}"></span><span class="lamp-lab">MSFS 2020</span></span><span class="lamp${y24 ? " on" : ""}"><span class="dot${y24 ? " ok" : ""}"></span><span class="lamp-lab">MSFS 2024</span></span>`;
+  const id = state?.identity;
+  const live = Boolean(id?.connected && !id.mock);
+  const product = id?.simProduct;
+  const on20 = live && (product === "MSFS2020" || (!product && simProc.msfs2020 && !simProc.msfs2024));
+  const on24 = live && (product === "MSFS2024" || (!product && simProc.msfs2024 && !simProc.msfs2020));
+  return `<span class="lamp${on20 ? " on" : ""}"><span class="dot${on20 ? " live" : ""}"></span><span class="lamp-lab">MSFS 2020</span></span><span class="lamp${on24 ? " on" : ""}"><span class="dot${on24 ? " live" : ""}"></span><span class="lamp-lab">MSFS 2024</span></span>`;
 }
 
 function paintSimLamps(): void {
@@ -449,7 +442,7 @@ function header(): string {
   return `
     <header class="bar">
       <div class="bar-left">
-        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.42")}</span></p>
+        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.43")}</span></p>
       </div>
       ${flightBarHtml()}
       <div class="bar-right">
@@ -655,18 +648,6 @@ function bindBoard(): void {
   bindUpdate();
 }
 
-function aircraftHint(): string {
-  const id = state?.identity;
-  const title = id?.aircraftTitle?.trim() ?? "";
-  if (!title) {
-    if (id?.connected && !id.mock) return "Spawn or select an aircraft in MSFS. This line fills from the sim.";
-    return "Pick the same airframe as the other pilot. Payware CDU is not pixel-perfect.";
-  }
-  const matched = simAircraft();
-  if (aircraftId === "auto" && matched) {
-    return `Loaded in sim: ${title}. Automatic selected ${matched.name}.`;
-  }
-  return `In sim: ${title}`;
 }
 
 function flightBarHtml(): string {
@@ -817,14 +798,13 @@ function renderBoard(): void {
             <span class="field-head"><span class="field-title">Aircraft</span><span class="field-note">Asobo, PMDG, Fenix, iFly, iniBuilds</span></span>
             ${aircraftPickerHtml(live)}
           </div>
-          <p class="hint" data-sim-title-hint>${escapeHtml(aircraftHint())}</p>
           ${communitySelectHtml(live)}
           <div class="setup ${install.ok ? "" : "bad"}">
             <p><span class="dot ${install.ok ? "ok" : ""}"></span><span class="setup-msg">${escapeHtml(install.message)}</span></p>
             <button type="button" id="pick">Find again</button>
           </div>
           ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found automatically. Click Browse on the MSFS 2020 row.</p>` : ""}
-          <p class="hint">Version ${escapeHtml(update?.current || "0.4.42")}${
+          <p class="hint">Version ${escapeHtml(update?.current || "0.4.43")}${
             !update
               ? " · checking…"
               : update.outdated
@@ -1039,8 +1019,6 @@ async function boot(): Promise<void> {
         if (pill) {
           pill.innerHTML = `<span class="dot ${state.identity.connected && !state.identity.mock ? "ok" : "warn"}"></span><span class="path-pill-text">${pathLabel(state.path)} · ${Math.round(state.latencyMs)} ms</span>`;
         }
-        const hint = document.querySelector("[data-sim-title-hint]");
-        if (hint) hint.textContent = aircraftHint();
         paintFlightBar();
         paintSimLamps();
       }
