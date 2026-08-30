@@ -130,7 +130,7 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   left: 0;
   width: 150px;
   height: 150px;
-  offset-path: path("M -90 510 C 280 430, 760 200, 1420 -220");
+  offset-path: path("M -110 430 C 250 290, 430 250, 580 400 C 740 560, 1040 500, 1340 430");
   offset-rotate: 0deg;
   offset-anchor: center;
   animation: boot-fly 7s linear both;

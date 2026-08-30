@@ -1,7 +1,7 @@
 {
-  "version": "0.4.38",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.38/SharedWingsX-Setup-0.4.38.exe",
-  "notes": "Boot plane flies in one continuous pass at native GIF sharpness.",
+  "version": "0.4.39",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.39/SharedWingsX-Setup-0.4.39.exe",
+  "notes": "Boot plane enters left-center, arcs up then down, and leaves right-center.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }
