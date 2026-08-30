@@ -49,6 +49,7 @@ jobs:
           files: |
             web/public/downloads/SharedWingsX-Setup.exe
             web/public/downloads/SharedWingsX-Setup-${{ steps.ver.outputs.VERSION }}.exe
+            web/public/downloads/SharedWingsX-${{ steps.ver.outputs.VERSION }}-linux-x64.zip
             web/public/update.json
           make_latest: true
       - uses: actions/configure-pages@v5

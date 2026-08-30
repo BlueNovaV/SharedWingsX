@@ -1,7 +1,7 @@
 {
   "version": "0.4.35",
-  "downloadUrl": "https://sharedwingsx.app/downloads/SharedWingsX-Setup.exe",
-  "notes": "Airline name moved to the footer copyright. Banner shows SharedWingsX only.",
-  "sha256": "470fb4d0e02a0b674a3a00d27dbfcaab4a76c4de1b6eee6579c601ac4b13c33f",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.35/SharedWingsX-Setup-0.4.35.exe",
+  "notes": "Download the ~95 MB Setup from GitHub Releases. A 12 KB file is a web page, not the installer.",
+  "sha256": "b3ac4c3de611e26d4613013110c6cb1789e209ae538d3971f35fbfb1e0ab1d26",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

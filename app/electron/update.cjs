@@ -43,6 +43,8 @@ function feedUrls(unpackaged) {
     `https://${host}/update.json`,
     `https://www.${host}/update.json`,
     `${site}/downloads/update.json`,
+    "https://bluenovav.github.io/sharedwingsx/update.json",
+    "https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/update.json",
     repo ? `https://${repo.split("/")[0]}.github.io/${repo.split("/")[1]}/update.json` : "",
     repo ? `https://raw.githubusercontent.com/${repo}/main/web/public/update.json` : "",
     "http://127.0.0.1:17323/update.json",

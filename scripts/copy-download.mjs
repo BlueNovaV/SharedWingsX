@@ -7,9 +7,8 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const require = createRequire(import.meta.url);
-const { siteUrl, relayUrl } = require("../app/electron/site.cjs");
+const { relayUrl } = require("../app/electron/site.cjs");
 const version = JSON.parse(readFileSync(join(root, "app", "package.json"), "utf8")).version;
-const site = String(siteUrl).replace(/\/$/, "");
 const setupFile = "SharedWingsX-Setup.exe";
 
 const destDir = join(root, "web", "public", "downloads");
@@ -96,10 +95,13 @@ if (linuxZipSrc) {
   console.log("Copied Linux zip from", linuxZipSrc);
 }
 
+const githubRepo = process.env.GITHUB_REPOSITORY || "BlueNovaV/sharedwingsx";
+const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${version}/SharedWingsX-Setup-${version}.exe`;
+
 const update = {
   version,
-  downloadUrl: `${site}/downloads/${setupFile}`,
-  notes: "Title bar is readable and you can drag the window from it.",
+  downloadUrl,
+  notes: "Use the GitHub Setup (~95 MB). A 12 KB file is a web page, not the installer.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };
