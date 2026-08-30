@@ -435,7 +435,7 @@ function header(): string {
   return `
     <header class="bar">
       <div class="bar-left">
-        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.34")}</span></p>
+        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.35")}</span></p>
         <div class="sim-lamps" data-sim-lamps>${simLampsHtml()}</div>
       </div>
       ${flightBarHtml()}
@@ -725,7 +725,6 @@ function renderBoard(): void {
         <div class="banner-glow"></div>
         <div class="banner-sweep"></div>
         <div class="banner-copy">
-          <p class="banner-kicker">BluNova Virtual Airlines</p>
           <p class="banner-title">SharedWingsX</p>
         </div>
       </div>
@@ -811,7 +810,7 @@ function renderBoard(): void {
             <button type="button" id="pick">Find again</button>
           </div>
           ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found automatically. Click Browse on the MSFS 2020 row.</p>` : ""}
-          <p class="hint">Version ${escapeHtml(update?.current || "0.4.34")}${
+          <p class="hint">Version ${escapeHtml(update?.current || "0.4.35")}${
             !update
               ? " · checking…"
               : update.outdated
@@ -829,6 +828,7 @@ function renderBoard(): void {
       <footer class="status">
         <span class="sim-lamps status-item" data-sim-lamps>${simLampsHtml()}</span>
         <span class="status-item"><span class="dot ${live && state?.path === "direct" ? "ok" : live ? "warn" : ""}"></span><span>${live ? escapeHtml(pathLabel(state?.path ?? "")) : "Path automatic"}</span></span>
+        <span class="status-copy">© 2026 BluNova Virtual Airlines by Jordy. All rights reserved.</span>
       </footer>
     </div>`;
 

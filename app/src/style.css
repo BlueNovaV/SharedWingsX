@@ -544,15 +544,6 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   pointer-events: none;
   z-index: 3;
 }
-.banner-kicker {
-  margin: 0;
-  color: var(--teal);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
 .banner-title {
   margin: 0;
   font-family: "Segoe UI Variable Text", "Segoe UI", sans-serif;
@@ -884,6 +875,16 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   font-size: 12px;
   letter-spacing: 0.03em;
   color: var(--mute);
+}
+.status-copy {
+  margin-left: auto;
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--mute);
+  opacity: 0.9;
+  text-align: right;
+  line-height: 1.35;
+  max-width: min(420px, 100%);
 }
 .status-item {
   display: inline-flex;
