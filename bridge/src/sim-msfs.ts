@@ -2,7 +2,7 @@ import type { SimConnectConnection } from "node-simconnect";
 import type { AircraftPack, PackVar } from "./pack.js";
 import { MockSim, type SimBackend, type SimIdentity, type WorldPose } from "./sim.js";
 import { nearestAirport } from "./airports.js";
-import { discreteEventForVar, inputEventPriority, skipInputEventName } from "./sim-events.js";
+import { discreteEventsForVar, inputEventPriority, skipInputEventName } from "./sim-events.js";
 
 type SimConnectMod = typeof import("node-simconnect");
 let sc: SimConnectMod;
@@ -494,13 +494,10 @@ class MsfsSim implements SimBackend {
       tagged: false,
     });
     this.fireAxis(v.sim, value);
-    const discrete = discreteEventForVar(v.sim, value);
-    if (discrete) {
-      const prev = this.lastDiscrete.get(discrete.name);
-      if (prev !== discrete.data) {
-        this.lastDiscrete.set(discrete.name, discrete.data);
-        this.fire(discrete.name, discrete.data);
-      }
+    for (const discrete of discreteEventsForVar(v.sim, value)) {
+      if (this.lastDiscrete.get(discrete.name) === discrete.data) continue;
+      this.lastDiscrete.set(discrete.name, discrete.data);
+      this.fire(discrete.name, discrete.data);
     }
     setTimeout(() => this.writing.delete(v.id), 160);
   }
@@ -532,47 +529,52 @@ class MsfsSim implements SimBackend {
 
   private fireAxis(sim: string, value: number): void {
     const axis = (n: number) => Math.max(-16384, Math.min(16383, Math.round(n * 16384)));
-    const throttle = (p: number) => Math.max(0, Math.min(16383, Math.round((p / 100) * 16383)));
-    let data: number | null = null;
-    let name = "";
+    const throttle = (p: number) => {
+      if (Math.abs(p) > 120) return Math.max(0, Math.min(16383, Math.round(p)));
+      return Math.max(0, Math.min(16383, Math.round((p / 100) * 16383)));
+    };
+    const pairs: { name: string; data: number }[] = [];
     switch (sim) {
       case "YOKE POSITION X":
       case "AILERON POSITION":
-        name = "AXIS_AILERONS_SET";
-        data = axis(value);
+        pairs.push({ name: "AXIS_AILERONS_SET", data: axis(value) });
         break;
       case "YOKE POSITION Y":
       case "ELEVATOR POSITION":
-        name = "AXIS_ELEVATOR_SET";
-        data = axis(value);
+        pairs.push({ name: "AXIS_ELEVATOR_SET", data: axis(value) });
         break;
       case "RUDDER PEDAL POSITION":
       case "RUDDER POSITION":
-        name = "AXIS_RUDDER_SET";
-        data = axis(value);
+        pairs.push({ name: "AXIS_RUDDER_SET", data: axis(value) });
         break;
       case "GENERAL ENG THROTTLE LEVER POSITION:1":
-        name = "AXIS_THROTTLE1_SET";
-        data = throttle(value);
+      case "L:WT_Virtual_Throttle_Lever_Pos_1":
+        pairs.push({ name: "AXIS_THROTTLE1_SET", data: throttle(value) });
+        pairs.push({ name: "THROTTLE1_SET", data: throttle(value) });
         break;
       case "GENERAL ENG THROTTLE LEVER POSITION:2":
-        name = "AXIS_THROTTLE2_SET";
-        data = throttle(value);
+      case "L:WT_Virtual_Throttle_Lever_Pos_2":
+        pairs.push({ name: "AXIS_THROTTLE2_SET", data: throttle(value) });
+        pairs.push({ name: "THROTTLE2_SET", data: throttle(value) });
         break;
       case "GENERAL ENG THROTTLE LEVER POSITION:3":
-        name = "AXIS_THROTTLE3_SET";
-        data = throttle(value);
+      case "L:WT_Virtual_Throttle_Lever_Pos_3":
+        pairs.push({ name: "AXIS_THROTTLE3_SET", data: throttle(value) });
+        pairs.push({ name: "THROTTLE3_SET", data: throttle(value) });
         break;
       case "GENERAL ENG THROTTLE LEVER POSITION:4":
-        name = "AXIS_THROTTLE4_SET";
-        data = throttle(value);
+      case "L:WT_Virtual_Throttle_Lever_Pos_4":
+        pairs.push({ name: "AXIS_THROTTLE4_SET", data: throttle(value) });
+        pairs.push({ name: "THROTTLE4_SET", data: throttle(value) });
         break;
       default:
         return;
     }
-    if (this.lastAxis.get(name) === data) return;
-    this.lastAxis.set(name, data);
-    this.fire(name, data >>> 0);
+    for (const pair of pairs) {
+      if (this.lastAxis.get(pair.name) === pair.data) continue;
+      this.lastAxis.set(pair.name, pair.data);
+      this.fire(pair.name, pair.data >>> 0);
+    }
   }
 
   transmitEvent(name: string, data: number, fromNetwork = false): void {

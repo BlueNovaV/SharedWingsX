@@ -5,10 +5,26 @@ import { findPack, loadPacks, titleMatches } from "./pack.js";
 describe("packs", () => {
   const packs = loadPacks();
 
-  it("loads c172, 787 and generic fallback", () => {
+  it("loads c172, 787, 747 and generic fallback", () => {
     assert.ok(packs.some((p) => p.id === "asobo-c172"));
     assert.ok(packs.some((p) => p.id === "asobo-787-10"));
+    assert.ok(packs.some((p) => p.id === "asobo-747-8"));
     assert.ok(packs.some((p) => p.id === "generic-msfs"));
+  });
+
+  it("matches 747-8 titles and keeps WT throttle LVars off the generic pack", () => {
+    assert.equal(findPack(packs, "Boeing 747-8 Intercontinental Asobo")?.id, "asobo-747-8");
+    const generic = findPack(packs, "Cessna 152")!;
+    assert.equal(generic.variables.some((v) => v.sim.startsWith("L:WT_Virtual_Throttle")), false);
+    const wide = findPack(packs, "", "asobo-747-8")!;
+    assert.ok(wide.variables.some((v) => v.sim === "L:WT_Virtual_Throttle_Lever_Pos_1"));
+  });
+
+  it("maps AP and battery to SET events", async () => {
+    const { discreteEventsForVar } = await import("./sim-events.js");
+    assert.equal(discreteEventsForVar("AUTOPILOT MASTER", 1)[0]?.name, "AUTOPILOT_ON");
+    assert.equal(discreteEventsForVar("ELECTRICAL MASTER BATTERY:1", 1)[0]?.name, "BATTERY1_SET");
+    assert.equal(discreteEventsForVar("AUTOPILOT HEADING LOCK DIR", 270)[0]?.data, 270);
   });
 
   it("uses universal pack for PMDG and unknown titles", () => {

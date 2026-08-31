@@ -12,6 +12,11 @@ export const COCKPIT_SIM_EVENTS = [
   "AXIS_ELEVATOR_SET",
   "AXIS_AILERONS_SET",
   "AXIS_RUDDER_SET",
+  "HEADING_BUG_SET",
+  "AP_ALT_VAR_SET_ENGLISH",
+  "AP_SPD_VAR_SET",
+  "AP_VS_VAR_SET_ENGLISH",
+  "KOHLSMAN_SET",
   "TOGGLE_MASTER_BATTERY",
   "BATTERY1_SET",
   "BATTERY2_SET",
@@ -96,47 +101,77 @@ export const COCKPIT_SIM_EVENTS = [
 const SET_TRUE = 1;
 const AXIS = (n: number) => Math.max(0, Math.min(16383, Math.round(n)));
 
-export function discreteEventForVar(
+export function discreteEventsForVar(
   sim: string,
   value: number,
-): { name: string; data: number } | null {
+): { name: string; data: number }[] {
   const on = value > 0.5;
+  const heading = Math.max(0, Math.round(value) % 360);
   switch (sim) {
     case "ELECTRICAL MASTER BATTERY":
-      return { name: "BATTERY1_SET", data: on ? SET_TRUE : 0 };
+    case "ELECTRICAL MASTER BATTERY:1":
+      return [{ name: "BATTERY1_SET", data: on ? SET_TRUE : 0 }];
+    case "ELECTRICAL MASTER BATTERY:2":
+      return [{ name: "BATTERY2_SET", data: on ? SET_TRUE : 0 }];
     case "AVIONICS MASTER SWITCH":
-      return { name: "AVIONICS_MASTER_SET", data: on ? SET_TRUE : 0 };
+    case "AVIONICS MASTER SWITCH:1":
+      return [{ name: "AVIONICS_MASTER_SET", data: on ? SET_TRUE : 0 }];
     case "BRAKE PARKING POSITION":
-      return { name: "PARKING_BRAKE_SET", data: on ? SET_TRUE : 0 };
+      return [{ name: "PARKING_BRAKE_SET", data: on ? SET_TRUE : 0 }];
     case "GEAR HANDLE POSITION":
-      return { name: on ? "GEAR_DOWN" : "GEAR_UP", data: 0 };
+      return [{ name: on ? "GEAR_DOWN" : "GEAR_UP", data: 0 }];
     case "FLAPS HANDLE INDEX":
-      return { name: "FLAPS_SET", data: AXIS((value / 8) * 16383) };
+      return [{ name: "FLAPS_SET", data: AXIS((value / 8) * 16383) }];
     case "SPOILERS HANDLE POSITION":
-      return { name: "SPOILERS_SET", data: AXIS((value / 100) * 16383) };
+      return [{ name: "SPOILERS_SET", data: AXIS((value / 100) * 16383) }];
     case "LIGHT LANDING":
-      return { name: "LANDING_LIGHTS_SET", data: on ? SET_TRUE : 0 };
+    case "LIGHT LANDING:1":
+      return [{ name: "LANDING_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
     case "LIGHT BEACON":
-      return { name: "BEACON_LIGHTS_SET", data: on ? SET_TRUE : 0 };
+    case "LIGHT BEACON:1":
+      return [{ name: "BEACON_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
     case "LIGHT NAV":
-      return { name: "NAV_LIGHTS_SET", data: on ? SET_TRUE : 0 };
+    case "LIGHT NAV:1":
+      return [{ name: "NAV_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
     case "LIGHT TAXI":
-      return { name: "TAXI_LIGHTS_SET", data: on ? SET_TRUE : 0 };
+    case "LIGHT TAXI:1":
+      return [{ name: "TAXI_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
     case "LIGHT STROBE":
-      return { name: "STROBES_SET", data: on ? SET_TRUE : 0 };
+    case "LIGHT STROBE:1":
+      return [{ name: "STROBES_SET", data: on ? SET_TRUE : 0 }];
     case "LIGHT CABIN":
-      return { name: "CABIN_LIGHTS_SET", data: on ? SET_TRUE : 0 };
+      return [{ name: "CABIN_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
     case "LIGHT PANEL":
-      return { name: "PANEL_LIGHTS_SET", data: on ? SET_TRUE : 0 };
+      return [{ name: "PANEL_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
     case "LIGHT LOGO":
-      return { name: "LOGO_LIGHTS_SET", data: on ? SET_TRUE : 0 };
+    case "LIGHT LOGO:1":
+      return [{ name: "LOGO_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
     case "PITOT HEAT":
-      return { name: "PITOT_HEAT_SET", data: on ? SET_TRUE : 0 };
+      return [{ name: "PITOT_HEAT_SET", data: on ? SET_TRUE : 0 }];
     case "STRUCTURAL DEICE SWITCH":
     case "ENG ANTI ICE:1":
-      return { name: "ANTI_ICE_SET", data: on ? SET_TRUE : 0 };
+      return [{ name: "ANTI_ICE_SET", data: on ? SET_TRUE : 0 }];
+    case "AUTOPILOT MASTER":
+      return [{ name: on ? "AUTOPILOT_ON" : "AUTOPILOT_OFF", data: 0 }];
+    case "AUTOPILOT HEADING LOCK DIR":
+    case "AUTOPILOT HEADING LOCK DIR:1":
+      return [{ name: "HEADING_BUG_SET", data: heading }];
+    case "AUTOPILOT ALTITUDE LOCK VAR":
+    case "AUTOPILOT ALTITUDE LOCK VAR:1":
+    case "AUTOPILOT ALTITUDE LOCK VAR:3":
+      return [{ name: "AP_ALT_VAR_SET_ENGLISH", data: Math.max(0, Math.round(value)) }];
+    case "AUTOPILOT AIRSPEED HOLD VAR":
+    case "AUTOPILOT AIRSPEED HOLD VAR:1":
+      return [{ name: "AP_SPD_VAR_SET", data: Math.max(0, Math.round(value)) }];
+    case "AUTOPILOT VERTICAL HOLD VAR":
+    case "AUTOPILOT VERTICAL HOLD VAR:1":
+      return [{ name: "AP_VS_VAR_SET_ENGLISH", data: Math.round(value) >>> 0 }];
+    case "KOHLSMAN SETTING MB:1":
+      return [{ name: "KOHLSMAN_SET", data: Math.max(0, Math.round(value * 16)) }];
+    case "APU SWITCH":
+      return [{ name: on ? "APU_STARTER" : "APU_OFF_SWITCH", data: 0 }];
     default:
-      return null;
+      return [];
   }
 }
 

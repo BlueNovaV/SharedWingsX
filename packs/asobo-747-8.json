@@ -1,13 +1,16 @@
 {
-  "id": "generic-msfs",
-  "name": "Universal MSFS (SimConnect)",
+  "id": "asobo-747-8",
+  "name": "Asobo Boeing 747-8",
   "support": "offset",
-  "fallback": true,
   "sim": ["MSFS2020", "MSFS2024"],
-  "titleMatchers": [],
+  "titleMatchers": [
+    "747-8",
+    "747-8i",
+    "Boeing 747-8"
+  ],
   "sharedLockMs": 450,
   "minDeltaMs": 40,
-  "notes": "Default for every MSFS title, including PMDG, Fenix and other payware. Uses stock SimConnect vars (flight controls, engines 1–4, gear, flaps, radios, ATC, autopilot). Custom CDU/FMS Lvars are not guaranteed.",
+  "notes": "Stock 747-8 / Intercontinental. Throttles use SimConnect SET events plus public Working Title virtual lever LVars. CDU/FMS is not a guaranteed sync surface.",
   "presence": {
     "support": "offset",
     "selfSeatDefault": "left",
@@ -18,14 +21,14 @@
       "jumpRight": "PILOT_3"
     },
     "remoteSeat": {
-      "offset": { "x": 0.55, "y": 0.1, "z": 0.2 },
+      "offset": { "x": 0.62, "y": 0.14, "z": 0.18 },
       "pbh": { "pitch": 0, "bank": 0, "heading": 0 }
     },
     "seats": {
-      "left": { "offset": { "x": -0.55, "y": 0.1, "z": 0.2 }, "node": "PILOT_0" },
-      "right": { "offset": { "x": 0.55, "y": 0.1, "z": 0.2 }, "node": "PILOT_1" },
-      "jumpLeft": { "offset": { "x": -0.4, "y": 0.12, "z": -1.05 }, "node": "PILOT_2" },
-      "jumpRight": { "offset": { "x": 0.4, "y": 0.12, "z": -1.05 }, "node": "PILOT_3" }
+      "left": { "offset": { "x": -0.62, "y": 0.14, "z": 0.18 }, "node": "PILOT_0" },
+      "right": { "offset": { "x": 0.62, "y": 0.14, "z": 0.18 }, "node": "PILOT_1" },
+      "jumpLeft": { "offset": { "x": -0.42, "y": 0.16, "z": -1.15 }, "node": "PILOT_2" },
+      "jumpRight": { "offset": { "x": 0.42, "y": 0.16, "z": -1.15 }, "node": "PILOT_3" }
     },
     "hideLocalAvatar": true
   },
@@ -37,8 +40,10 @@
     { "id": 5, "name": "THROTTLE 2", "sim": "GENERAL ENG THROTTLE LEVER POSITION:2", "unit": "Percent", "domain": "flying", "sync": true, "epsilon": 0.35 },
     { "id": 6, "name": "THROTTLE 3", "sim": "GENERAL ENG THROTTLE LEVER POSITION:3", "unit": "Percent", "domain": "flying", "sync": true, "epsilon": 0.35 },
     { "id": 7, "name": "THROTTLE 4", "sim": "GENERAL ENG THROTTLE LEVER POSITION:4", "unit": "Percent", "domain": "flying", "sync": true, "epsilon": 0.35 },
-    { "id": 8, "name": "MIXTURE 1", "sim": "GENERAL ENG MIXTURE LEVER POSITION:1", "unit": "Percent", "domain": "flying", "sync": true, "epsilon": 0.4 },
-    { "id": 9, "name": "PROP 1", "sim": "GENERAL ENG PROPELLER LEVER POSITION:1", "unit": "Percent", "domain": "flying", "sync": true, "epsilon": 0.4 },
+    { "id": 80, "name": "WT THROTTLE 1", "sim": "L:WT_Virtual_Throttle_Lever_Pos_1", "unit": "Number", "domain": "flying", "sync": true, "epsilon": 40 },
+    { "id": 81, "name": "WT THROTTLE 2", "sim": "L:WT_Virtual_Throttle_Lever_Pos_2", "unit": "Number", "domain": "flying", "sync": true, "epsilon": 40 },
+    { "id": 82, "name": "WT THROTTLE 3", "sim": "L:WT_Virtual_Throttle_Lever_Pos_3", "unit": "Number", "domain": "flying", "sync": true, "epsilon": 40 },
+    { "id": 83, "name": "WT THROTTLE 4", "sim": "L:WT_Virtual_Throttle_Lever_Pos_4", "unit": "Number", "domain": "flying", "sync": true, "epsilon": 40 },
     { "id": 10, "name": "BRAKE LEFT", "sim": "BRAKE LEFT POSITION", "unit": "Position", "domain": "flying", "sync": true, "epsilon": 0.02 },
     { "id": 11, "name": "BRAKE RIGHT", "sim": "BRAKE RIGHT POSITION", "unit": "Position", "domain": "flying", "sync": true, "epsilon": 0.02 },
     { "id": 12, "name": "ELEVATOR TRIM", "sim": "ELEVATOR TRIM POSITION", "unit": "Radians", "domain": "flying", "sync": true, "epsilon": 0.002 },
@@ -82,11 +87,6 @@
     { "id": 58, "name": "LIGHT LOGO", "sim": "LIGHT LOGO", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
     { "id": 59, "name": "LIGHT WING", "sim": "LIGHT WING", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
     { "id": 60, "name": "PITOT HEAT", "sim": "PITOT HEAT", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
-    { "id": 61, "name": "PANEL POT 1", "sim": "LIGHT POTENTIOMETER:1", "unit": "Percent", "domain": "shared", "sync": true, "epsilon": 1.5 },
-    { "id": 62, "name": "PANEL POT 2", "sim": "LIGHT POTENTIOMETER:2", "unit": "Percent", "domain": "shared", "sync": true, "epsilon": 1.5 },
-    { "id": 63, "name": "PANEL POT 3", "sim": "LIGHT POTENTIOMETER:3", "unit": "Percent", "domain": "shared", "sync": true, "epsilon": 1.5 },
-    { "id": 64, "name": "PANEL POT 4", "sim": "LIGHT POTENTIOMETER:4", "unit": "Percent", "domain": "shared", "sync": true, "epsilon": 1.5 },
-    { "id": 65, "name": "PANEL POT 7", "sim": "LIGHT POTENTIOMETER:7", "unit": "Percent", "domain": "shared", "sync": true, "epsilon": 1.5 },
     { "id": 66, "name": "CIRCUIT AVIONICS", "sim": "CIRCUIT AVIONICS ON", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
     { "id": 67, "name": "CIRCUIT PANEL", "sim": "CIRCUIT GENERAL PANEL ON", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
     { "id": 68, "name": "APU SWITCH", "sim": "APU SWITCH", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
@@ -98,6 +98,9 @@
     { "id": 74, "name": "BARO 1", "sim": "KOHLSMAN SETTING MB:1", "unit": "Millibars", "domain": "monitoring", "sync": true, "epsilon": 0.15 },
     { "id": 84, "name": "BATTERY 1", "sim": "ELECTRICAL MASTER BATTERY:1", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
     { "id": 85, "name": "AVIONICS 1", "sim": "AVIONICS MASTER SWITCH:1", "unit": "Bool", "domain": "shared", "sync": true, "epsilon": 0.5 },
-    { "id": 90, "name": "N1 1", "sim": "TURB ENG N1:1", "unit": "Percent", "domain": "flying", "sync": false, "epsilon": 1 }
+    { "id": 90, "name": "N1 1", "sim": "TURB ENG N1:1", "unit": "Percent", "domain": "flying", "sync": false, "epsilon": 1 },
+    { "id": 91, "name": "N1 2", "sim": "TURB ENG N1:2", "unit": "Percent", "domain": "flying", "sync": false, "epsilon": 1 },
+    { "id": 92, "name": "N1 3", "sim": "TURB ENG N1:3", "unit": "Percent", "domain": "flying", "sync": false, "epsilon": 1 },
+    { "id": 93, "name": "N1 4", "sim": "TURB ENG N1:4", "unit": "Percent", "domain": "flying", "sync": false, "epsilon": 1 }
   ]
 }
