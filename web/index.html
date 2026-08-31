@@ -227,8 +227,8 @@
         <div>
           <p class="copy" data-i="airCopy">
             Universal SimConnect layer for every MSFS aircraft: PMDG 737, 777, 747, Fenix, iFly, Asobo. Dedicated
-            packs for C172 and 787-10. Aircraft files stay untouched. Payware CDU/FMS is not pixel-perfect; flight
-            controls, thrust, gear, flaps, radios and ATC sync.
+            packs for C172 and 787-10. Aircraft files stay untouched. Payware CDU, EFB and FMS are not a second
+            identical box. Flight controls, thrust, gear, flaps, radios and ATC sync.
           </p>
           <ul class="lines">
             <li><b data-i="airUni">Universal</b> <span data-i="airUniSub">Every MSFS title via SimConnect</span></li>
@@ -317,8 +317,11 @@
           <details>
             <summary data-i="q5">PMDG, Fenix, and the rest?</summary>
             <p data-i="q5a">
-              Yes through the universal layer: PMDG, Fenix, and the rest of MSFS. Flight controls, thrust, gear,
-              flaps, radios and ATC sync. Payware CDU/FMS buttons are not 100%. Dedicated packs follow for those.
+              Yes through the universal layer: PMDG, Fenix, iFly, Asobo and the rest of MSFS. Yoke, thrust, gear, flaps,
+              radios and ATC sync. The payware CDU, EFB and FMS are not a second identical box. On Fenix, let the
+              captain set fuel and payload, use one transponder, and expect standby radios and some overhead clicks to
+              drift. On PMDG, baro and some MCP keys follow whoever is flying. Dedicated packs (C172, 787-10) cover more
+              of those aircraft.
             </p>
           </details>
           <details>
@@ -326,18 +329,27 @@
             <p data-i="q7a">
               SharedWingsX is not Microsoft Flight Simulator multiplayer. Keep MSFS multiplayer off so you do not get two
               airframes in one world. Only the captain writes flying controls. The first officer has radios, MCP and
-              overhead. Shared switches use a short last-mover lock so both sims do not pull the same lever. Jump
-              seats watch only. You still need the same aircraft, same spawn and the same weather/time. Payware FMS
-              internals are not a second pixel-perfect box.
+              overhead. Shared switches use a short last-mover lock so both sims do not pull the same lever. Fuel,
+              payload and time stay with the captain when the FO is not flying, so autothrottle does not fight. We do
+              not stack a second physics engine on MSFS. Jump seats watch only. Same aircraft, spawn, weather and time
+              remain required.
             </p>
           </details>
           <details>
             <summary data-i="q8">Flight plan, VATSIM, smartCARS, Volanta?</summary>
             <p data-i="q8a">
               Load the same flight plan in both FMCs (SimBrief on both PCs). SharedWingsX does not clone the whole payware
-              CDU. The first officer sees the same radios, squawk and MCP as they move. VATSIM/IVAO: captain runs
-              vPilot or Altitude; first officer is observer. smartCARS, Volanta and similar trackers run on the
-              captain’s sim (one flight). SharedWingsX does not replace those apps; they sit next to it.
+              CDU or tablet keyboard. The first officer sees the same radios, squawk and MCP as they move. VATSIM/IVAO:
+              captain runs vPilot or Altitude; first officer is observer. smartCARS, Volanta and similar trackers run on
+              the captain’s sim (one flight). SharedWingsX does not replace those apps; they sit next to it.
+            </p>
+          </details>
+          <details>
+            <summary data-i="q10">MSFS 2024 as well as 2020?</summary>
+            <p data-i="q10a">
+              Yes. The footer lamps show which sim is running. Both PCs need the same sim. A 2020 title loaded in 2024
+              can miss lights, trim or touchscreens. If the guest stops moving, reconnect: only the captain writes world
+              pose.
             </p>
           </details>
           <details>
