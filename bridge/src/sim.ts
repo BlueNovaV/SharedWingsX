@@ -48,6 +48,8 @@ export interface SimBackend {
   drainEvents(): { name: string; data: number }[];
   applyInputEvent(hash: bigint, value: number): void;
   drainInputEvents(): { hash: bigint; value: number }[];
+  zulu(): { hour: number; minute: number } | null;
+  applyZuluHour(hour: number): void;
 }
 
 export class MockSim implements SimBackend {
@@ -112,6 +114,10 @@ export class MockSim implements SimBackend {
     this.outboundInput = [];
     return out;
   }
+  zulu() {
+    return { hour: 12, minute: 0 };
+  }
+  applyZuluHour(): void {}
 }
 
 export function applyRemoteVar(sim: SimBackend, pack: AircraftPack, id: number, value: number): void {

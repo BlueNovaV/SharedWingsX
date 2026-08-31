@@ -26,6 +26,8 @@ import {
   decodeWorldPose,
   encodeInputEvent,
   decodeInputEvent,
+  encodeWeatherTimePolicy,
+  decodeWeatherTimePolicy,
   type DesyncReportPayload,
   type HelloPayload,
   type PanelLock,
@@ -108,6 +110,9 @@ export class TwinSeatSession {
   private lastHelloAt = 0;
   private lastSnapAt = 0;
   private lastPresenceAt = 0;
+  private lastTimeSend = 0;
+  private syncReadyAt = 0;
+  private lastSyncReady = false;
   private roomHost = false;
   private lastRemote = new Map<number, number>();
   private homeRelayHttp: string;
@@ -220,7 +225,7 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.56 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.57 open.",
       );
     }
     throw new Error(
@@ -383,6 +388,10 @@ export class TwinSeatSession {
     return Boolean(this.room && this.hasCrew() && !this.iAmPoseSource());
   }
 
+  private cockpitReady(now = Date.now()): boolean {
+    return this.syncReadyAt > 0 && now >= this.syncReadyAt;
+  }
+
   transfer(targetName: string, role: Role): void {
     const payload = {
       targetName,
@@ -430,7 +439,7 @@ export class TwinSeatSession {
       const ws = new WebSocket(toWs(url), {
         handshakeTimeout: 8000,
         perMessageDeflate: false,
-        headers: { "User-Agent": "SharedWingsX/0.4.56" },
+        headers: { "User-Agent": "SharedWingsX/0.4.57" },
       });
       this.signal = ws;
       const timer = setTimeout(() => {
@@ -613,7 +622,7 @@ export class TwinSeatSession {
         return;
       }
       this.othersSeen = true;
-      if (this.iAmPoseSource()) this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
+      if (this.iAmPoseSource() && this.cockpitReady()) this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
       return;
     }
 
@@ -630,10 +639,10 @@ export class TwinSeatSession {
         if (!def?.sync) continue;
         const lock = this.locks.find((l) => l.varId === rec.id && l.untilMs > now);
         if (lock && lock.lockedBy === this.displayName) continue;
-        applyRemoteVar(this.sim, this.pack, rec.id, rec.value);
         this.lastRemote.set(rec.id, rec.value);
         this.lastEmit.set(rec.id, { value: rec.value, at: now });
         this.remoteHeld.add(rec.id);
+        if (this.cockpitReady(now)) applyRemoteVar(this.sim, this.pack, rec.id, rec.value);
       }
       return;
     }
@@ -669,7 +678,15 @@ export class TwinSeatSession {
       return;
     }
 
+    if (header.type === MessageType.WeatherTimePolicy) {
+      if (this.iAmPoseSource()) return;
+      const policy = decodeWeatherTimePolicy(game);
+      if (policy.syncTime) this.sim.applyZuluHour(policy.hostZuluHour);
+      return;
+    }
+
     if (header.type === MessageType.SimEvent) {
+      if (!this.cockpitReady()) return;
       const ev = decodeSimEvent(game);
       const def = (this.pack.events ?? []).find((e) => e.id === ev.eventId);
       if (!def) return;
@@ -677,6 +694,7 @@ export class TwinSeatSession {
     }
 
     if (header.type === MessageType.InputEvent) {
+      if (!this.cockpitReady()) return;
       const input = decodeInputEvent(game);
       this.sim.applyInputEvent(input.hash, input.value);
     }
@@ -706,10 +724,24 @@ export class TwinSeatSession {
 
     const pose = this.sim.worldPose();
     const inWorld = Boolean(pose);
+    if (inWorld) {
+      if (!this.syncReadyAt) this.syncReadyAt = now + 3000;
+    } else {
+      this.syncReadyAt = 0;
+      this.lastSyncReady = false;
+    }
+    const ready = this.cockpitReady(now);
     const hold = this.shouldHoldFollower();
     const enteredWorld = inWorld && !this.wasInWorld;
 
-    if (hold) {
+    if (ready && !this.lastSyncReady) {
+      for (const [id, value] of this.lastRemote) {
+        applyRemoteVar(this.sim, this.pack, id, value);
+      }
+    }
+    this.lastSyncReady = ready;
+
+    if (hold && ready) {
       for (const [id, value] of this.lastRemote) {
         applyRemoteVar(this.sim, this.pack, id, value);
       }
@@ -730,7 +762,7 @@ export class TwinSeatSession {
     }
     this.wasInWorld = inWorld;
 
-    if (this.room && this.hasCrew() && pose && this.iAmPoseSource()) {
+    if (this.room && this.hasCrew() && pose && this.iAmPoseSource() && ready) {
       const worldGap = pose.onGround ? 100 : 50;
       if (now - this.lastWorldSend > worldGap) {
         this.lastWorldSend = now;
@@ -738,7 +770,7 @@ export class TwinSeatSession {
       }
     }
 
-    if (this.room && this.hasCrew()) {
+    if (this.room && this.hasCrew() && ready) {
       for (const ev of this.sim.drainEvents()) {
         const def = (this.pack.events ?? []).find((e) => e.sim === ev.name);
         if (!def) continue;
@@ -774,13 +806,27 @@ export class TwinSeatSession {
     }
 
     const delta = this.collectOwnedDeltas(now);
-    if (delta.length && this.room) {
+    if (delta.length && this.room && ready) {
       this.sendGame(encodeDelta(this.seq++, delta));
     }
 
-    if (this.room && this.hasCrew() && this.iAmPoseSource() && now - this.lastSnapAt > 200) {
+    if (this.room && this.hasCrew() && this.iAmPoseSource() && ready && now - this.lastSnapAt > 200) {
       this.lastSnapAt = now;
       this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
+    }
+
+    if (this.room && this.hasCrew() && this.iAmPoseSource() && ready && now - this.lastTimeSend > 8000) {
+      this.lastTimeSend = now;
+      const z = this.sim.zulu();
+      if (z) {
+        this.sendGame(
+          encodeWeatherTimePolicy({
+            syncTime: true,
+            syncWeather: false,
+            hostZuluHour: z.hour + z.minute / 60,
+          }),
+        );
+      }
     }
   }
 

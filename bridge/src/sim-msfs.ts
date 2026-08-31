@@ -48,6 +48,8 @@ const INIT_POSE_WRITE = 11;
 const AVATAR_POSE_DEF = 12;
 const FREEZE_DEF = 13;
 const FREEZE_REQ = 13;
+const TIME_DEF = 14;
+const TIME_REQ = 14;
 const CMD_DATA_ID = 21;
 const CMD_DEF_ID = 22;
 const INPUT_LIST_REQ = 41;
@@ -122,6 +124,8 @@ class MsfsSim implements SimBackend {
   private freezeLat = 0;
   private freezeAlt = 0;
   private freezeAtt = 0;
+  private zuluHours = Number.NaN;
+  private zuluMinutes = 0;
   private followPose: WorldPose | null = null;
   private pinSeats = new Set<Seat>();
   private avatarIds = new Map<Seat, number>();
@@ -202,6 +206,13 @@ class MsfsSim implements SimBackend {
       sc.SimConnectConstants.OBJECT_ID_USER,
       sc.SimConnectPeriod.SIM_FRAME,
     );
+    handle.addToDataDefinition(TIME_DEF, "ZULU TIME", "Hours", sc.SimConnectDataType.FLOAT64);
+    handle.requestDataOnSimObject(
+      TIME_REQ,
+      TIME_DEF,
+      sc.SimConnectConstants.OBJECT_ID_USER,
+      sc.SimConnectPeriod.SECOND,
+    );
     try {
       handle.mapClientDataNameToID("SharedWingsX.Cmd", CMD_DATA_ID);
       handle.createClientData(CMD_DATA_ID, 64, false);
@@ -279,6 +290,16 @@ class MsfsSim implements SimBackend {
             this.freezeAlt = recv.data.readFloat64();
             this.freezeAtt = recv.data.readFloat64();
             this.enforceFreeze();
+          }
+          return;
+        }
+        if (recv.defineID === TIME_DEF || recv.requestID === TIME_REQ) {
+          if (recv.data.remaining() >= 8) {
+            const hours = recv.data.readFloat64();
+            if (Number.isFinite(hours)) {
+              this.zuluHours = Math.floor(hours) % 24;
+              this.zuluMinutes = Math.max(0, Math.min(59, Math.round((hours % 1) * 60)));
+            }
           }
           return;
         }
@@ -757,23 +778,30 @@ class MsfsSim implements SimBackend {
       this.fireIds.set(name, id);
       this.handle.mapClientEventToSimEvent(id, name);
     }
-    this.handle.transmitClientEvent(
-      sc.SimConnectConstants.OBJECT_ID_USER,
-      id,
-      data >>> 0,
-      sc.NotificationPriority.HIGHEST,
-      sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
-    );
-    try {
-      this.handle.transmitClientEventEx(
-        sc.SimConnectConstants.OBJECT_ID_USER,
-        id,
-        sc.NotificationPriority.HIGHEST,
-        sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
-        data >>> 0,
-      );
-    } catch {
-      /* older sim */
+    const targets = [sc.SimConnectConstants.OBJECT_ID_USER, 1];
+    for (const objectId of targets) {
+      try {
+        this.handle.transmitClientEvent(
+          objectId,
+          id,
+          data >>> 0,
+          sc.NotificationPriority.HIGHEST,
+          sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
+        );
+      } catch {
+        /* ignore */
+      }
+      try {
+        this.handle.transmitClientEventEx(
+          objectId,
+          id,
+          sc.NotificationPriority.HIGHEST,
+          sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
+          data >>> 0,
+        );
+      } catch {
+        /* older sim */
+      }
     }
     this.pumpCmd(name, data >>> 0);
     for (const [cid, n] of this.eventByClient) {
@@ -840,13 +868,7 @@ class MsfsSim implements SimBackend {
       this.handle.mapClientEventToSimEvent(eventId, name);
       this.eventsMapped.add(name);
     }
-    this.handle.transmitClientEvent(
-      sc.SimConnectConstants.OBJECT_ID_USER,
-      eventId,
-      data >>> 0,
-      sc.NotificationPriority.HIGHEST,
-      sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
-    );
+    this.fire(name, data >>> 0);
     this.muteEvent.set(eventId, Date.now() + 180);
     if (!fromNetwork) this.outbound.push({ name, data });
   }
@@ -855,6 +877,19 @@ class MsfsSim implements SimBackend {
     const out = this.outbound;
     this.outbound = [];
     return out;
+  }
+
+  zulu(): { hour: number; minute: number } | null {
+    if (!Number.isFinite(this.zuluHours)) return null;
+    return { hour: this.zuluHours, minute: this.zuluMinutes };
+  }
+
+  applyZuluHour(hour: number): void {
+    if (!Number.isFinite(hour)) return;
+    const h = ((Math.floor(hour) % 24) + 24) % 24;
+    const m = Math.max(0, Math.min(59, Math.round((hour % 1) * 60)));
+    this.fire("ZULU_HOURS_SET", h);
+    this.fire("ZULU_MINUTES_SET", m);
   }
 
   applyInputEvent(hash: bigint, value: number): void {
