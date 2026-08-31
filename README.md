@@ -64,7 +64,8 @@ Open two browser windows on http://localhost:17322. **Start a deck** in one, typ
 
 The TypeScript bridge talks to `SimConnect.dll` when present. A C# host stub lives in `bridge/simconnect-host/` for a native Windows build against the official SDK.
 
-Install the Community package from `community/twinseat-presence` into your MSFS Community folder after compiling WASM.
+Install the Community package from `community/twinseat-presence` (the EXE copies it). For in-sim `K:` events compile the original WASM: install the MSFS SDK, then `npm run wasm`.
+
 
 ## License
 

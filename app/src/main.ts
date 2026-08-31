@@ -33,7 +33,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.57";
+const APP_VER = "0.4.58";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 

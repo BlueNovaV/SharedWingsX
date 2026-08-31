@@ -7,17 +7,19 @@
 #include <cstring>
 #include <cstdio>
 
+#if defined(_MSFS_WASM) && !defined(__MSFS_WASM)
+#define __MSFS_WASM 1
+#endif
+
 #ifdef __MSFS_WASM
 #include <MSFS/MSFS.h>
 #include <SimConnect.h>
-#ifdef __has_include
 #if __has_include(<MSFS/legacy/gauges.h>)
 #include <MSFS/legacy/gauges.h>
 #define TWINSEAT_HAS_CALC 1
 #elif __has_include(<gauges.h>)
 #include <gauges.h>
 #define TWINSEAT_HAS_CALC 1
-#endif
 #endif
 #endif
 
@@ -66,13 +68,13 @@ void CALLBACK TwinSeatDispatch(SIMCONNECT_RECV *recv, DWORD, void *) {
     SimConnect_RequestClientData(
         g_sim, 1, 2, 1, SIMCONNECT_CLIENT_DATA_PERIOD_VISUAL_FRAME, SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_CHANGED, 0, 0,
         0);
+    SimConnect_SubscribeToSystemEvent(g_sim, 99, "Frame");
     return;
   }
   if (recv->dwID == SIMCONNECT_RECV_ID_CLIENT_DATA) {
     auto *data = reinterpret_cast<SIMCONNECT_RECV_CLIENT_DATA *>(recv);
-    if (data->dwDefineCount < 1) return;
     TwinSeatCmd cmd{};
-    std::memcpy(&cmd, reinterpret_cast<const char *>(data) + sizeof(SIMCONNECT_RECV_CLIENT_DATA), sizeof(cmd));
+    std::memcpy(&cmd, &data->dwData, sizeof(cmd));
     cmd.name[55] = 0;
     apply_cmd(&cmd);
   }
