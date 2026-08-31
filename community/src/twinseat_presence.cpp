@@ -29,12 +29,42 @@ struct TwinSeatCmd {
   int data;
   char name[56];
 };
+struct TwinSeatCalc {
+  unsigned int seq;
+  char rpn[252];
+};
 #pragma pack(pop)
 
 static unsigned int g_lastSeq = 0;
+static unsigned int g_lastCalc = 0;
 
 #ifdef __MSFS_WASM
 static HANDLE g_sim = nullptr;
+
+static int rpn_ok(const char *s) {
+  if (!s || !s[0]) return 0;
+  for (const char *p = s; *p; p++) {
+    const unsigned char c = static_cast<unsigned char>(*p);
+    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) continue;
+    if (c == ' ' || c == ':' || c == '_' || c == '(' || c == ')' || c == '>' || c == ',' || c == '.' ||
+        c == '+' || c == '-' || c == '*' || c == '/')
+      continue;
+    return 0;
+  }
+  return 1;
+}
+
+static void apply_calc(const TwinSeatCalc *cmd) {
+  if (!cmd || cmd->seq == g_lastCalc) return;
+  g_lastCalc = cmd->seq;
+  char rpn[252];
+  std::memset(rpn, 0, sizeof(rpn));
+  std::memcpy(rpn, cmd->rpn, sizeof(cmd->rpn) - 1);
+  if (!rpn_ok(rpn)) return;
+#ifdef TWINSEAT_HAS_CALC
+  execute_calculator_code(rpn, nullptr, nullptr, nullptr);
+#endif
+}
 
 static void apply_cmd(const TwinSeatCmd *cmd) {
   if (!cmd || !cmd->name[0]) return;
@@ -82,11 +112,26 @@ void CALLBACK TwinSeatDispatch(SIMCONNECT_RECV *recv, DWORD, void *) {
     SimConnect_RequestClientData(
         g_sim, 1, 2, 1, SIMCONNECT_CLIENT_DATA_PERIOD_VISUAL_FRAME, SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_CHANGED, 0, 0,
         0);
+    SimConnect_MapClientDataNameToID(g_sim, "SharedWingsX.Calc", 2);
+    SimConnect_CreateClientData(g_sim, 2, sizeof(TwinSeatCalc), SIMCONNECT_CREATE_CLIENT_DATA_FLAG_DEFAULT);
+    SimConnect_AddToClientDataDefinition(g_sim, 2, 0, sizeof(TwinSeatCalc), 0, 0);
+    SimConnect_RequestClientData(
+        g_sim, 2, 3, 2, SIMCONNECT_CLIENT_DATA_PERIOD_ON_SET, SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_DEFAULT, 0, 0, 0);
+    SimConnect_RequestClientData(
+        g_sim, 2, 4, 2, SIMCONNECT_CLIENT_DATA_PERIOD_VISUAL_FRAME, SIMCONNECT_CLIENT_DATA_REQUEST_FLAG_CHANGED, 0, 0,
+        0);
     SimConnect_SubscribeToSystemEvent(g_sim, 99, "Frame");
     return;
   }
   if (recv->dwID == SIMCONNECT_RECV_ID_CLIENT_DATA) {
     auto *data = reinterpret_cast<SIMCONNECT_RECV_CLIENT_DATA *>(recv);
+    if (data->dwDefineID == 2) {
+      TwinSeatCalc calc{};
+      std::memcpy(&calc, &data->dwData, sizeof(calc));
+      calc.rpn[251] = 0;
+      apply_calc(&calc);
+      return;
+    }
     TwinSeatCmd cmd{};
     std::memcpy(&cmd, &data->dwData, sizeof(cmd));
     cmd.name[55] = 0;

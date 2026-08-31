@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Domain, PresenceSupport, Seat } from "@twinseat/protocol";
 import { COCKPIT_SIM_EVENTS } from "./sim-events.js";
+import { applyFsCopilotModules } from "./fscopilot-yaml.js";
 
 export type PackVar = {
   id: number;
@@ -12,6 +13,7 @@ export type PackVar = {
   domain: Domain;
   sync: boolean;
   epsilon: number;
+  calc?: { get: string; set?: string; units: string };
 };
 
 export type PackEvent = {
@@ -106,13 +108,19 @@ export function loadPacks(dir = packsDir()): AircraftPack[] {
 }
 
 export function findPack(packs: AircraftPack[], aircraftTitle: string, packId?: string): AircraftPack | null {
-  if (packId) return packs.find((p) => p.id === packId) ?? null;
-  const title = aircraftTitle.toLowerCase();
-  const named = packs.find(
-    (p) => !p.fallback && p.titleMatchers.some((m) => title.includes(m.toLowerCase())),
-  );
-  if (named) return named;
-  return packs.find((p) => p.fallback) ?? null;
+  let pack: AircraftPack | null = null;
+  if (packId) pack = packs.find((p) => p.id === packId) ?? null;
+  else {
+    const title = aircraftTitle.toLowerCase();
+    pack =
+      packs.find(
+        (p) => !p.fallback && p.titleMatchers.some((m) => title.includes(m.toLowerCase())),
+      ) ??
+      packs.find((p) => p.fallback) ??
+      null;
+  }
+  if (!pack) return null;
+  return applyFsCopilotModules(pack, aircraftTitle);
 }
 
 export function titleMatches(pack: AircraftPack, aircraftTitle: string): boolean {

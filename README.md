@@ -17,6 +17,7 @@ YourControls-style tools sync loose simulator variables and leave both clients f
 | `app/` | Connect UI + Windows EXE (Electron) |
 | `relay/` | Room codes, hole-punch signaling, UDP relay fallback |
 | `packs/` | Aircraft JSON (universal SimConnect pack, C172, 787-10) |
+| `third_party/fscopilot/` | MIT YAML modules from [FsCopilot](https://github.com/yury-sch/FsCopilot) (G1000/GNS `get`/`set`) |
 | `web/` | Product website + EXE download |
 
 ## Website
@@ -69,4 +70,4 @@ Install the Community package from `community/twinseat-presence` (the EXE copies
 
 ## License
 
-Proprietary. See `LICENSE` and `EULA.md`. Do not copy YourControls source, YAML, or protocol.
+Proprietary. See `LICENSE` and `EULA.md`. Do not copy YourControls source, YAML, or protocol. MIT FsCopilot YAML modules are vendored separately under `third_party/fscopilot` with their copyright notice.

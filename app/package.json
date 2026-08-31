@@ -1,6 +1,6 @@
 {
   "name": "@twinseat/app",
-  "version": "0.4.60",
+  "version": "0.4.61",
   "private": true,
   "type": "module",
   "main": "electron/main.cjs",
@@ -60,6 +60,10 @@
           "*.json",
           "!schema.json"
         ]
+      },
+      {
+        "from": "../third_party/fscopilot",
+        "to": "fscopilot"
       },
       {
         "from": "../community/twinseat-presence",

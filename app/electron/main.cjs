@@ -27,6 +27,11 @@ function packsPath() {
   return path.join(__dirname, "..", "..", "packs");
 }
 
+function fscopilotPath() {
+  if (app.isPackaged) return path.join(process.resourcesPath, "fscopilot");
+  return path.join(__dirname, "..", "..", "third_party", "fscopilot");
+}
+
 function communitySource() {
   if (app.isPackaged) return path.join(process.resourcesPath, "community", "twinseat-presence");
   return path.join(__dirname, "..", "..", "community", "twinseat-presence");
@@ -161,6 +166,7 @@ function sendSim() {
 
 async function createWindow() {
   process.env.TWINSEAT_PACKS = packsPath();
+  process.env.TWINSEAT_FSCOPILOT = fscopilotPath();
   process.env.TWINSEAT_FREE_PORTS = "1";
   installInfo = installCommunity(communitySource(), { userData: app.getPath("userData") });
   try {

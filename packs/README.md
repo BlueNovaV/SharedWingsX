@@ -1,6 +1,8 @@
 # SharedWingsX aircraft packs
 
-Original SharedWingsX definitions. Do **not** import YourControls YAML.
+Original SharedWingsX JSON. Do **not** import YourControls YAML.
+
+G1000 / GNS mappings for matching titles come from MIT FsCopilot modules in `third_party/fscopilot` (see that folder’s `NOTICE.md`). Those files are not converted into this JSON.
 
 | Pack | Support | Notes |
 |------|--------|--------|

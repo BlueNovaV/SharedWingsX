@@ -4,6 +4,7 @@ import type { AircraftPack, PackVar } from "./pack.js";
 import { seatOffset } from "./pack.js";
 import { MockSim, type SimBackend, type SimIdentity, type WorldPose } from "./sim.js";
 import { nearestAirport } from "./airports.js";
+import { evalFsSet, sanitizeRpn } from "./fscopilot-yaml.js";
 import { discreteEventsForVar, inputEventPriority, skipInputEventName } from "./sim-events.js";
 import { bodyOffsetToWorld } from "./presence.js";
 
@@ -52,6 +53,8 @@ const TIME_DEF = 14;
 const TIME_REQ = 14;
 const CMD_DATA_ID = 21;
 const CMD_DEF_ID = 22;
+const CALC_DATA_ID = 23;
+const CALC_DEF_ID = 24;
 const INPUT_LIST_REQ = 41;
 const AVATAR_REQ: Record<Seat, number> = { left: 61, right: 62, jumpLeft: 63, jumpRight: 64 };
 const AVATAR_TITLE = "TwinSeat Avatar";
@@ -121,6 +124,8 @@ class MsfsSim implements SimBackend {
   private lastWarpAt = 0;
   private cmdSeq = 1;
   private cmdReady = false;
+  private calcSeq = 1;
+  private calcReady = false;
   private freezeLat = 0;
   private freezeAlt = 0;
   private freezeAtt = 0;
@@ -220,6 +225,14 @@ class MsfsSim implements SimBackend {
       this.cmdReady = true;
     } catch (err) {
       console.warn("[twinseat] in-sim command channel skipped", err instanceof Error ? err.message : err);
+    }
+    try {
+      handle.mapClientDataNameToID("SharedWingsX.Calc", CALC_DATA_ID);
+      handle.createClientData(CALC_DATA_ID, 256, false);
+      handle.addToClientDataDefinition(CALC_DEF_ID, 0, 256);
+      this.calcReady = true;
+    } catch (err) {
+      console.warn("[twinseat] in-sim calculator channel skipped", err instanceof Error ? err.message : err);
     }
 
     handle.addToDataDefinition(POSE_WRITE, "PLANE LATITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
@@ -598,11 +611,25 @@ class MsfsSim implements SimBackend {
     }
   }
 
+  private pumpCalc(rpn: string): void {
+    if (!this.calcReady) return;
+    const seq = this.calcSeq++ >>> 0 || 1;
+    const buf = Buffer.alloc(256);
+    buf.writeUInt32LE(seq, 0);
+    buf.write(rpn.slice(0, 251), 4, "ascii");
+    try {
+      this.handle.setClientData(CALC_DATA_ID, CALC_DEF_ID, 0, 0, 256, buf);
+    } catch {
+      this.calcReady = false;
+    }
+  }
+
   read(v: PackVar): number {
     return this.values.get(v.id) ?? 0;
   }
 
   write(v: PackVar, value: number): void {
+    const current = this.values.get(v.id) ?? 0;
     this.values.set(v.id, value);
     this.writing.add(v.id);
     const buf = new sc.RawBuffer(16);
@@ -613,10 +640,15 @@ class MsfsSim implements SimBackend {
       tagged: false,
     });
     this.fireAxis(v.sim, value);
-    for (const discrete of discreteEventsForVar(v.sim, value)) {
-      if (this.lastDiscrete.get(discrete.name) === discrete.data) continue;
-      this.lastDiscrete.set(discrete.name, discrete.data);
-      this.fire(discrete.name, discrete.data);
+    if (v.calc) {
+      const rpn = sanitizeRpn(evalFsSet({ get: v.calc.get, set: v.calc.set }, value, current));
+      if (rpn) this.pumpCalc(rpn);
+    } else {
+      for (const discrete of discreteEventsForVar(v.sim, value)) {
+        if (this.lastDiscrete.get(discrete.name) === discrete.data) continue;
+        this.lastDiscrete.set(discrete.name, discrete.data);
+        this.fire(discrete.name, discrete.data);
+      }
     }
     setTimeout(() => this.writing.delete(v.id), 160);
   }
