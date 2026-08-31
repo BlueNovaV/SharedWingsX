@@ -1,6 +1,6 @@
-# TwinSeat WASM presence module
-# Requires MSFS SDK. Compile community/src/twinseat_presence.cpp and copy the
-# output here as twinseat_presence.wasm. Until then this folder has no .wasm
-# (layout.json lists a 1-byte stub path; that is expected, not a deleted file).
-# 2020 vs 2024: swap manifest.msfs2020.json / manifest.msfs2024.json over manifest.json
+# SharedWingsX WASM command pump
+# Compile community/src/twinseat_presence.cpp with the MSFS WASM SDK and copy
+# the result here as twinseat_presence.wasm, then list it in layout.json.
+# Until a .wasm is present the desktop bridge still sends SimConnect events
+# and client data; 2024 titles that ignore transmitClientEvent need this module.
 

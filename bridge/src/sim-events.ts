@@ -175,6 +175,11 @@ export function discreteEventsForVar(
   }
 }
 
+export function calculatorEvent(name: string, data: number): string {
+  const safe = name.replace(/[^A-Z0-9_]/gi, "");
+  return `${data >>> 0} (>K:${safe})`;
+}
+
 export function skipInputEventName(name: string): boolean {
   const n = name.toUpperCase();
   return /CAMERA|PAUSE|MENU|TOOLTIP|DEBUG|KNEEBOARD|MOUSE|WINDOW|VIEW_|ESC\b|ATC_PANEL|SIM_RATE|SAVE|LOAD|QUIT|SCREENSHOT/.test(

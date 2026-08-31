@@ -46,6 +46,10 @@ const CAM_REQ = 9;
 const GROUND_POSE_WRITE = 10;
 const INIT_POSE_WRITE = 11;
 const AVATAR_POSE_DEF = 12;
+const FREEZE_DEF = 13;
+const FREEZE_REQ = 13;
+const CMD_DATA_ID = 21;
+const CMD_DEF_ID = 22;
 const INPUT_LIST_REQ = 41;
 const AVATAR_REQ: Record<Seat, number> = { left: 61, right: 62, jumpLeft: 63, jumpRight: 64 };
 const AVATAR_TITLE = "TwinSeat Avatar";
@@ -113,6 +117,11 @@ class MsfsSim implements SimBackend {
   private muteEvent = new Map<number, number>();
   private eventByClient = new Map<number, string>();
   private lastWarpAt = 0;
+  private cmdSeq = 1;
+  private cmdReady = false;
+  private freezeLat = 0;
+  private freezeAlt = 0;
+  private freezeAtt = 0;
   private followPose: WorldPose | null = null;
   private pinSeats = new Set<Seat>();
   private avatarIds = new Map<Seat, number>();
@@ -184,6 +193,23 @@ class MsfsSim implements SimBackend {
       sc.SimConnectConstants.OBJECT_ID_USER,
       sc.SimConnectPeriod.SIM_FRAME,
     );
+    handle.addToDataDefinition(FREEZE_DEF, "IS LATITUDE LONGITUDE FREEZE ON", "Bool", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(FREEZE_DEF, "IS ALTITUDE FREEZE ON", "Bool", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(FREEZE_DEF, "IS ATTITUDE FREEZE ON", "Bool", sc.SimConnectDataType.FLOAT64);
+    handle.requestDataOnSimObject(
+      FREEZE_REQ,
+      FREEZE_DEF,
+      sc.SimConnectConstants.OBJECT_ID_USER,
+      sc.SimConnectPeriod.SIM_FRAME,
+    );
+    try {
+      handle.mapClientDataNameToID("SharedWingsX.Cmd", CMD_DATA_ID);
+      handle.createClientData(CMD_DATA_ID, 64, false);
+      handle.addToClientDataDefinition(CMD_DEF_ID, 0, 64);
+      this.cmdReady = true;
+    } catch (err) {
+      console.warn("[twinseat] in-sim command channel skipped", err instanceof Error ? err.message : err);
+    }
 
     handle.addToDataDefinition(POSE_WRITE, "PLANE LATITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(POSE_WRITE, "PLANE LONGITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
@@ -245,6 +271,15 @@ class MsfsSim implements SimBackend {
         }
         if (recv.defineID === CAM_DEF || recv.requestID === CAM_REQ) {
           if (recv.data.remaining() >= 8) this.cameraState = recv.data.readFloat64();
+          return;
+        }
+        if (recv.defineID === FREEZE_DEF || recv.requestID === FREEZE_REQ) {
+          if (recv.data.remaining() >= 24) {
+            this.freezeLat = recv.data.readFloat64();
+            this.freezeAlt = recv.data.readFloat64();
+            this.freezeAtt = recv.data.readFloat64();
+            this.enforceFreeze();
+          }
           return;
         }
         if (recv.defineID === ATC_DEF || recv.requestID === ATC_REQ) {
@@ -479,9 +514,9 @@ class MsfsSim implements SimBackend {
         });
       }
       const velBuf = new sc.RawBuffer(24);
-      velBuf.writeFloat64(pose.onGround ? 0 : (pose.vx ?? 0));
+      velBuf.writeFloat64(pose.vx ?? 0);
       velBuf.writeFloat64(pose.onGround ? 0 : (pose.vy ?? 0));
-      velBuf.writeFloat64(pose.onGround ? 0 : (pose.vz ?? 0));
+      velBuf.writeFloat64(pose.vz ?? 0);
       this.handle.setDataOnSimObject(VEL_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
         buffer: velBuf,
         arrayCount: 0,
@@ -489,7 +524,7 @@ class MsfsSim implements SimBackend {
       });
       const rotBuf = new sc.RawBuffer(24);
       rotBuf.writeFloat64(pose.onGround ? 0 : (pose.rx ?? 0));
-      rotBuf.writeFloat64(pose.onGround ? 0 : (pose.ry ?? 0));
+      rotBuf.writeFloat64(pose.ry ?? 0);
       rotBuf.writeFloat64(pose.onGround ? 0 : (pose.rz ?? 0));
       this.handle.setDataOnSimObject(ROT_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
         buffer: rotBuf,
@@ -516,9 +551,30 @@ class MsfsSim implements SimBackend {
   setPhysicsHold(on: boolean, force = false): void {
     if (!force && this.physicsHold === on) return;
     this.physicsHold = on;
-    this.fire("FREEZE_LATITUDE_LONGITUDE_SET", 0);
-    this.fire("FREEZE_ALTITUDE_SET", on ? 1 : 0);
-    this.fire("FREEZE_ATTITUDE_SET", on ? 1 : 0);
+    this.enforceFreeze(true);
+  }
+
+  private enforceFreeze(force = false): void {
+    const wantLat = 0;
+    const wantAlt = this.physicsHold ? 1 : 0;
+    const wantAtt = this.physicsHold ? 1 : 0;
+    if (force || this.freezeLat > 0.5) this.fire("FREEZE_LATITUDE_LONGITUDE_SET", wantLat);
+    if (force || (this.freezeAlt > 0.5) !== (wantAlt === 1)) this.fire("FREEZE_ALTITUDE_SET", wantAlt);
+    if (force || (this.freezeAtt > 0.5) !== (wantAtt === 1)) this.fire("FREEZE_ATTITUDE_SET", wantAtt);
+  }
+
+  private pumpCmd(name: string, data: number): void {
+    if (!this.cmdReady) return;
+    const seq = this.cmdSeq++ >>> 0 || 1;
+    const buf = Buffer.alloc(64);
+    buf.writeUInt32LE(seq, 0);
+    buf.writeInt32LE(data | 0, 4);
+    buf.write(name.replace(/[^A-Z0-9_]/gi, "").slice(0, 55), 8, "ascii");
+    try {
+      this.handle.setClientData(CMD_DATA_ID, CMD_DEF_ID, 0, 0, 64, buf);
+    } catch {
+      this.cmdReady = false;
+    }
   }
 
   read(v: PackVar): number {
@@ -708,6 +764,18 @@ class MsfsSim implements SimBackend {
       sc.NotificationPriority.HIGHEST,
       sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
     );
+    try {
+      this.handle.transmitClientEventEx(
+        sc.SimConnectConstants.OBJECT_ID_USER,
+        id,
+        sc.NotificationPriority.HIGHEST,
+        sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
+        data >>> 0,
+      );
+    } catch {
+      /* older sim */
+    }
+    this.pumpCmd(name, data >>> 0);
     for (const [cid, n] of this.eventByClient) {
       if (n === name) this.muteEvent.set(cid, Date.now() + 180);
     }

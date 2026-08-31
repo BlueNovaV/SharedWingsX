@@ -220,7 +220,7 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.55 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.56 open.",
       );
     }
     throw new Error(
@@ -430,7 +430,7 @@ export class TwinSeatSession {
       const ws = new WebSocket(toWs(url), {
         handshakeTimeout: 8000,
         perMessageDeflate: false,
-        headers: { "User-Agent": "SharedWingsX/0.4.55" },
+        headers: { "User-Agent": "SharedWingsX/0.4.56" },
       });
       this.signal = ws;
       const timer = setTimeout(() => {

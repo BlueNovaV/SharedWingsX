@@ -25,6 +25,8 @@ describe("packs", () => {
     assert.equal(discreteEventsForVar("AUTOPILOT MASTER", 1)[0]?.name, "AUTOPILOT_ON");
     assert.equal(discreteEventsForVar("ELECTRICAL MASTER BATTERY:1", 1)[0]?.name, "BATTERY1_SET");
     assert.equal(discreteEventsForVar("AUTOPILOT HEADING LOCK DIR", 270)[0]?.data, 270);
+    const { calculatorEvent } = await import("./sim-events.js");
+    assert.equal(calculatorEvent("THROTTLE1_SET", 3600), "3600 (>K:THROTTLE1_SET)");
   });
 
   it("uses universal pack for PMDG and unknown titles", () => {
