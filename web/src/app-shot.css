@@ -269,12 +269,12 @@
 .swx .deck-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0;
+  gap: 20px;
   flex: none;
 }
-.swx .deck-pane { padding: 0 16px 0 0; }
+.swx .deck-pane { padding: 0; }
 .swx .deck-pane + .deck-pane {
-  padding: 0 0 0 16px;
+  padding: 0 0 0 20px;
   border-left: 1px solid var(--line);
 }
 .swx .card h2 {
@@ -311,22 +311,23 @@
 .swx .choice {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 12px;
+  gap: 12px;
+  margin: 12px 0 4px;
 }
-.swx .choice.seats { grid-template-columns: 1fr 1fr 1fr; }
+.swx .choice.seats { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 .swx .choice.seats > span {
-  min-height: 38px;
-  padding: 0 8px;
+  min-height: 42px;
+  padding: 0 14px;
   font-size: 12px;
+  gap: 10px;
 }
 .swx .choice label,
 .swx .choice > span {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 0 12px;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 14px;
   font-size: 13px;
   color: var(--ink);
   background: rgba(7, 9, 12, 0.55);
@@ -622,8 +623,9 @@
 .swx .status-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  line-height: 1;
+  gap: 8px;
+  height: 20px;
+  line-height: 20px;
 }
 .swx .status-copy {
   margin-left: auto;

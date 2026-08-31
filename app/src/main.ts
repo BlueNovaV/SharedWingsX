@@ -32,7 +32,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.48";
+const APP_VER = "0.4.49";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 
@@ -760,7 +760,7 @@ function renderBoard(): void {
       </div>
       <footer class="status">
         <span class="sim-lamps status-item" data-sim-lamps>${simLampsHtml()}</span>
-        <span class="status-item"><span class="dot ${live && state?.path === "direct" ? "ok" : live ? "warn" : ""}"></span><span>${live ? escapeHtml(pathLabel(state?.path ?? "")) : "Path automatic"}</span></span>
+        <span class="status-item"><span class="dot ${live && state?.path === "direct" ? "ok" : live ? "warn" : ""}"></span><span class="lamp-lab">${live ? escapeHtml(pathLabel(state?.path ?? "")) : "Path automatic"}</span></span>
         <span class="status-copy">© BluNova Virtual Airlines by Jordy</span>
       </footer>
     </div>`;
