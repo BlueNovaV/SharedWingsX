@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Domain, PresenceSupport, Seat } from "@twinseat/protocol";
 import { COCKPIT_SIM_EVENTS } from "./sim-events.js";
-import { applyFsCopilotModules } from "./fscopilot-yaml.js";
+import { applyAvionicsYamlModules } from "./avionics-yaml.js";
 
 export type PackVar = {
   id: number;
@@ -120,7 +120,7 @@ export function findPack(packs: AircraftPack[], aircraftTitle: string, packId?: 
       null;
   }
   if (!pack) return null;
-  return applyFsCopilotModules(pack, aircraftTitle);
+  return applyAvionicsYamlModules(pack, aircraftTitle);
 }
 
 export function titleMatches(pack: AircraftPack, aircraftTitle: string): boolean {

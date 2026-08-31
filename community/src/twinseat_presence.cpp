@@ -2,7 +2,6 @@
 // Reads a 64-byte SimConnect client-data packet from the desktop bridge and
 // applies public SDK K: events with execute_calculator_code so titles that
 // ignore transmitClientEvent still move throttles, freeze, and lights.
-// Do not mix with GPL shared-cockpit gauges or their packet formats.
 
 #include <cstring>
 #include <cstdio>

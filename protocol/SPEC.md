@@ -1,6 +1,6 @@
 # TwinSeat protocol v1
 
-Independent binary protocol. Not compatible with YourControls.
+Independent binary protocol.
 
 ## Transport
 

@@ -1,6 +1,6 @@
 {
   "name": "@twinseat/app",
-  "version": "0.4.61",
+  "version": "0.4.62",
   "private": true,
   "type": "module",
   "main": "electron/main.cjs",
@@ -62,8 +62,8 @@
         ]
       },
       {
-        "from": "../third_party/fscopilot",
-        "to": "fscopilot"
+        "from": "../third_party/avionics-yaml",
+        "to": "avionics-yaml"
       },
       {
         "from": "../community/twinseat-presence",

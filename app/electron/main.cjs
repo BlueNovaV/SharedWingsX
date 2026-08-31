@@ -27,9 +27,9 @@ function packsPath() {
   return path.join(__dirname, "..", "..", "packs");
 }
 
-function fscopilotPath() {
-  if (app.isPackaged) return path.join(process.resourcesPath, "fscopilot");
-  return path.join(__dirname, "..", "..", "third_party", "fscopilot");
+function avionicsYamlPath() {
+  if (app.isPackaged) return path.join(process.resourcesPath, "avionics-yaml");
+  return path.join(__dirname, "..", "..", "third_party", "avionics-yaml");
 }
 
 function communitySource() {
@@ -166,7 +166,7 @@ function sendSim() {
 
 async function createWindow() {
   process.env.TWINSEAT_PACKS = packsPath();
-  process.env.TWINSEAT_FSCOPILOT = fscopilotPath();
+  process.env.TWINSEAT_AVIONICS_YAML = avionicsYamlPath();
   process.env.TWINSEAT_FREE_PORTS = "1";
   installInfo = installCommunity(communitySource(), { userData: app.getPath("userData") });
   try {

@@ -22,4 +22,4 @@ Without the `.wasm`, SharedWingsX still syncs over SimConnect; glass/747 may ign
 
 After install, the package shows in MSFS under **Marketplace → My Library → Community** as **SharedWingsX**.
 
-The included glTF is a **placeholder silhouette**. Do not import GPL YAML or VCockpit patches from other shared-cockpit tools. MIT FsCopilot YAML is loaded by the desktop bridge, not by this Community package.
+The included glTF is a **placeholder silhouette**. Do not import GPL YAML or VCockpit patches. MIT avionics YAML is loaded by the desktop bridge, not by this Community package.

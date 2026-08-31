@@ -4,7 +4,7 @@ import type { AircraftPack, PackVar } from "./pack.js";
 import { seatOffset } from "./pack.js";
 import { MockSim, type SimBackend, type SimIdentity, type WorldPose } from "./sim.js";
 import { nearestAirport } from "./airports.js";
-import { evalFsSet, sanitizeRpn } from "./fscopilot-yaml.js";
+import { evalCalcSet, sanitizeRpn } from "./avionics-yaml.js";
 import { discreteEventsForVar, inputEventPriority, skipInputEventName } from "./sim-events.js";
 import { bodyOffsetToWorld } from "./presence.js";
 
@@ -641,7 +641,7 @@ class MsfsSim implements SimBackend {
     });
     this.fireAxis(v.sim, value);
     if (v.calc) {
-      const rpn = sanitizeRpn(evalFsSet({ get: v.calc.get, set: v.calc.set }, value, current));
+      const rpn = sanitizeRpn(evalCalcSet({ get: v.calc.get, set: v.calc.set }, value, current));
       if (rpn) this.pumpCalc(rpn);
     } else {
       for (const discrete of discreteEventsForVar(v.sim, value)) {

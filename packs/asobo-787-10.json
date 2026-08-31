@@ -10,7 +10,7 @@
   ],
   "sharedLockMs": 450,
   "minDeltaMs": 40,
-  "notes": "Stock 787-10. Copilot mesh uses calibrated offset when PILOT_1 is missing. FMS internals are not fully exposed via SimConnect. Treat FMS as overlay/crew procedure, not a guaranteed sync surface.",
+  "notes": "Stock 787-10. First-officer mesh uses calibrated offset when PILOT_1 is missing. FMS internals are not fully exposed via SimConnect. Treat FMS as overlay/crew procedure, not a guaranteed sync surface.",
   "presence": {
     "support": "offset",
     "selfSeatDefault": "left",

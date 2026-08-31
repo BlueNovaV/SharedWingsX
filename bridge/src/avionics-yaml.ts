@@ -4,20 +4,20 @@ import { fileURLToPath } from "node:url";
 import type { Domain } from "@twinseat/protocol";
 import type { AircraftPack, PackVar } from "./pack.js";
 
-export type FsLink = {
+export type YamlLink = {
   get: string;
   set?: string;
   skp?: string;
 };
 
-export type FsModule = {
+export type YamlModule = {
   include: string[];
-  shared: FsLink[];
-  master: FsLink[];
+  shared: YamlLink[];
+  master: YamlLink[];
   ignore: string[];
 };
 
-export type FsCalc = {
+export type CalcMap = {
   get: string;
   set?: string;
   units: string;
@@ -25,22 +25,22 @@ export type FsCalc = {
 
 const BANNED = /\b(process|require|import|eval|Function|globalThis|window|document|child_process)\b/;
 
-export function fscopilotDir(): string {
-  if (process.env.TWINSEAT_FSCOPILOT) return process.env.TWINSEAT_FSCOPILOT;
+export function avionicsYamlDir(): string {
+  if (process.env.TWINSEAT_AVIONICS_YAML) return process.env.TWINSEAT_AVIONICS_YAML;
   try {
     const here = dirname(fileURLToPath(import.meta.url));
-    return join(here, "..", "..", "third_party", "fscopilot");
+    return join(here, "..", "..", "third_party", "avionics-yaml");
   } catch {
-    return join(process.cwd(), "third_party", "fscopilot");
+    return join(process.cwd(), "third_party", "avionics-yaml");
   }
 }
 
-export function parseFsYaml(text: string): FsModule {
+export function parseAvionicsYaml(text: string): YamlModule {
   const src = text.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n");
   const lines = src.split("\n");
-  const out: FsModule = { include: [], shared: [], master: [], ignore: [] };
+  const out: YamlModule = { include: [], shared: [], master: [], ignore: [] };
   let section: "include" | "shared" | "master" | "ignore" | "" = "";
-  let item: FsLink | null = null;
+  let item: YamlLink | null = null;
   let collectingSet = false;
   let setIndent = 0;
   let setBuf: string[] = [];
@@ -170,7 +170,7 @@ export function parseGet(raw: string): { kind: string; sim: string; units: strin
   return null;
 }
 
-export function evalFsSet(link: FsLink, value: number, current: number): string {
+export function evalCalcSet(link: YamlLink, value: number, current: number): string {
   const parsed = parseGet(link.get);
   const get = parsed?.get ?? link.get.trim();
   const units = parsed?.units ?? "Number";
@@ -221,13 +221,13 @@ export function sanitizeRpn(code: string): string {
   return s;
 }
 
-export function loadFsModuleFile(rel: string, root = fscopilotDir(), seen = new Set<string>()): FsLink[] {
+export function loadAvionicsModuleFile(rel: string, root = avionicsYamlDir(), seen = new Set<string>()): YamlLink[] {
   const file = join(root, "Definitions", ...rel.split("/"));
   if (seen.has(file) || !existsSync(file)) return [];
   seen.add(file);
-  const parsed = parseFsYaml(readFileSync(file, "utf8"));
-  const links: FsLink[] = [];
-  for (const inc of parsed.include) links.push(...loadFsModuleFile(inc, root, seen));
+  const parsed = parseAvionicsYaml(readFileSync(file, "utf8"));
+  const links: YamlLink[] = [];
+  for (const inc of parsed.include) links.push(...loadAvionicsModuleFile(inc, root, seen));
   links.push(...parsed.shared, ...parsed.master);
   return links;
 }
@@ -270,7 +270,7 @@ function epsilonFor(units: string): number {
   return 0.25;
 }
 
-export function linksToVars(links: FsLink[], startId: number): PackVar[] {
+export function linksToVars(links: YamlLink[], startId: number): PackVar[] {
   const seen = new Set<string>();
   const vars: PackVar[] = [];
   let id = startId;
@@ -279,7 +279,7 @@ export function linksToVars(links: FsLink[], startId: number): PackVar[] {
     if (!parsed) continue;
     if (seen.has(parsed.sim)) continue;
     seen.add(parsed.sim);
-    const calc: FsCalc = { get: parsed.get, set: link.set, units: parsed.units };
+    const calc: CalcMap = { get: parsed.get, set: link.set, units: parsed.units };
     vars.push({
       id: id++,
       name: parsed.sim,
@@ -295,11 +295,11 @@ export function linksToVars(links: FsLink[], startId: number): PackVar[] {
   return vars;
 }
 
-export function applyFsCopilotModules(pack: AircraftPack, aircraftTitle: string): AircraftPack {
+export function applyAvionicsYamlModules(pack: AircraftPack, aircraftTitle: string): AircraftPack {
   const mods = modulesForTitle(aircraftTitle, pack.id);
   if (!mods.length) return pack;
   const have = new Set(pack.variables.map((v) => v.sim));
-  const links = mods.flatMap((m) => loadFsModuleFile(m));
+  const links = mods.flatMap((m) => loadAvionicsModuleFile(m));
   const extra = linksToVars(links, 5000).filter((v) => !have.has(v.sim));
   if (!extra.length) return pack;
   return { ...pack, variables: [...pack.variables, ...extra] };

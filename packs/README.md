@@ -1,8 +1,8 @@
 # SharedWingsX aircraft packs
 
-Original SharedWingsX JSON. Do **not** import YourControls YAML.
+Original SharedWingsX JSON. Do **not** import GPL definition files.
 
-G1000 / GNS mappings for matching titles come from MIT FsCopilot modules in `third_party/fscopilot` (see that folder’s `NOTICE.md`). Those files are not converted into this JSON.
+G1000 / GNS mappings for matching titles come from MIT YAML under `third_party/avionics-yaml` (see that folder’s `NOTICE.md` and `LICENSE`). Those files are not converted into this JSON.
 
 | Pack | Support | Notes |
 |------|--------|--------|
@@ -14,6 +14,7 @@ G1000 / GNS mappings for matching titles come from MIT FsCopilot modules in `thi
 
 `support` levels:
 
-- `full`: copilot node + avatar mesh with no clip in interior
+- `full`: first-officer node + avatar mesh with no clip in interior
 - `offset`: calibrated XYZ/PBH relative to user aircraft (2020 + payware without nodes)
 - `overlay`: in-sim attach failed; app draws the fallback silhouette
+
