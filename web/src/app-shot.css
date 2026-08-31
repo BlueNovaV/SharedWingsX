@@ -629,9 +629,6 @@
   opacity: 0.88;
 }
 
-.app-intro { margin-bottom: 36px; }
-.app-intro .copy { max-width: 40rem; }
-
 @media (max-width: 860px) {
   .swx .frame { min-height: 0; }
   .swx .bar-mid { display: none; }

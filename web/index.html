@@ -9,37 +9,41 @@
       content="SharedWingsX is shared cockpit for MSFS 2020 and 2024. One Windows app, one code, two seats."
     />
     <meta name="theme-color" content="#05070a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="icon" href="./brand/logo.png?v=4" type="image/png" />
     <link rel="icon" href="./brand/mark.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./src/styles.css" />
   </head>
   <body>
     <header class="top">
-      <a class="brand" href="#top">
-        <img src="./brand/logo.png?v=4" width="36" height="36" alt="SharedWingsX" />
-        SharedWingsX
-      </a>
-      <nav>
-        <a href="#app" data-i="navApp">The app</a>
-        <a href="#aircraft" data-i="navAircraft">Aircraft</a>
-        <a href="#how" data-i="navHow">How it works</a>
-        <a href="#faq" data-i="navFaq">Questions</a>
-        <a href="https://discord.gg/bluenovav" target="_blank" rel="noopener">Discord</a>
-        <button type="button" class="lang" id="lang">NL</button>
-        <a class="btn" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
-          <img src="./brand/logo.png?v=4" width="18" height="18" alt="" />
-          <span data-i="cta">Download</span>
-          <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path
-              d="M12 4v11m0 0 5-5m-5 5-5-5M5 19h14"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
-          </svg>
+      <div class="wrap top-bar">
+        <a class="brand" href="#top">
+          <img src="./brand/logo.png?v=4" width="36" height="36" alt="SharedWingsX" />
+          SharedWingsX
         </a>
-      </nav>
+        <nav>
+          <a href="#app" data-i="navApp">The app</a>
+          <a href="#aircraft" data-i="navAircraft">Aircraft</a>
+          <a href="#how" data-i="navHow">How it works</a>
+          <a href="#faq" data-i="navFaq">Questions</a>
+          <a href="https://discord.gg/bluenovav" target="_blank" rel="noopener">Discord</a>
+          <button type="button" class="lang" id="lang">NL</button>
+          <a class="btn" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
+            <img src="./brand/logo.png?v=4" width="18" height="18" alt="" />
+            <span data-i="cta">Download</span>
+            <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M12 4v11m0 0 5-5m-5 5-5-5M5 19h14"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
+        </nav>
+      </div>
     </header>
 
     <section class="stage" id="top">
@@ -93,7 +97,7 @@
     </section>
 
     <section class="block dim" id="app">
-      <div class="wrap app-intro">
+      <div class="wrap split app-intro">
         <h2 data-i="appTitle">The Windows app</h2>
         <p class="copy" data-i="appCopy">
           This is SharedWingsX. Host starts a deck, a six-character code appears, the other seats join. MSFS 2020 and
@@ -363,15 +367,15 @@
 
     <footer>
       <div class="wrap foot">
-        <img src="./brand/logo.png?v=4" width="28" height="28" alt="" />
-        <span>SharedWingsX</span>
+        <a class="brand foot-brand" href="#top">
+          <img src="./brand/logo.png?v=4" width="28" height="28" alt="" />
+          SharedWingsX
+        </a>
         <span class="foot-links">
           <a href="https://discord.gg/bluenovav" target="_blank" rel="noopener">discord.gg/bluenovav</a>
           <a href="mailto:info@blunovav.com">info@blunovav.com</a>
         </span>
-        <span class="credit">
-          <span data-i="copy">© BluNova Virtual Airlines by Jordy. All rights reserved.</span>
-        </span>
+        <span class="credit" data-i="copy">© BluNova Virtual Airlines by Jordy. All rights reserved.</span>
       </div>
     </footer>
     <script type="module" src="./src/main.ts"></script>
