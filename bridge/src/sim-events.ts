@@ -1,5 +1,17 @@
 /** Stock MSFS SimConnect event names from the public SDK. Original mapping. */
 export const COCKPIT_SIM_EVENTS = [
+  "AXIS_THROTTLE1_SET",
+  "AXIS_THROTTLE2_SET",
+  "AXIS_THROTTLE3_SET",
+  "AXIS_THROTTLE4_SET",
+  "AXIS_THROTTLE_SET",
+  "THROTTLE1_SET",
+  "THROTTLE2_SET",
+  "THROTTLE3_SET",
+  "THROTTLE4_SET",
+  "AXIS_ELEVATOR_SET",
+  "AXIS_AILERONS_SET",
+  "AXIS_RUDDER_SET",
   "TOGGLE_MASTER_BATTERY",
   "BATTERY1_SET",
   "BATTERY2_SET",
@@ -130,7 +142,15 @@ export function discreteEventForVar(
 
 export function skipInputEventName(name: string): boolean {
   const n = name.toUpperCase();
-  return /CAMERA|PAUSE|MENU|TOOLTIP|DEBUG|KNEEBOARD|MOUSE|WINDOW|VIEW_|ESC\b|ATC_PANEL|SIM_RATE|SLEW|SAVE|LOAD|QUIT|SCREENSHOT/.test(
+  return /CAMERA|PAUSE|MENU|TOOLTIP|DEBUG|KNEEBOARD|MOUSE|WINDOW|VIEW_|ESC\b|ATC_PANEL|SIM_RATE|SAVE|LOAD|QUIT|SCREENSHOT/.test(
     n,
   );
+}
+
+export function inputEventPriority(name: string): number {
+  const n = name.toUpperCase();
+  if (/THROTTLE|ENGINE|N1|STARTER|BATTERY|AVIONIC|MASTER|LIGHT|SWITCH|FUEL|FLAP|GEAR|SPOILER|APU|PARK/.test(n)) {
+    return 0;
+  }
+  return 1;
 }

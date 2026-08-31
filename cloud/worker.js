@@ -37,17 +37,31 @@ function roster(room) {
 
 function emit(peer, msg) {
   if (!peer) return;
-  if (peer.ws && peer.ws.readyState === 1) {
+  const payload = JSON.stringify(msg);
+  if (peer.ws) {
     try {
-      peer.ws.send(JSON.stringify(msg));
+      peer.ws.send(payload);
       return;
     } catch {
-      /* fall through to queue */
+      /* queue */
     }
   }
   peer.queue = peer.queue || [];
   peer.queue.push(msg);
-  if (peer.queue.length > 400) peer.queue.splice(0, peer.queue.length - 400);
+  if (peer.queue.length > 800) peer.queue.splice(0, peer.queue.length - 800);
+}
+
+function flush(peer) {
+  if (!peer?.ws || !peer.queue?.length) return;
+  while (peer.queue.length) {
+    const msg = peer.queue.shift();
+    try {
+      peer.ws.send(JSON.stringify(msg));
+    } catch {
+      peer.queue.unshift(msg);
+      break;
+    }
+  }
 }
 
 function broadcast(room, msg, exceptId) {
@@ -119,7 +133,9 @@ export class TwinSeatLobby {
       }
       const replies = this.handle(id, parsed, ws);
       const peer = this.findPeer(id) || { ws, queue: [], id };
+      if (peer.ws !== ws) peer.ws = ws;
       for (const msg of replies) emit(peer, msg);
+      flush(peer);
     });
     ws.addEventListener("close", () => this.drop(id));
   }
@@ -200,6 +216,7 @@ export class TwinSeatLobby {
     }
     if (type === "game") {
       broadcast(room, { type: "game", data: msg.data }, id);
+      for (const p of room.peers.values()) flush(p);
       return replies;
     }
     if (type === "swap-command") {

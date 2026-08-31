@@ -40,7 +40,7 @@ import { seatOffset, titleMatches } from "./pack.js";
 import type { SimBackend } from "./sim.js";
 import { applyRemoteVar } from "./sim.js";
 import { findLanHost } from "./lan.js";
-import { cloudRelayUrls, toWs } from "./cloud.js";
+import { cloudRelayUrls, toHttp, toWs } from "./cloud.js";
 
 export type PathMode = "unknown" | "direct" | "relay";
 
@@ -115,6 +115,9 @@ export class TwinSeatSession {
   private httpBase = "";
   private httpClientId = "";
   private httpPoll: ReturnType<typeof setInterval> | null = null;
+  private cloudBase = "";
+  private seenKeys = new Set<string>();
+  private othersSeen = false;
 
   constructor(
     readonly pack: AircraftPack,
@@ -217,7 +220,7 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.51 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.52 open.",
       );
     }
     throw new Error(
@@ -232,12 +235,14 @@ export class TwinSeatSession {
       try {
         await this.connectSignal(url);
         this.useHttp = false;
+        this.cloudBase = toHttp(url);
         return true;
       } catch (err) {
         console.warn("[twinseat] cloud ws failed", url, err instanceof Error ? err.message : err);
       }
       try {
         await this.connectHttp(url);
+        this.cloudBase = toHttp(url);
         return true;
       } catch (err) {
         console.warn("[twinseat] cloud http failed", url, err instanceof Error ? err.message : err);
@@ -288,7 +293,7 @@ export class TwinSeatSession {
   }
 
   private async httpPull(): Promise<void> {
-    if (!this.useHttp || !this.httpBase || !this.httpClientId) return;
+    if (!this.httpBase || !this.httpClientId) return;
     try {
       const res = await fetch(`${this.httpBase}/poll?id=${encodeURIComponent(this.httpClientId)}`, {
         signal: this.abortAfter(8000),
@@ -370,8 +375,12 @@ export class TwinSeatSession {
     return false;
   }
 
+  private hasCrew(): boolean {
+    return this.roster.length > 1 || this.othersSeen;
+  }
+
   private shouldHoldFollower(): boolean {
-    return Boolean(this.room && this.roster.length > 1 && !this.iAmPoseSource());
+    return Boolean(this.room && this.hasCrew() && !this.iAmPoseSource());
   }
 
   transfer(targetName: string, role: Role): void {
@@ -393,6 +402,7 @@ export class TwinSeatSession {
 
   private applyRoster(list: UiState["roster"]): void {
     this.roster = list;
+    if (list.length > 1) this.othersSeen = true;
     const me = list.find((p) => p.id === this.selfId) ?? list.find((p) => p.name === this.displayName);
     if (me?.seat && me.seat !== this.seat) this.remoteHeld.clear();
     if (me?.seat) this.seat = me.seat;
@@ -420,7 +430,7 @@ export class TwinSeatSession {
       const ws = new WebSocket(toWs(url), {
         handshakeTimeout: 8000,
         perMessageDeflate: false,
-        headers: { "User-Agent": "SharedWingsX/0.4.51" },
+        headers: { "User-Agent": "SharedWingsX/0.4.52" },
       });
       this.signal = ws;
       const timer = setTimeout(() => {
@@ -479,6 +489,7 @@ export class TwinSeatSession {
       this.applyRoster(this.roster);
       this.registerUdp();
       this.punchUntil = Date.now() + 3000;
+      this.ensureGamePull();
       this.hostedWait?.resolve();
       return;
     }
@@ -524,10 +535,31 @@ export class TwinSeatSession {
     this.udp.send(Buffer.concat([Buffer.from([0x52, 1]), payload]), this.relayUdpPort, this.relayUdpHost);
   }
 
+  private ensureGamePull(): void {
+    const base = this.httpBase || this.cloudBase;
+    const id = this.httpClientId || this.selfId;
+    if (!base || !id) return;
+    this.httpBase = base;
+    this.httpClientId = id;
+    this.startHttpPoll();
+  }
+
+  private rememberPacket(buf: Buffer): boolean {
+    const key = `${buf.length}:${buf.subarray(0, Math.min(buf.length, 24)).toString("hex")}`;
+    if (this.seenKeys.has(key)) return false;
+    this.seenKeys.add(key);
+    if (this.seenKeys.size > 500) {
+      const first = this.seenKeys.values().next().value;
+      if (first != null) this.seenKeys.delete(first);
+    }
+    return true;
+  }
+
   private sendGame(buf: Buffer): void {
     if ((this.signal?.readyState === WebSocket.OPEN || this.useHttp) && this.room) {
       this.sendSignal({ type: "game", data: buf.toString("base64") });
     }
+    if (!this.useHttp) void this.pushGameHttp(buf);
     if (this.path === "direct" && this.peers.size) {
       for (const peer of this.peers.values()) this.udp.send(buf, peer.port, peer.ip);
       return;
@@ -537,11 +569,31 @@ export class TwinSeatSession {
     }
   }
 
+  private async pushGameHttp(buf: Buffer): Promise<void> {
+    const base = this.httpBase || this.cloudBase;
+    const id = this.httpClientId || this.selfId;
+    if (!base || !id || !this.room) return;
+    try {
+      const res = await fetch(`${base}/rpc`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        signal: this.abortAfter(4000),
+        body: JSON.stringify({ type: "game", data: buf.toString("base64"), clientId: id }),
+      });
+      if (!res.ok) return;
+      const body = (await res.json()) as { messages?: Signaling[] };
+      for (const m of body.messages ?? []) this.onSignal(m);
+    } catch {
+      /* WS path still open */
+    }
+  }
+
   private onUdp(msg: Buffer, rinfo: RemoteInfo): void {
     let game = msg;
     if (msg[0] === 0x52 && msg[1] === 2) game = msg.subarray(2);
     const header = decodeHeader(game);
     if (!header) return;
+    if (!this.rememberPacket(game) && header.type !== MessageType.Heartbeat) return;
 
     if (header.type === MessageType.PunchPing) {
       if (!rinfo.port) return;
@@ -560,6 +612,7 @@ export class TwinSeatSession {
       if (hello.packId !== this.pack.id && hello.packId !== "generic-msfs" && this.pack.id !== "generic-msfs") {
         return;
       }
+      this.othersSeen = true;
       if (this.iAmPoseSource()) this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
       return;
     }
@@ -644,7 +697,7 @@ export class TwinSeatSession {
       this.sendGame(encodeHeartbeat(this.seq++, now));
     }
 
-    if (this.room && this.roster.length > 1 && now - this.lastHelloAt > 1500) {
+    if (this.room && this.hasCrew() && now - this.lastHelloAt > 1500) {
       this.lastHelloAt = now;
       this.lastRosterN = this.roster.length;
       this.helloPeer();
@@ -675,7 +728,7 @@ export class TwinSeatSession {
     }
     this.wasInWorld = inWorld;
 
-    if (this.room && this.roster.length > 1 && pose && this.iAmPoseSource()) {
+    if (this.room && this.hasCrew() && pose && this.iAmPoseSource()) {
       const worldGap = pose.onGround ? 100 : 50;
       if (now - this.lastWorldSend > worldGap) {
         this.lastWorldSend = now;
@@ -683,7 +736,7 @@ export class TwinSeatSession {
       }
     }
 
-    if (this.room && this.roster.length > 1) {
+    if (this.room && this.hasCrew()) {
       for (const ev of this.sim.drainEvents()) {
         const def = (this.pack.events ?? []).find((e) => e.sim === ev.name);
         if (!def) continue;
@@ -723,7 +776,7 @@ export class TwinSeatSession {
       this.sendGame(encodeDelta(this.seq++, delta));
     }
 
-    if (this.room && this.roster.length > 1 && this.iAmPoseSource() && now - this.lastSnapAt > 200) {
+    if (this.room && this.hasCrew() && this.iAmPoseSource() && now - this.lastSnapAt > 200) {
       this.lastSnapAt = now;
       this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
     }
@@ -823,6 +876,8 @@ export class TwinSeatSession {
     this.lastRemote.clear();
     this.lastError = "";
     this.useHttp = false;
+    this.othersSeen = false;
+    this.seenKeys.clear();
     this.stopHttpPoll();
     this.sim.setPhysicsHold(false);
     try {

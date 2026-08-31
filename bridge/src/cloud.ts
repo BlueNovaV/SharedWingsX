@@ -1,4 +1,4 @@
-function toHttp(url: string): string {
+export function toHttp(url: string): string {
   return url
     .trim()
     .replace(/\/$/, "")

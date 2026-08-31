@@ -2,7 +2,7 @@ import type { SimConnectConnection } from "node-simconnect";
 import type { AircraftPack, PackVar } from "./pack.js";
 import { MockSim, type SimBackend, type SimIdentity, type WorldPose } from "./sim.js";
 import { nearestAirport } from "./airports.js";
-import { discreteEventForVar, skipInputEventName } from "./sim-events.js";
+import { discreteEventForVar, inputEventPriority, skipInputEventName } from "./sim-events.js";
 
 type SimConnectMod = typeof import("node-simconnect");
 let sc: SimConnectMod;
@@ -13,6 +13,16 @@ function usableName(s: string): boolean {
   if (/ATCCOM/i.test(t)) return false;
   if (/\.text$/i.test(t)) return false;
   return true;
+}
+
+function metersBetween(aLat: number, aLon: number, bLat: number, bLon: number): number {
+  const r = 6371000;
+  const dLat = ((bLat - aLat) * Math.PI) / 180;
+  const dLon = ((bLon - aLon) * Math.PI) / 180;
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((aLat * Math.PI) / 180) * Math.cos((bLat * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+  return 2 * r * Math.asin(Math.min(1, Math.sqrt(s)));
 }
 
 const TITLE_DEF = 1;
@@ -31,6 +41,7 @@ const ATC_REQ = 8;
 const CAM_DEF = 9;
 const CAM_REQ = 9;
 const GROUND_POSE_WRITE = 10;
+const INIT_POSE_WRITE = 11;
 const INPUT_LIST_REQ = 41;
 const EVENT_GROUP = 1;
 const WRITE_BASE = 1000;
@@ -44,7 +55,7 @@ export async function connectMsfs(pack: AircraftPack): Promise<SimBackend | null
     const opened = await Promise.race([
       sc.open("SharedWingsX", sc.Protocol.KittyHawk),
       new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error("SimConnect timeout")), 2500);
+        setTimeout(() => reject(new Error("SimConnect timeout")), 8000);
       }),
     ]);
     return new MsfsSim(pack, opened.handle, opened.recvOpen);
@@ -95,6 +106,7 @@ class MsfsSim implements SimBackend {
   private muteInput = new Map<string, number>();
   private muteEvent = new Map<number, number>();
   private eventByClient = new Map<number, string>();
+  private lastWarpAt = 0;
 
   constructor(pack: AircraftPack, handle: SimConnectConnection, recvOpen: {
     applicationName?: string;
@@ -171,6 +183,7 @@ class MsfsSim implements SimBackend {
     handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE LONGITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE ALTITUDE", "feet", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE HEADING DEGREES TRUE", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(INIT_POSE_WRITE, "Initial Position", null, sc.SimConnectDataType.INITPOSITION);
     handle.addToDataDefinition(VEL_WRITE, "VELOCITY BODY X", "feet per second", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(VEL_WRITE, "VELOCITY BODY Y", "feet per second", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(VEL_WRITE, "VELOCITY BODY Z", "feet per second", sc.SimConnectDataType.FLOAT64);
@@ -255,7 +268,9 @@ class MsfsSim implements SimBackend {
       console.warn("[twinseat] input event list skipped", err instanceof Error ? err.message : err);
     }
     handle.on("inputEventsList", (list) => {
-      const rows = list.inputEventDescriptors ?? [];
+      const rows = [...(list.inputEventDescriptors ?? [])].sort(
+        (a, b) => inputEventPriority(String(a.name ?? "")) - inputEventPriority(String(b.name ?? "")),
+      );
       let n = 0;
       for (const row of rows) {
         const name = String(row.name ?? "");
@@ -388,18 +403,38 @@ class MsfsSim implements SimBackend {
 
   applyWorldPose(pose: WorldPose): void {
     try {
-      if (pose.onGround) {
-        const ground = new sc.RawBuffer(32);
-        ground.writeFloat64(pose.lat);
-        ground.writeFloat64(pose.lon);
-        ground.writeFloat64(pose.alt);
-        ground.writeFloat64(pose.heading);
-        this.handle.setDataOnSimObject(GROUND_POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
-          buffer: ground,
+      this.fire("FREEZE_LATITUDE_LONGITUDE_SET", 0);
+      const far =
+        !this.hasPosition() || metersBetween(this.lat, this.lon, pose.lat, pose.lon) > 25;
+      const now = Date.now();
+      if (far && now - this.lastWarpAt > 400) {
+        this.lastWarpAt = now;
+        const init = new sc.RawBuffer(56);
+        init.writeFloat64(pose.lat);
+        init.writeFloat64(pose.lon);
+        init.writeFloat64(pose.alt);
+        init.writeFloat64(pose.onGround ? 0 : pose.pitch);
+        init.writeFloat64(pose.onGround ? 0 : pose.bank);
+        init.writeFloat64(pose.heading);
+        init.writeInt32(pose.onGround ? 1 : 0);
+        init.writeInt32(pose.onGround ? 0 : Math.max(0, Math.round(Math.hypot(pose.vx ?? 0, pose.vz ?? 0) * 0.592484)));
+        this.handle.setDataOnSimObject(INIT_POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
+          buffer: init,
           arrayCount: 0,
           tagged: false,
         });
-      } else {
+      }
+      const ground = new sc.RawBuffer(32);
+      ground.writeFloat64(pose.lat);
+      ground.writeFloat64(pose.lon);
+      ground.writeFloat64(pose.alt);
+      ground.writeFloat64(pose.heading);
+      this.handle.setDataOnSimObject(GROUND_POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
+        buffer: ground,
+        arrayCount: 0,
+        tagged: false,
+      });
+      if (!pose.onGround) {
         const poseBuf = new sc.RawBuffer(48);
         poseBuf.writeFloat64(pose.lat);
         poseBuf.writeFloat64(pose.lon);
@@ -439,10 +474,9 @@ class MsfsSim implements SimBackend {
   setPhysicsHold(on: boolean, force = false): void {
     if (!force && this.physicsHold === on) return;
     this.physicsHold = on;
-    const flag = on ? 1 : 0;
-    this.fire("FREEZE_LATITUDE_LONGITUDE_SET", flag);
-    this.fire("FREEZE_ALTITUDE_SET", flag);
-    this.fire("FREEZE_ATTITUDE_SET", flag);
+    this.fire("FREEZE_LATITUDE_LONGITUDE_SET", 0);
+    this.fire("FREEZE_ALTITUDE_SET", on ? 1 : 0);
+    this.fire("FREEZE_ATTITUDE_SET", on ? 1 : 0);
   }
 
   read(v: PackVar): number {
