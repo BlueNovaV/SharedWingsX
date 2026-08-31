@@ -1,6 +1,6 @@
 {
   "name": "@twinseat/app",
-  "version": "0.4.44",
+  "version": "0.4.45",
   "private": true,
   "type": "module",
   "main": "electron/main.cjs",
@@ -73,7 +73,9 @@
       "signExecutable": false,
       "signtoolOptions": {
         "publisherName": "BluNova Virtual Airlines",
-        "signingHashAlgorithms": ["sha256"],
+        "signingHashAlgorithms": [
+          "sha256"
+        ],
         "rfc3161TimeStampServer": "http://timestamp.digicert.com"
       },
       "target": [
@@ -112,16 +114,23 @@
       "target": [
         {
           "target": "AppImage",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "zip",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
     "appImage": {
       "artifactName": "SharedWingsX-${version}.AppImage"
     }
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-sans": "^5.3.0"
   }
 }

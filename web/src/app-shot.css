@@ -14,18 +14,15 @@
   overflow: hidden;
   border-radius: 10px;
   border: 1px solid rgba(232, 214, 176, 0.16);
-  background:
-    radial-gradient(1200px 520px at 50% -10%, rgba(111, 191, 180, 0.08), transparent 55%),
-    radial-gradient(900px 480px at 100% 110%, rgba(224, 196, 138, 0.07), transparent 50%),
-    var(--bg);
+  background: var(--bg);
   color: var(--ink);
-  font-family: "Segoe UI Variable Text", "Segoe UI", Inter, sans-serif;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.45);
   pointer-events: none;
   user-select: none;
 }
 .swx .frame {
-  min-height: 720px;
+  min-height: 480px;
   height: auto;
   display: flex;
   flex-direction: column;
@@ -157,17 +154,7 @@
   border-radius: 6px;
   flex: none;
 }
-.swx .deck-banner {
-  position: relative;
-  flex: none;
-  height: 168px;
-  margin: 12px 18px 0;
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid rgba(111, 191, 180, 0.2);
-  background: #05070c;
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
-}
+.swx .deck-banner { display: none; }
 .swx .banner-media {
   position: absolute;
   inset: -8%;
@@ -244,11 +231,10 @@
 }
 .swx .board {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: minmax(220px, 1fr) minmax(260px, 1fr);
-  gap: 16px;
-  padding: 16px 18px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 16px 10px;
   min-height: 0;
 }
 .swx .card {
@@ -256,26 +242,39 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  overflow: auto;
-  overflow-x: hidden;
-  padding: 16px 18px 16px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), transparent 32%),
-    rgba(16, 19, 26, 0.82);
+  overflow: hidden;
+  padding: 14px 16px 12px;
+  background: #12151c;
   border: 1px solid var(--line);
-  border-radius: 14px;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border-radius: 8px;
+  box-shadow: none;
 }
-.swx .card::before {
-  content: "";
-  position: absolute;
-  left: 16px;
-  right: 16px;
-  top: 0;
-  height: 2px;
-  border-radius: 0 0 2px 2px;
-  background: linear-gradient(90deg, var(--teal), transparent 55%, var(--amber));
-  opacity: 0.7;
+.swx .card::before { display: none; }
+.swx .name-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.swx .name-row input {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(7, 9, 12, 0.7);
+  color: var(--ink);
+  font: inherit;
+}
+.swx .deck-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+.swx .deck-pane { padding: 0 16px 0 0; }
+.swx .deck-pane + .deck-pane {
+  padding: 0 0 0 16px;
+  border-left: 1px solid var(--line);
 }
 .swx .card h2 {
   display: flex;
@@ -632,9 +631,6 @@
 @media (max-width: 860px) {
   .swx .frame { min-height: 0; }
   .swx .bar-mid { display: none; }
-  .swx .board {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-  }
+  .swx .deck-split { grid-template-columns: 1fr; }
   .swx .status-copy { margin-left: 0; }
 }

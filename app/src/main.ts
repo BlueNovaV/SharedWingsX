@@ -32,55 +32,17 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-let bootWhooshPlayed = false;
-let bannerMotionReady = false;
+const APP_VER = "0.4.45";
+let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 
 function restartCssAnimations(scope: ParentNode): void {
-  const nodes = scope.querySelectorAll<HTMLElement>(
-    ".boot-craft, .boot-grid, .boot-glow, .boot-runway span, .boot-bar span, .boot-ring, .boot-steps li",
-  );
+  const nodes = scope.querySelectorAll<HTMLElement>(".boot-bar span, .boot-ring");
   for (const el of Array.from(nodes)) {
     el.style.animation = "none";
     void el.offsetWidth;
     el.style.animation = "";
   }
-}
-
-function playBootWhoosh(): void {
-  if (bootWhooshPlayed) return;
-  const audio = document.querySelector("#boot-whoosh");
-  if (!(audio instanceof HTMLAudioElement)) return;
-  bootWhooshPlayed = true;
-  audio.loop = false;
-  audio.volume = 0.85;
-  audio.currentTime = 0;
-  void audio.play().catch(() => {});
-}
-
-function fadeBootWhoosh(): void {
-  const audio = document.querySelector("#boot-whoosh");
-  if (!(audio instanceof HTMLAudioElement) || audio.paused) return;
-  const start = audio.volume;
-  const t0 = performance.now();
-  const tick = (now: number): void => {
-    const t = Math.min(1, (now - t0) / 720);
-    audio.volume = Math.max(0, start * (1 - t));
-    if (t < 1 && !audio.paused) requestAnimationFrame(tick);
-    else stopBootWhoosh();
-  };
-  requestAnimationFrame(tick);
-}
-
-function stopBootWhoosh(): void {
-  bootWhooshPlayed = true;
-  const audio = document.querySelector("#boot-whoosh");
-  if (!(audio instanceof HTMLAudioElement)) return;
-  audio.pause();
-  audio.currentTime = 0;
-  audio.removeAttribute("src");
-  audio.load();
-  audio.remove();
 }
 
 function escapeHtml(s: string): string {
@@ -159,12 +121,7 @@ function cockpitView(): string {
       return `<div class="seat-3d ${s.id} ${cls}" title="${s.title}"><span class="seat-code">${s.label}</span><span class="seat-who">${escapeHtml(who)}</span></div>`;
     })
     .join("");
-  return `
-    <div class="cabin" role="img" aria-label="Flight deck">
-      <div class="cabin-photo"></div>
-      <div class="cabin-vignette"></div>
-      <div class="cabin-seats">${chips}</div>
-    </div>`;
+  return `<div class="crew-grid">${chips}</div>`;
 }
 
 function simOn2024(): boolean {
@@ -328,42 +285,36 @@ function aircraftPickerHtml(live: boolean): string {
   </div>`;
 }
 
-function updateModal(): string {
+function updateToast(): string {
   if (updateLater) return "";
   if (update?.outdated) {
     const busy = updateBusy;
     const label =
       updatePhase === "install"
-        ? "Starting the installer. SharedWingsX will close and reopen."
+        ? "Installer starting…"
         : updateBusy
-          ? `Downloading the latest version… ${updatePct}%`
-          : "Click Update. SharedWingsX downloads the latest Setup and installs it.";
+          ? `Downloading… ${updatePct}%`
+          : `${update.current} → ${update.latest}`;
     return `
-    <div class="update-mask">
-      <div class="update-card">
-        <p class="update-kicker">Update required</p>
-        <h2>You are on an outdated version</h2>
-        <p>This SharedWingsX is <strong>${escapeHtml(update.current)}</strong>. Latest is <strong>${escapeHtml(update.latest)}</strong>. Update to continue.</p>
-        ${update.notes ? `<p class="hint">${escapeHtml(update.notes)}</p>` : ""}
-        <p class="hint">${escapeHtml(updateError || label)}</p>
-        ${busy ? `<div class="bar-track"><span style="width:${updatePct}%"></span></div>` : ""}
-        <button type="button" class="btn-update" id="do-update" ${busy ? "disabled" : ""}>${busy ? "Updating…" : "Update to latest version"}</button>
-        <button type="button" class="update-skip" id="later" ${busy ? "disabled" : ""}>Not now</button>
-      </div>
-    </div>`;
+    <aside class="update-toast" role="status">
+      <p class="update-kicker">Update</p>
+      <h2>Newer version available</h2>
+      <p>${escapeHtml(updateError || label)}</p>
+      ${busy ? `<div class="bar-track"><span style="width:${updatePct}%"></span></div>` : ""}
+      <button type="button" class="btn-update" id="do-update" ${busy ? "disabled" : ""}>${busy ? "Updating…" : "Update"}</button>
+      <button type="button" class="update-skip" id="later" ${busy ? "disabled" : ""}>Not now</button>
+    </aside>`;
   }
   if (update && update.checked === false) {
     return `
-    <div class="update-mask">
-      <div class="update-card">
-        <p class="update-kicker">Update check</p>
-        <h2>Could not check for a newer version</h2>
-        <p>SharedWingsX could not reach update.json. Without that feed it cannot tell if you need to update.</p>
-        <button type="button" class="btn-update" id="retry-update">Check again</button>
-        <button type="button" class="update-skip" id="open-setup">Download Setup</button>
-        <button type="button" class="update-skip" id="later">Not now</button>
-      </div>
-    </div>`;
+    <aside class="update-toast" role="status">
+      <p class="update-kicker">Update</p>
+      <h2>Could not check for updates</h2>
+      <p>update.json is unreachable.</p>
+      <button type="button" class="btn-update" id="retry-update">Retry</button>
+      <button type="button" class="update-skip" id="open-setup">Download Setup</button>
+      <button type="button" class="update-skip" id="later">Dismiss</button>
+    </aside>`;
   }
   return "";
 }
@@ -452,25 +403,56 @@ function header(): string {
   return `
     <header class="bar">
       <div class="bar-left">
-        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || "0.4.44")}</span></p>
+        <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || APP_VER)}</span></p>
       </div>
       ${flightBarHtml()}
       <div class="bar-right">
         ${live ? `<p class="pill path-pill"><span class="dot ${state?.identity.connected && !state.identity.mock ? "ok" : "warn"}"></span><span class="path-pill-text">${escapeHtml(link)}</span></p>` : ""}
-        ${live ? `<button type="button" class="back js-leave">Back to start</button>` : ""}
+        ${live ? `<button type="button" class="back js-leave">Leave</button>` : `<button type="button" class="back" id="open-settings">Settings</button>`}
+        ${live ? `<button type="button" class="ghost-sm" id="open-settings">Settings</button>` : ""}
       </div>
     </header>`;
 }
 
-function crewRows(): string {
-  const order = ["left", "right", "jumpLeft", "jumpRight"];
-  return order
-    .map((seat) => {
-      const who = nameAt(seat);
-      const you = state?.seat === seat;
-      return `<li><span class="who-seat">${seatTitle(seat)}</span><span class="who-name">${escapeHtml(who)}${you ? " (you)" : ""}</span></li>`;
-    })
-    .join("");
+function settingsPanel(): string {
+  const live = Boolean(state?.room);
+  return `<div class="settings-layer" ${settingsOpen ? "" : "hidden"}>
+    <aside class="settings-sheet" role="dialog" aria-label="Settings">
+      <div class="picker-sheet-head">
+        <p class="picker-sheet-title">Settings</p>
+        <button type="button" class="picker-sheet-close" id="close-settings">Close</button>
+      </div>
+      ${live ? `<label class="field">Name
+        <input id="name" value="${escapeHtml(name)}" maxlength="24" />
+      </label>` : ""}
+      <div class="field">
+        <span class="field-head"><span class="field-title">Sync pack</span><span class="field-note">Universal SimConnect or a dedicated pack</span></span>
+        ${packPickerHtml(live)}
+      </div>
+      <div class="field">
+        <span class="field-head"><span class="field-title">Aircraft</span><span class="field-note">Asobo, PMDG, Fenix, iFly, iniBuilds</span></span>
+        ${aircraftPickerHtml(live)}
+      </div>
+      ${communitySelectHtml(live)}
+      <div class="setup ${install.ok ? "" : "bad"}">
+        <p><span class="dot ${install.ok ? "ok" : ""}"></span><span class="setup-msg">${escapeHtml(install.message)}</span></p>
+        <button type="button" id="pick">Find again</button>
+      </div>
+      ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found. Browse on the 2020 row.</p>` : ""}
+      <p class="hint">Version ${escapeHtml(update?.current || APP_VER)}${
+        !update
+          ? " · checking…"
+          : update.outdated
+            ? ` · latest ${escapeHtml(update.latest)}`
+            : update.checked === false
+              ? " · check failed"
+              : " · up to date"
+      }</p>
+      <div class="card-foot">
+        <button type="button" class="btn-secondary" id="check-update">Check for updates</button>
+      </div>
+    </aside>
+  </div>`;
 }
 
 let pickerCleanups: Array<() => void> = [];
@@ -588,6 +570,21 @@ function bindBoard(): void {
   const nameInput = root.querySelector<HTMLInputElement>("#name");
   nameInput?.addEventListener("input", () => {
     name = nameInput.value.trim() || "Pilot";
+    localStorage.setItem("twinseat-name", name);
+  });
+  root.querySelector("#open-settings")?.addEventListener("click", () => {
+    settingsOpen = true;
+    renderBoard();
+  });
+  root.querySelector("#close-settings")?.addEventListener("click", () => {
+    settingsOpen = false;
+    renderBoard();
+  });
+  root.querySelector(".settings-layer")?.addEventListener("click", (ev) => {
+    if (ev.target === ev.currentTarget) {
+      settingsOpen = false;
+      renderBoard();
+    }
   });
   root.querySelector("#apply")?.addEventListener("click", () => {
     const next = root.querySelector<HTMLInputElement>("#name")?.value.trim() || "Pilot";
@@ -717,120 +714,67 @@ function renderBoard(): void {
       ? { start: active.selectionStart, end: active.selectionEnd }
       : null;
 
+  const lobby = `
+        <section class="card deck-home" data-card="deck">
+          ${error ? `<p class="card-err">${escapeHtml(error)}</p>` : ""}
+          <div class="name-row">
+            <label for="name">Name</label>
+            <input id="name" value="${escapeHtml(name)}" maxlength="24" />
+          </div>
+          <div class="deck-split">
+            <div class="deck-pane">
+              <h2>Host</h2>
+              <p class="hint">Start a session. Share the six-character code. Same aircraft, multiplayer off.</p>
+              <div class="card-foot">
+                <button type="button" class="btn-host" id="start" ${busy ? "disabled" : ""}>${busy ? "Starting..." : "Start deck"}</button>
+              </div>
+            </div>
+            <div class="deck-pane">
+              <h2>Join</h2>
+              <input id="code" class="code-one" maxlength="8" autocomplete="off" spellcheck="false" inputmode="text" aria-label="Session code" value="${escapeHtml(joinCode)}" />
+              <div class="choice seats">
+                <label><input type="radio" name="seat" value="right" ${joinSeat === "right" ? "checked" : ""} /> FO</label>
+                <label><input type="radio" name="seat" value="jumpLeft" ${joinSeat === "jumpLeft" ? "checked" : ""} /> Jump L</label>
+                <label><input type="radio" name="seat" value="jumpRight" ${joinSeat === "jumpRight" ? "checked" : ""} /> Jump R</label>
+              </div>
+              <div class="card-foot">
+                <button type="button" class="btn-join" id="connect" ${busy ? "disabled" : ""}>${busy ? "Connecting..." : "Connect"}</button>
+              </div>
+            </div>
+          </div>
+        </section>`;
+
+  const liveView = `
+        <section class="card deck-live" data-card="live">
+          ${error ? `<p class="card-err">${escapeHtml(error)}</p>` : ""}
+          <h2>${host ? "Your deck" : "Connected"}</h2>
+          <p class="hint">${escapeHtml(roleLine)}</p>
+          ${
+            host
+              ? `<div class="live-code"><div class="room" aria-label="Session code">${escapeHtml(state?.room ?? "")}</div>
+                 <button type="button" class="ghost-sm" id="copy">${copied ? "Copied" : "Copy"}</button></div>`
+              : `<p class="hint">Seat: ${escapeHtml(seatTitle(state?.seat ?? ""))}. Leave flying axes idle unless you take command.</p>`
+          }
+          ${cockpitView()}
+          <div class="card-actions">
+            ${canGive || canTake ? `<button type="button" class="ghost-sm" id="hand">${iFly ? "FO becomes captain" : "Take command back"}</button>` : ""}
+            ${fo && !observer ? `<button type="button" class="ghost-sm" id="obs">FO observer</button>` : ""}
+            <button type="button" class="ghost-sm js-leave">${host ? "Close deck" : "Leave"}</button>
+          </div>
+        </section>`;
+
   root.innerHTML = `
     <div class="frame board-frame">
-      ${updateModal()}
+      ${updateToast()}
       ${header()}
-      <div class="deck-banner" aria-hidden="true">
-        <img class="banner-media" src="./brand/banner.jpg" alt="" />
-        <div class="banner-shade"></div>
-        <div class="banner-glow"></div>
-        <div class="banner-sweep"></div>
-        <div class="banner-copy">
-          <p class="banner-kicker">Shared flight deck</p>
-          <p class="banner-title">SharedWingsX</p>
-        </div>
-      </div>
+      ${settingsPanel()}
       <div class="board">
-        <section class="card" data-card="join">
-          <h2><span>01</span> Join</h2>
-          ${error ? `<p class="card-err">${escapeHtml(error)}</p>` : ""}
-          ${
-            live && host
-              ? `<p class="hint">You started this deck. Share the code under Host. Guests do not start a deck.</p>`
-              : live
-                ? `<p class="hint">You are connected as ${escapeHtml(seatTitle(state?.seat ?? ""))}. After spawn, this sim is locked to the captain aircraft. Leave flying axes idle on this PC. Keep MSFS multiplayer off.</p>
-                   <div class="card-foot"><button type="button" class="ghost-sm js-leave">Leave deck</button></div>`
-                : `<p class="choice-lab">Session code</p>
-          <p class="hint">Paste the six-character code from the host. Spaces and dashes are stripped. Last code is remembered.</p>
-          <div class="field">
-            <input id="code" class="code-one" maxlength="8" autocomplete="off" spellcheck="false" inputmode="text" aria-label="Session code" value="${escapeHtml(joinCode)}" />
-          </div>
-          <p class="choice-lab">Seat</p>
-          <div class="choice seats">
-            <label><input type="radio" name="seat" value="right" ${joinSeat === "right" ? "checked" : ""} /> First Officer</label>
-            <label><input type="radio" name="seat" value="jumpLeft" ${joinSeat === "jumpLeft" ? "checked" : ""} /> Jumpseat L</label>
-            <label><input type="radio" name="seat" value="jumpRight" ${joinSeat === "jumpRight" ? "checked" : ""} /> Jumpseat R</label>
-          </div>
-          <p class="hint grow">Works over the internet. The host clicks Start deck and keeps SharedWingsX open. You do not need to be in the aircraft first.</p>
-          <div class="card-foot">
-            <button type="button" class="btn-join" id="connect" ${busy ? "disabled" : ""}>${busy ? "Connecting..." : "Connect"}</button>
-          </div>`
-          }
-        </section>
-
-        <section class="card" data-card="host">
-          <h2><span>02</span> Host</h2>
-          ${
-            live && host
-              ? `<p class="hint">Give this session code to the other pilot. They paste it under Join and click Connect. Keep this app open.</p>
-                 <div class="room" aria-label="Session code">${escapeHtml(state?.room ?? "")}</div>
-                 <p class="hint">${escapeHtml(roleLine)} Path: ${escapeHtml(pathLabel(state?.path ?? ""))} · ${Math.round(state?.latencyMs ?? 0)} ms</p>
-                 <div class="card-actions">
-                   <button type="button" class="ghost-sm" id="copy">${copied ? "Copied" : "Copy code"}</button>
-                   ${canGive || canTake ? `<button type="button" class="ghost-sm" id="hand">${iFly ? "FO becomes captain" : "Take command back"}</button>` : ""}
-                   ${fo && !observer ? `<button type="button" class="ghost-sm" id="obs">FO observer</button>` : ""}
-                 </div>
-                 <div class="card-foot"><button type="button" class="ghost-sm js-leave">Close deck</button></div>`
-              : live
-                ? `<p class="hint">You did not start this deck. Only the host has the session code. After you both spawn, you are moved onto the captain aircraft. If they disconnect, you leave too.</p>`
-                : `<p class="hint">Click Start deck. A six-character session code appears. Share that code. Keep SharedWingsX open. You do not need to spawn in first.</p>
-                 <ul class="quiet">
-                   <li>Same aircraft. Multiplayer off. Crash physics off.</li>
-                   <li>Captain flies. The other sim is frozen onto that aircraft so yoke, throttle and switches follow.</li>
-                   <li>FO: do not move flying axes unless you take command.</li>
-                   <li>VATSIM: captain logs in. FO as observer.</li>
-                 </ul>
-                 <div class="card-foot">
-                   <button type="button" class="btn-host" id="start" ${busy ? "disabled" : ""}>${busy ? "Starting..." : "Start deck"}</button>
-                 </div>`
-          }
-        </section>
-
-        <section class="card" data-card="crew">
-          <h2><span>03</span> Crew</h2>
-          ${cockpitView()}
-          <ul class="crew-list">${crewRows()}</ul>
-        </section>
-
-        <section class="card" data-card="settings">
-          <h2><span>04</span> Settings</h2>
-          <label class="field">Name
-            <input id="name" value="${escapeHtml(name)}" maxlength="24" />
-          </label>
-          <div class="field">
-            <span class="field-head"><span class="field-title">Sync pack</span><span class="field-note">Universal SimConnect or a dedicated pack</span></span>
-            ${packPickerHtml(live)}
-          </div>
-          <div class="field">
-            <span class="field-head"><span class="field-title">Aircraft</span><span class="field-note">Asobo, PMDG, Fenix, iFly, iniBuilds</span></span>
-            ${aircraftPickerHtml(live)}
-          </div>
-          ${communitySelectHtml(live)}
-          <div class="setup ${install.ok ? "" : "bad"}">
-            <p><span class="dot ${install.ok ? "ok" : ""}"></span><span class="setup-msg">${escapeHtml(install.message)}</span></p>
-            <button type="button" id="pick">Find again</button>
-          </div>
-          ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found automatically. Click Browse on the MSFS 2020 row.</p>` : ""}
-          <p class="hint">Version ${escapeHtml(update?.current || "0.4.44")}${
-            !update
-              ? " · checking…"
-              : update.outdated
-                ? ` · outdated, latest ${escapeHtml(update.latest)}`
-                : update.checked === false
-                  ? " · update check failed"
-                  : " · up to date"
-          }</p>
-          <div class="card-foot">
-            <button type="button" class="btn-join btn-secondary" id="check-update">Check for updates</button>
-            <button type="button" class="btn-join" id="apply">${saved ? "Saved" : "Save"}</button>
-          </div>
-        </section>
+        ${live ? liveView : lobby}
       </div>
       <footer class="status">
         <span class="sim-lamps status-item" data-sim-lamps>${simLampsHtml()}</span>
         <span class="status-item"><span class="dot ${live && state?.path === "direct" ? "ok" : live ? "warn" : ""}"></span><span>${live ? escapeHtml(pathLabel(state?.path ?? "")) : "Path automatic"}</span></span>
-        <span class="status-copy">© BluNova Virtual Airlines by Jordy · All rights reserved</span>
+        <span class="status-copy">© BluNova Virtual Airlines by Jordy</span>
       </footer>
     </div>`;
 
@@ -857,10 +801,6 @@ function renderBoard(): void {
         }
       }
     }
-  }
-  if (!bannerMotionReady) {
-    bannerMotionReady = true;
-    requestAnimationFrame(() => restartCssAnimations(root));
   }
 }
 
@@ -928,15 +868,12 @@ async function boot(): Promise<void> {
     splashStarted = true;
     const splash = document.getElementById("boot");
     restartCssAnimations(document);
-    playBootWhoosh();
     window.setTimeout(() => {
-      fadeBootWhoosh();
       splash?.classList.add("out");
-    }, 7000);
+    }, 1800);
     window.setTimeout(() => {
-      stopBootWhoosh();
       splash?.remove();
-    }, 7800);
+    }, 2200);
   };
   if (document.visibilityState === "visible") startSplash();
   else {

@@ -69,13 +69,13 @@
               </span>
               <span class="btn-copy">
                 <span data-i="cta2">Download SharedWingsX</span>
-                <small data-i="ctaSub">Windows installer · 0.4.44 · ~95 MB</small>
+                <small data-i="ctaSub">Windows installer · 0.4.45 · ~95 MB</small>
               </span>
             </a>
             <span data-i="heroMeta">Windows and Linux, no account</span>
           </div>
           <p class="cta-linux">
-            <a href="./downloads/SharedWingsX-0.4.44-linux-x64.zip" download>Linux (x64 zip)</a>
+            <a href="./downloads/SharedWingsX-0.4.45-linux-x64.zip" download>Linux (x64 zip)</a>
           </p>
       </div>
     </section>
@@ -84,16 +84,16 @@
       <div class="wrap split app-intro">
         <h2 data-i="appTitle">The Windows app</h2>
         <p class="copy" data-i="appCopy">
-          This is SharedWingsX. Host starts a deck, a six-character code appears, the other seats join. MSFS 2020 and
-          2024 lamps sit in the footer. Same version on every PC.
+            This is SharedWingsX. Host and join sit on one screen. Settings open from the header. Updates appear as a
+            corner toast. Same version on every PC.
         </p>
       </div>
       <div class="wrap bezel">
-        <div class="swx" role="img" aria-label="SharedWingsX window: Join, Host, Crew and Settings">
+        <div class="swx" role="img" aria-label="SharedWingsX window: host and join on one screen">
           <div class="frame board-frame">
             <header class="bar">
               <div class="bar-left">
-                <p class="brand"><img src="./brand/logo.png?v=4" alt="" /><span>SharedWingsX</span> <span class="ver" data-rel-ver>0.4.44</span></p>
+                <p class="brand"><img src="./brand/logo.png?v=4" alt="" /><span>SharedWingsX</span> <span class="ver" data-rel-ver>0.4.45</span></p>
               </div>
               <div class="bar-mid" data-flight-bar>
                 <span class="flight-ac">PMDG 737</span>
@@ -101,100 +101,41 @@
                 <span class="flight-apt">EHAM</span>
               </div>
               <div class="bar-right">
-                <p class="pill path-pill"><span class="dot ok"></span><span class="path-pill-text">Cloud · 42 ms</span></p>
-                <span class="back">Back to start</span>
+                <span class="back">Settings</span>
               </div>
             </header>
-            <div class="deck-banner" aria-hidden="true">
-              <img class="banner-media" src="./brand/banner-still.png" alt="" />
-              <div class="banner-shade"></div>
-              <div class="banner-glow"></div>
-              <div class="banner-sweep"></div>
-              <div class="banner-copy">
-                <p class="banner-kicker">Shared flight deck</p>
-                <p class="banner-title">SharedWingsX</p>
-              </div>
-            </div>
             <div class="board">
-              <section class="card">
-                <h2><span>01</span> Join</h2>
-                <label class="choice-lab" for="swx-demo-code">Session code</label>
-                <p class="hint">Paste the six-character code from the host. Spaces and dashes are stripped. Last code is remembered.</p>
-                <div class="field">
-                  <input
-                    id="swx-demo-code"
-                    name="swx-demo-code"
-                    class="code-one"
-                    maxlength="8"
-                    value="K7MP2Q"
-                    readonly
-                    tabindex="-1"
-                    autocomplete="off"
-                  />
-                </div>
-                <p class="choice-lab" id="swx-demo-seat-lab">Seat</p>
-                <div class="choice seats" role="group" aria-labelledby="swx-demo-seat-lab">
-                  <span><span class="swx-radio on"></span> First Officer</span>
-                  <span><span class="swx-radio"></span> Jumpseat L</span>
-                  <span><span class="swx-radio"></span> Jumpseat R</span>
-                </div>
-                <p class="hint grow">Works over the internet. The host clicks Start deck and keeps SharedWingsX open. You do not need to be in the aircraft first.</p>
-                <div class="card-foot">
-                  <span class="btn-join">Connect</span>
-                </div>
-              </section>
-              <section class="card">
-                <h2><span>02</span> Host</h2>
-                <p class="hint">Give this session code to the other pilot. They paste it under Join and click Connect. Keep this app open.</p>
-                <div class="room">K7MP2Q</div>
-                <p class="hint">You are captain. You fly. Path: Cloud · 42 ms</p>
-                <div class="card-actions">
-                  <span class="ghost-sm">Copy code</span>
-                  <span class="ghost-sm">FO becomes captain</span>
-                </div>
-                <div class="card-foot"><span class="ghost-sm">Close deck</span></div>
-              </section>
-              <section class="card">
-                <h2><span>03</span> Crew</h2>
-                <div class="cabin">
-                  <img class="cabin-photo" src="./brand/cabin-deck.jpg" alt="" />
-                  <div class="cabin-vignette"></div>
-                  <div class="cabin-seats">
-                    <div class="seat-3d left you"><span class="seat-code">Captain</span><span class="seat-who">Jordy</span></div>
-                    <div class="seat-3d right crew"><span class="seat-code">First Officer</span><span class="seat-who">Alex</span></div>
-                    <div class="seat-3d jumpLeft empty"><span class="seat-code">Jumpseat L</span><span class="seat-who">Empty</span></div>
-                    <div class="seat-3d jumpRight empty"><span class="seat-code">Jumpseat R</span><span class="seat-who">Empty</span></div>
-                  </div>
-                </div>
-                <ul class="crew-list">
-                  <li><span class="who-seat">Captain</span><span class="who-name">Jordy (you)</span></li>
-                  <li><span class="who-seat">First officer</span><span class="who-name">Alex</span></li>
-                  <li><span class="who-seat">Jumpseat L</span><span class="who-name">Empty</span></li>
-                  <li><span class="who-seat">Jumpseat R</span><span class="who-name">Empty</span></li>
-                </ul>
-              </section>
-              <section class="card">
-                <h2><span>04</span> Settings</h2>
-                <label class="field" for="swx-demo-name">Name
+              <section class="card deck-home">
+                <div class="name-row">
+                  <span class="choice-lab">Name</span>
                   <input id="swx-demo-name" name="swx-demo-name" value="Jordy" readonly tabindex="-1" autocomplete="off" />
-                </label>
-                <div class="field">
-                  <span class="field-head"><span class="field-title">Sync pack</span><span class="field-note">Universal SimConnect or a dedicated pack</span></span>
-                  <div class="picker">
-                    <span class="picker-btn"><span class="picker-kicker">Sync pack</span><span class="picker-value">Universal MSFS (SimConnect)</span></span>
+                </div>
+                <div class="deck-split">
+                  <div class="deck-pane">
+                    <h2>Host</h2>
+                    <p class="hint">Start a session. Share the six-character code. Same aircraft, multiplayer off.</p>
+                    <div class="card-foot"><span class="btn-host">Start deck</span></div>
+                  </div>
+                  <div class="deck-pane">
+                    <h2>Join</h2>
+                    <input
+                      id="swx-demo-code"
+                      name="swx-demo-code"
+                      class="code-one"
+                      maxlength="8"
+                      value="K7MP2Q"
+                      readonly
+                      tabindex="-1"
+                      autocomplete="off"
+                    />
+                    <div class="choice seats" role="group">
+                      <span><span class="swx-radio on"></span> FO</span>
+                      <span><span class="swx-radio"></span> Jump L</span>
+                      <span><span class="swx-radio"></span> Jump R</span>
+                    </div>
+                    <div class="card-foot"><span class="btn-join">Connect</span></div>
                   </div>
                 </div>
-                <div class="field">
-                  <span class="field-head"><span class="field-title">Aircraft</span><span class="field-note">Asobo, PMDG, Fenix, iFly, iniBuilds</span></span>
-                  <div class="picker">
-                    <span class="picker-btn"><span class="picker-kicker">From sim</span><span class="picker-value">Automatic · PMDG 737</span></span>
-                  </div>
-                </div>
-                <div class="setup">
-                  <p><span class="dot ok"></span><span class="setup-msg">Presence in Community</span></p>
-                  <span class="ghost-sm">Find again</span>
-                </div>
-                <p class="hint">Version <span data-rel-ver>0.4.44</span> · up to date</p>
               </section>
             </div>
             <footer class="status">
@@ -202,8 +143,8 @@
                 <span class="lamp"><span class="dot"></span><span class="lamp-lab">MSFS 2020</span></span>
                 <span class="lamp on"><span class="dot live"></span><span class="lamp-lab">MSFS 2024</span></span>
               </span>
-              <span class="status-item"><span class="dot warn"></span><span>Cloud</span></span>
-              <span class="status-copy">© BluNova Virtual Airlines by Jordy · All rights reserved</span>
+              <span class="status-item"><span class="dot"></span><span>Path automatic</span></span>
+              <span class="status-copy">© BluNova Virtual Airlines by Jordy</span>
             </footer>
           </div>
         </div>

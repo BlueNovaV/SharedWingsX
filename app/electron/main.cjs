@@ -162,10 +162,10 @@ async function createWindow() {
 
   const work = screen.getPrimaryDisplay().workAreaSize;
   mainWindow = new BrowserWindow({
-    width: Math.min(1440, Math.max(1200, work.width - 80)),
-    height: Math.min(960, Math.max(780, work.height - 80)),
-    minWidth: 1100,
-    minHeight: 720,
+    width: Math.min(820, Math.max(760, work.width - 160)),
+    height: Math.min(620, Math.max(540, work.height - 160)),
+    minWidth: 720,
+    minHeight: 500,
     icon: path.join(__dirname, "..", "build", "icon.ico"),
     backgroundColor: "#0b0d12",
     title: "SharedWingsX",

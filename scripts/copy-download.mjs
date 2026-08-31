@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "Use the GitHub Setup (~95 MB). A 12 KB file is a web page, not the installer.",
+  notes: "Compact window, no startup sound, updates in a corner toast. Host and join share one screen.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };
