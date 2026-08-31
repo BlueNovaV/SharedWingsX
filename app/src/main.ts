@@ -32,7 +32,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.45";
+const APP_VER = "0.4.46";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 
@@ -121,7 +121,11 @@ function cockpitView(): string {
       return `<div class="seat-3d ${s.id} ${cls}" title="${s.title}"><span class="seat-code">${s.label}</span><span class="seat-who">${escapeHtml(who)}</span></div>`;
     })
     .join("");
-  return `<div class="crew-grid">${chips}</div>`;
+  return `
+    <div class="cabin" role="img" aria-label="Flight deck">
+      <div class="cabin-vignette"></div>
+      <div class="cabin-seats">${chips}</div>
+    </div>`;
 }
 
 function simOn2024(): boolean {
@@ -408,20 +412,16 @@ function header(): string {
       ${flightBarHtml()}
       <div class="bar-right">
         ${live ? `<p class="pill path-pill"><span class="dot ${state?.identity.connected && !state.identity.mock ? "ok" : "warn"}"></span><span class="path-pill-text">${escapeHtml(link)}</span></p>` : ""}
-        ${live ? `<button type="button" class="back js-leave">Leave</button>` : `<button type="button" class="back" id="open-settings">Settings</button>`}
-        ${live ? `<button type="button" class="ghost-sm" id="open-settings">Settings</button>` : ""}
+        ${live ? `<button type="button" class="back js-leave">Leave</button>` : ""}
+        <button type="button" class="back" id="open-settings">${settingsOpen ? "Close settings" : "Settings"}</button>
       </div>
     </header>`;
 }
 
 function settingsPanel(): string {
   const live = Boolean(state?.room);
-  return `<div class="settings-layer" ${settingsOpen ? "" : "hidden"}>
-    <aside class="settings-sheet" role="dialog" aria-label="Settings">
-      <div class="picker-sheet-head">
-        <p class="picker-sheet-title">Settings</p>
-        <button type="button" class="picker-sheet-close" id="close-settings">Close</button>
-      </div>
+  return `<section class="card settings-card" data-card="settings">
+      <h2>Settings</h2>
       ${live ? `<label class="field">Name
         <input id="name" value="${escapeHtml(name)}" maxlength="24" />
       </label>` : ""}
@@ -451,8 +451,7 @@ function settingsPanel(): string {
       <div class="card-foot">
         <button type="button" class="btn-secondary" id="check-update">Check for updates</button>
       </div>
-    </aside>
-  </div>`;
+    </section>`;
 }
 
 let pickerCleanups: Array<() => void> = [];
@@ -573,18 +572,8 @@ function bindBoard(): void {
     localStorage.setItem("twinseat-name", name);
   });
   root.querySelector("#open-settings")?.addEventListener("click", () => {
-    settingsOpen = true;
+    settingsOpen = !settingsOpen;
     renderBoard();
-  });
-  root.querySelector("#close-settings")?.addEventListener("click", () => {
-    settingsOpen = false;
-    renderBoard();
-  });
-  root.querySelector(".settings-layer")?.addEventListener("click", (ev) => {
-    if (ev.target === ev.currentTarget) {
-      settingsOpen = false;
-      renderBoard();
-    }
   });
   root.querySelector("#apply")?.addEventListener("click", () => {
     const next = root.querySelector<HTMLInputElement>("#name")?.value.trim() || "Pilot";
@@ -637,7 +626,7 @@ function bindBoard(): void {
     window.setTimeout(() => {
       copied = false;
       const again = root.querySelector("#copy");
-      if (again) again.textContent = "Copy code";
+      if (again) again.textContent = "Copy";
     }, 1600);
   });
   const fo = otherFront();
@@ -714,62 +703,61 @@ function renderBoard(): void {
       ? { start: active.selectionStart, end: active.selectionEnd }
       : null;
 
-  const lobby = `
+  const home = `
         <section class="card deck-home" data-card="deck">
           ${error ? `<p class="card-err">${escapeHtml(error)}</p>` : ""}
-          <div class="name-row">
-            <label for="name">Name</label>
-            <input id="name" value="${escapeHtml(name)}" maxlength="24" />
-          </div>
-          <div class="deck-split">
-            <div class="deck-pane">
-              <h2>Host</h2>
-              <p class="hint">Start a session. Share the six-character code. Same aircraft, multiplayer off.</p>
-              <div class="card-foot">
-                <button type="button" class="btn-host" id="start" ${busy ? "disabled" : ""}>${busy ? "Starting..." : "Start deck"}</button>
-              </div>
-            </div>
-            <div class="deck-pane">
-              <h2>Join</h2>
-              <input id="code" class="code-one" maxlength="8" autocomplete="off" spellcheck="false" inputmode="text" aria-label="Session code" value="${escapeHtml(joinCode)}" />
-              <div class="choice seats">
-                <label><input type="radio" name="seat" value="right" ${joinSeat === "right" ? "checked" : ""} /> FO</label>
-                <label><input type="radio" name="seat" value="jumpLeft" ${joinSeat === "jumpLeft" ? "checked" : ""} /> Jump L</label>
-                <label><input type="radio" name="seat" value="jumpRight" ${joinSeat === "jumpRight" ? "checked" : ""} /> Jump R</label>
-              </div>
-              <div class="card-foot">
-                <button type="button" class="btn-join" id="connect" ${busy ? "disabled" : ""}>${busy ? "Connecting..." : "Connect"}</button>
-              </div>
-            </div>
-          </div>
-        </section>`;
-
-  const liveView = `
-        <section class="card deck-live" data-card="live">
-          ${error ? `<p class="card-err">${escapeHtml(error)}</p>` : ""}
-          <h2>${host ? "Your deck" : "Connected"}</h2>
-          <p class="hint">${escapeHtml(roleLine)}</p>
           ${
-            host
-              ? `<div class="live-code"><div class="room" aria-label="Session code">${escapeHtml(state?.room ?? "")}</div>
-                 <button type="button" class="ghost-sm" id="copy">${copied ? "Copied" : "Copy"}</button></div>`
-              : `<p class="hint">Seat: ${escapeHtml(seatTitle(state?.seat ?? ""))}. Leave flying axes idle unless you take command.</p>`
+            live
+              ? `<div class="live-head">
+                   <h2>${host ? "Your deck" : "Connected"}</h2>
+                   <p class="hint">${escapeHtml(roleLine)}</p>
+                   ${
+                     host
+                       ? `<div class="live-code"><div class="room" aria-label="Session code">${escapeHtml(state?.room ?? "")}</div>
+                          <button type="button" class="ghost-sm" id="copy">${copied ? "Copied" : "Copy"}</button></div>`
+                       : `<p class="hint">Seat: ${escapeHtml(seatTitle(state?.seat ?? ""))}. Leave flying axes idle unless you take command.</p>`
+                   }
+                   <div class="card-actions">
+                     ${canGive || canTake ? `<button type="button" class="ghost-sm" id="hand">${iFly ? "FO becomes captain" : "Take command back"}</button>` : ""}
+                     ${fo && !observer ? `<button type="button" class="ghost-sm" id="obs">FO observer</button>` : ""}
+                   </div>
+                 </div>`
+              : `<div class="name-row">
+                   <label for="name">Name</label>
+                   <input id="name" value="${escapeHtml(name)}" maxlength="24" />
+                 </div>
+                 <div class="deck-split">
+                   <div class="deck-pane">
+                     <h2>Host</h2>
+                     <p class="hint">Start a session. Share the six-character code.</p>
+                     <div class="card-foot">
+                       <button type="button" class="btn-host" id="start" ${busy ? "disabled" : ""}>${busy ? "Starting..." : "Start deck"}</button>
+                     </div>
+                   </div>
+                   <div class="deck-pane">
+                     <h2>Join</h2>
+                     <input id="code" class="code-one" maxlength="8" autocomplete="off" spellcheck="false" inputmode="text" aria-label="Session code" value="${escapeHtml(joinCode)}" />
+                     <div class="choice seats">
+                       <label><input type="radio" name="seat" value="right" ${joinSeat === "right" ? "checked" : ""} /> FO</label>
+                       <label><input type="radio" name="seat" value="jumpLeft" ${joinSeat === "jumpLeft" ? "checked" : ""} /> Jump L</label>
+                       <label><input type="radio" name="seat" value="jumpRight" ${joinSeat === "jumpRight" ? "checked" : ""} /> Jump R</label>
+                     </div>
+                     <div class="card-foot">
+                       <button type="button" class="btn-join" id="connect" ${busy ? "disabled" : ""}>${busy ? "Connecting..." : "Connect"}</button>
+                     </div>
+                   </div>
+                 </div>`
           }
+          <h2 class="crew-title">Crew</h2>
           ${cockpitView()}
-          <div class="card-actions">
-            ${canGive || canTake ? `<button type="button" class="ghost-sm" id="hand">${iFly ? "FO becomes captain" : "Take command back"}</button>` : ""}
-            ${fo && !observer ? `<button type="button" class="ghost-sm" id="obs">FO observer</button>` : ""}
-            <button type="button" class="ghost-sm js-leave">${host ? "Close deck" : "Leave"}</button>
-          </div>
         </section>`;
 
   root.innerHTML = `
     <div class="frame board-frame">
       ${updateToast()}
       ${header()}
-      ${settingsPanel()}
       <div class="board">
-        ${live ? liveView : lobby}
+        ${settingsOpen ? settingsPanel() : home}
       </div>
       <footer class="status">
         <span class="sim-lamps status-item" data-sim-lamps>${simLampsHtml()}</span>
@@ -814,6 +802,7 @@ function renderLive(): void {
 
 async function startDeck(): Promise<void> {
   if (!ws || busy || state?.room) return;
+  settingsOpen = false;
   busy = true;
   error = "";
   renderBoard();
@@ -838,6 +827,7 @@ function tryJoin(): void {
     return;
   }
   if (!ws || busy) return;
+  settingsOpen = false;
   busy = true;
   showJoinError("");
   setConnectBusy(true);

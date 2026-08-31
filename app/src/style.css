@@ -539,7 +539,7 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
 }
 .card .hint.grow { flex: 1; }
 .card-foot {
-  margin-top: auto;
+  margin-top: 12px;
   display: flex;
   flex-wrap: wrap;
   justify-content: stretch;
@@ -601,20 +601,15 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
 .cabin {
   position: relative;
   flex: 1;
-  min-height: 188px;
-  margin: 0 0 12px;
-  border-radius: 12px;
+  min-height: 200px;
+  margin: 0;
+  border-radius: 8px;
   overflow: hidden;
-  border: 1px solid rgba(111, 191, 180, 0.2);
-  background: #07090e;
+  border: 1px solid var(--line);
+  background: #0a0d12;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
-.cabin-photo {
-  position: absolute;
-  inset: 0;
-  background: #07090e;
-  filter: saturate(1.08) contrast(1.08);
-}
+.cabin-photo { display: none; }
 .cabin-vignette {
   position: absolute;
   inset: 0;
@@ -1298,14 +1293,20 @@ button {
   min-height: 52px;
   padding: 8px;
 }
-.crew-grid .seat-3d::after { display: none; }
-.deck-home, .deck-live { flex: 1; overflow: auto; }
+.deck-home, .deck-live, .settings-card {
+  flex: 1;
+  overflow: auto;
+}
+.deck-home {
+  display: flex;
+  flex-direction: column;
+}
 .deck-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
-  flex: 1;
-  min-height: 0;
+  flex: none;
+  align-items: start;
 }
 .deck-pane {
   display: flex;
@@ -1318,12 +1319,16 @@ button {
   border-left: 1px solid var(--line);
 }
 .deck-pane h2 { margin-top: 0; }
+.deck-pane .card-foot { margin-top: 10px; }
+.crew-title {
+  margin: 14px 0 8px;
+}
 .name-row {
   display: grid;
   grid-template-columns: 72px 1fr;
   align-items: center;
   gap: 10px;
-  margin: 0 0 14px;
+  margin: 0 0 12px;
 }
 .name-row label { color: var(--mute); font-size: 12px; }
 .name-row input {
@@ -1341,35 +1346,14 @@ button {
   gap: 8px;
   margin: 0 0 12px;
 }
-.seat-3d {
-  min-height: 56px;
-}
-.cabin, .cabin-photo, .cabin-vignette, .cabin-seats { display: none; }
+.live-head { flex: none; }
 .live-code {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
 }
 .live-code .room { margin: 0; font-size: 22px; }
-.settings-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 70;
-  display: flex;
-  justify-content: flex-end;
-  background: rgba(5, 7, 12, 0.5);
-  -webkit-app-region: no-drag;
-}
-.settings-layer[hidden] { display: none !important; }
-.settings-sheet {
-  width: min(400px, 100%);
-  height: 100%;
-  overflow: auto;
-  padding: 16px 16px 24px;
-  background: #12151c;
-  border-left: 1px solid var(--line);
-}
 .update-toast {
   position: fixed;
   right: 14px;

@@ -266,10 +266,14 @@
   color: var(--ink);
   font: inherit;
 }
+.swx .card.deck-home {
+  flex: 1;
+}
 .swx .deck-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
+  flex: none;
 }
 .swx .deck-pane { padding: 0 16px 0 0; }
 .swx .deck-pane + .deck-pane {
@@ -392,15 +396,16 @@
   margin-bottom: 8px;
 }
 .swx .card-foot {
-  margin-top: auto;
+  margin-top: 10px;
   display: flex;
   gap: 8px;
   padding-top: 12px;
 }
+.swx .crew-title { margin: 14px 0 8px; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
 .swx .cabin {
   position: relative;
   flex: 1;
-  min-height: 148px;
+  min-height: 200px;
   margin: 0 0 12px;
   border-radius: 12px;
   overflow: hidden;
