@@ -63,7 +63,7 @@ const nl: Record<string, string> = {
   navApp: "De app",
   navFaq: "FAQ",
   eyebrow: "Microsoft Flight Simulator 2020 & 2024",
-  heroTitle: "Eén cockpit.<br />Twee mensen.",
+  heroTitle: "Eén cockpit. Twee mensen.",
   heroLede:
     "Shared cockpit als product, niet als zip-avontuur. Eén Windows-app, één code, captain en first officer in dezelfde stoelen.",
   cta: "Download",

@@ -163,7 +163,7 @@ body {
   position: relative;
   min-height: 100vh;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   overflow: hidden;
   padding: 110px 0 56px;
 }
@@ -194,6 +194,8 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .night-pan { animation: none; }
   .swx .banner-media { animation: none; }
+  .steps li { transition: none; }
+  .steps li:hover { transform: none; }
 }
 .shade {
   position: absolute;
@@ -208,7 +210,7 @@ body {
   z-index: 2;
   width: var(--page);
   margin: 0 auto;
-  max-width: 38rem;
+  max-width: none;
   padding-bottom: 8px;
 }
 .eyebrow {
@@ -222,16 +224,18 @@ body {
 h1 {
   margin: 0 0 18px;
   font-family: var(--serif);
-  font-size: clamp(48px, 7vw, 84px);
+  font-size: clamp(36px, 5.2vw, 68px);
   font-weight: 400;
   font-optical-sizing: auto;
-  line-height: 0.94;
+  line-height: 1;
   letter-spacing: -0.03em;
   color: #fff;
+  white-space: nowrap;
   text-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
 }
 .lede {
   margin: 0;
+  max-width: 36rem;
   color: #d8d0c4;
   font-size: 18px;
   line-height: 1.55;
@@ -379,6 +383,17 @@ h2 {
   border-radius: 22px;
   background: #101820;
   border: 1px solid var(--line);
+  cursor: default;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.steps li:hover {
+  transform: translateY(-4px);
+  background: #1c2733;
+  border-color: rgba(237, 215, 174, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(237, 215, 174, 0.18),
+    0 0 36px rgba(201, 163, 106, 0.22),
+    0 18px 40px rgba(0, 0, 0, 0.28);
 }
 .steps-n {
   margin-bottom: 28px;
@@ -386,6 +401,11 @@ h2 {
   font-size: 42px;
   line-height: 1;
   color: var(--gold-hi);
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+.steps li:hover .steps-n {
+  color: #fff6e6;
+  text-shadow: 0 0 22px rgba(237, 215, 174, 0.7);
 }
 .steps h3 {
   margin: 0 0 10px;
@@ -466,6 +486,7 @@ details[open] summary::after { content: "–"; }
   .top nav a:not(.btn) { display: none; }
   .steps, .how-head, .strip-row, .split, .foot { grid-template-columns: 1fr; }
   .stage { min-height: 0; padding-top: 96px; }
+  h1 { white-space: normal; font-size: clamp(36px, 9vw, 52px); }
   .block { padding: 72px 0; }
   .block[data-chap]::after { display: none; }
   .app-intro { align-items: start; }
