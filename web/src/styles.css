@@ -420,34 +420,78 @@ h2 {
   line-height: 1.55;
 }
 
-.faq details { border-top: 1px solid var(--line); }
-.faq details:last-child { border-bottom: 1px solid var(--line); }
-summary {
+.faq-head {
+  margin-bottom: 32px;
+}
+.faq {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 24px;
+  flex-direction: column;
+  gap: 10px;
+  counter-reset: faq;
+}
+.faq details {
+  counter-increment: faq;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #101820;
+  overflow: hidden;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.faq details:hover {
+  border-color: rgba(237, 215, 174, 0.45);
+  background: #1c2733;
+  box-shadow: 0 0 28px rgba(201, 163, 106, 0.14);
+}
+.faq details[open] {
+  border-color: rgba(237, 215, 174, 0.5);
+  background: #1c2733;
+  box-shadow:
+    0 0 0 1px rgba(237, 215, 174, 0.12),
+    0 16px 36px rgba(0, 0, 0, 0.22);
+}
+.faq summary {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   cursor: pointer;
-  padding: 22px 0;
-  font-size: 18px;
+  padding: 18px 20px;
+  font-size: 16.5px;
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
   list-style: none;
 }
-summary::-webkit-details-marker { display: none; }
-summary::after {
-  content: "+";
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::before {
+  content: counter(faq, decimal-leading-zero);
+  flex-shrink: 0;
+  width: 2.2rem;
   font-family: var(--serif);
-  font-size: 28px;
-  color: var(--gold);
-  line-height: 0.8;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--gold-hi);
+  transition: color 0.2s ease, text-shadow 0.2s ease;
 }
-details[open] summary::after { content: "–"; }
+.faq details:hover summary::before,
+.faq details[open] summary::before {
+  color: #fff6e6;
+  text-shadow: 0 0 18px rgba(237, 215, 174, 0.55);
+}
+.faq summary::after {
+  content: "+";
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--serif);
+  font-size: 26px;
+  line-height: 0.8;
+  color: var(--gold);
+}
+.faq details[open] summary::after { content: "–"; }
 .faq p {
-  margin: 0 0 22px;
-  max-width: 40rem;
+  margin: 0;
+  padding: 0 20px 20px 4.4rem;
+  max-width: none;
   color: var(--mute);
-  font-size: 16px;
+  font-size: 15.5px;
   line-height: 1.65;
 }
 .faq p a { color: var(--gold-hi); }
