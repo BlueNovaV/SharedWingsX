@@ -36,7 +36,6 @@ let updateInfo = {
   downloadUrl: "",
   notes: "",
   outdated: false,
-  checked: false,
 };
 let updateBusy = false;
 let updateCheck = null;
@@ -185,21 +184,15 @@ async function createWindow() {
     },
   });
 
+  void runUpdateCheck();
   mainWindow.once("ready-to-show", () => mainWindow.show());
   await mainWindow.loadFile(path.join(__dirname, "..", "dist", "index.html"));
   await mainWindow.webContents.setVisualZoomLevelLimits(1, 1);
   if (!mainWindow.isVisible()) mainWindow.show();
-  void checkUpdate(app.getVersion(), !app.isPackaged).then((info) => {
-    updateInfo = info;
-    sendUpdate();
-  });
-  sendUpdate();
   sendSim();
   mainWindow.webContents.once("did-finish-load", () => {
-    sendUpdate();
     sendSim();
   });
-  setTimeout(() => sendUpdate(), 800);
   setInterval(() => {
     void runUpdateCheck();
   }, 4 * 60 * 60 * 1000);

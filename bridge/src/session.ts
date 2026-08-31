@@ -210,7 +210,7 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.46 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.47 open.",
       );
     }
     throw new Error("Could not reach SharedWingsX internet. Both PCs need internet, then try Connect again.");

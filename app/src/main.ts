@@ -32,7 +32,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.46";
+const APP_VER = "0.4.47";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 
@@ -882,9 +882,8 @@ async function boot(): Promise<void> {
     if (!state?.room && !lobbyEditing()) renderBoard();
   });
   const applyUpdate = (info: UpdateInfo) => {
-    const first = update === null;
     update = info;
-    if ((first || info.outdated || info.checked === false) && !lobbyEditing()) renderBoard();
+    if (!lobbyEditing()) renderBoard();
   };
   app.onUpdate?.(applyUpdate);
   app.onUpdateProgress?.((info) => {

@@ -35,20 +35,16 @@ function siteHost() {
 
 function feedUrls(unpackaged) {
   const site = String(siteUrl).replace(/\/$/, "");
-  const host = siteHost();
-  const repo = process.env.TWINSEAT_GITHUB_REPO || process.env.GITHUB_REPOSITORY;
   const urls = [
     process.env.TWINSEAT_UPDATE_FEED,
     `${site}/update.json`,
-    `https://${host}/update.json`,
-    `https://www.${host}/update.json`,
-    `${site}/downloads/update.json`,
+    "https://raw.githubusercontent.com/BlueNovaV/SharedWingsX/main/web/public/update.json",
+    "https://raw.githubusercontent.com/BlueNovaV/sharedwingsx/main/web/public/update.json",
+    "https://bluenovav.github.io/SharedWingsX/update.json",
     "https://bluenovav.github.io/sharedwingsx/update.json",
+    "https://github.com/BlueNovaV/SharedWingsX/releases/latest/download/update.json",
     "https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/update.json",
-    repo ? `https://${repo.split("/")[0]}.github.io/${repo.split("/")[1]}/update.json` : "",
-    repo ? `https://raw.githubusercontent.com/${repo}/main/web/public/update.json` : "",
-    "http://127.0.0.1:17323/update.json",
-    "http://[::1]:17323/update.json",
+    "https://cdn.jsdelivr.net/gh/BlueNovaV/SharedWingsX@main/web/public/update.json",
   ];
   if (unpackaged || process.env.TWINSEAT_DEV_UPDATE === "1") {
     urls.unshift("http://127.0.0.1:17323/update.json");
@@ -63,6 +59,8 @@ function downloadAllowed(url, unpackaged) {
     if (parsed.protocol === "https:") {
       if (host === siteHost()) return true;
       if (host === "github.com" || host.endsWith(".github.io")) return true;
+      if (host === "raw.githubusercontent.com") return true;
+      if (host === "cdn.jsdelivr.net") return true;
       if (host === "objects.githubusercontent.com") return true;
       if (host === "release-assets.githubusercontent.com") return true;
     }
@@ -78,7 +76,7 @@ function downloadAllowed(url, unpackaged) {
 
 async function readFeed(url) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 4000);
+  const timer = setTimeout(() => controller.abort(), 6000);
   try {
     const res = await fetch(`${url}${url.includes("?") ? "&" : "?"}v=${Date.now()}`, {
       signal: controller.signal,
@@ -116,8 +114,17 @@ function emptyResult(current) {
 
 async function checkUpdate(currentVersion, unpackaged = false) {
   const current = String(currentVersion || "0.0.0");
-  const feeds = await Promise.all(feedUrls(unpackaged).map(readFeed));
-  const feed = feeds.find(Boolean);
+  const attempts = feedUrls(unpackaged).map(async (url) => {
+    const data = await readFeed(url);
+    if (!data) throw new Error("empty");
+    return data;
+  });
+  let feed = null;
+  try {
+    feed = await Promise.any(attempts);
+  } catch {
+    feed = null;
+  }
   if (!feed) return emptyResult(current);
   return {
     current,
