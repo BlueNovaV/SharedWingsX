@@ -194,6 +194,12 @@ export function calculatorEventK2(name: string, data: number, index = 1): string
   return `${index} ${data >>> 0} (>K:2:${safe})`;
 }
 
+/** Public RPN: value then index, e.g. millibars*16 0 (>K:KOHLSMAN_SET). */
+export function calculatorEventIndexed(name: string, data: number, index: number): string {
+  const safe = name.replace(/[^A-Z0-9_]/gi, "");
+  return `${data >>> 0} ${index >>> 0} (>K:${safe})`;
+}
+
 export function skipInputEventName(name: string): boolean {
   const n = name.toUpperCase();
   return /CAMERA|PAUSE|MENU|TOOLTIP|DEBUG|KNEEBOARD|MOUSE|WINDOW|VIEW_|ESC\b|ATC_PANEL|SIM_RATE|SAVE|LOAD|QUIT|SCREENSHOT/.test(

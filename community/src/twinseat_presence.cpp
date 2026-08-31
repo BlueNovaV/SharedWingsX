@@ -48,18 +48,27 @@ static void apply_cmd(const TwinSeatCmd *cmd) {
     else break;
   }
   if (!safe[0]) return;
-  char rpn[96];
-  std::snprintf(rpn, sizeof(rpn), "%u (>K:%s)", static_cast<unsigned int>(cmd->data), safe);
+  char rpn[128];
+  const unsigned v = static_cast<unsigned int>(cmd->data);
+  auto run = [&](const char *code) {
 #ifdef TWINSEAT_HAS_CALC
-  execute_calculator_code(rpn, nullptr, nullptr, nullptr);
-  if (std::strstr(safe, "_SET")) {
-    char rpn2[112];
-    std::snprintf(rpn2, sizeof(rpn2), "1 %u (>K:2:%s)", static_cast<unsigned int>(cmd->data), safe);
-    execute_calculator_code(rpn2, nullptr, nullptr, nullptr);
-  }
+    execute_calculator_code(code, nullptr, nullptr, nullptr);
 #else
-  (void)rpn;
+    (void)code;
 #endif
+  };
+  std::snprintf(rpn, sizeof(rpn), "%u (>K:%s)", v, safe);
+  run(rpn);
+  if (std::strstr(safe, "_SET")) {
+    std::snprintf(rpn, sizeof(rpn), "%u 0 (>K:%s)", v, safe);
+    run(rpn);
+    std::snprintf(rpn, sizeof(rpn), "%u 1 (>K:%s)", v, safe);
+    run(rpn);
+    std::snprintf(rpn, sizeof(rpn), "0 %u (>K:2:%s)", v, safe);
+    run(rpn);
+    std::snprintf(rpn, sizeof(rpn), "1 %u (>K:2:%s)", v, safe);
+    run(rpn);
+  }
 }
 
 void CALLBACK TwinSeatDispatch(SIMCONNECT_RECV *recv, DWORD, void *) {
