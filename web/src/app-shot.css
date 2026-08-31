@@ -314,7 +314,7 @@
   gap: 12px;
   margin: 12px 0 4px;
 }
-.swx .choice.seats { grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+.swx .choice.seats { grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 22px 0 8px; }
 .swx .choice.seats > span {
   min-height: 42px;
   padding: 0 14px;
@@ -624,8 +624,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 20px;
-  line-height: 20px;
+  line-height: 1;
 }
 .swx .status-copy {
   margin-left: auto;
