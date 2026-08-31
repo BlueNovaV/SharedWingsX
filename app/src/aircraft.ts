@@ -36,7 +36,7 @@ export const AIRCRAFT_LIST: AircraftOption[] = [
   { id: "asobo-pitts", name: "Aviat Pitts S-1", packId: "generic-msfs", group: "Other" },
   { id: "asobo-a320", name: "Airbus A320neo (Asobo)", packId: "generic-msfs", group: "Asobo" },
   { id: "asobo-a310", name: "Airbus A310-300", packId: "generic-msfs", group: "Asobo" },
-  { id: "asobo-747", name: "Boeing 747-8i (Asobo)", packId: "generic-msfs", group: "Asobo" },
+  { id: "asobo-747", name: "Boeing 747-8i (Asobo)", packId: "asobo-747-8", group: "Asobo" },
   { id: "asobo-787-10", name: "Boeing 787-10", packId: "asobo-787-10", group: "Asobo" },
   { id: "asobo-737max", name: "Boeing 737 MAX 8 (Asobo)", packId: "generic-msfs", group: "Asobo" },
   { id: "pmdg-737-600", name: "PMDG 737-600", packId: "generic-msfs", group: "PMDG" },

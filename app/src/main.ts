@@ -18,6 +18,7 @@ let packs: PackInfo[] = [
   { id: "generic-msfs", name: "Automatic (any MSFS aircraft)", support: "offset" },
   { id: "asobo-c172", name: "Cessna 172 Skyhawk", support: "offset" },
   { id: "asobo-787-10", name: "Boeing 787-10", support: "offset" },
+  { id: "asobo-747-8", name: "Boeing 747-8", support: "offset" },
 ];
 let packChoice = localStorage.getItem("twinseat-pack") || packIdForAircraft(aircraftId);
 let simYear = localStorage.getItem("twinseat-sim") === "MSFS2020" ? "MSFS2020" : "MSFS2024";
@@ -32,7 +33,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.54";
+const APP_VER = "0.4.55";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 

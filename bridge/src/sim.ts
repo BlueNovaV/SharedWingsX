@@ -1,3 +1,4 @@
+import type { Seat } from "@twinseat/protocol";
 import type { AircraftPack, PackVar } from "./pack.js";
 
 export type SimIdentity = {
@@ -36,6 +37,8 @@ export interface SimBackend {
   identity(): SimIdentity;
   worldPose(): WorldPose | null;
   applyWorldPose(pose: WorldPose): void;
+  setFollowPose(pose: WorldPose | null): void;
+  syncCrewPins(seats: Seat[]): void;
   setPhysicsHold(on: boolean, force?: boolean): void;
   read(v: PackVar): number;
   write(v: PackVar, value: number): void;
@@ -78,6 +81,8 @@ export class MockSim implements SimBackend {
     return null;
   }
   applyWorldPose(): void {}
+  setFollowPose(): void {}
+  syncCrewPins(): void {}
   setPhysicsHold(_on: boolean, _force?: boolean): void {}
   read(v: PackVar): number {
     return this.values.get(v.id) ?? 0;

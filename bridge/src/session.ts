@@ -220,7 +220,7 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.54 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.55 open.",
       );
     }
     throw new Error(
@@ -430,7 +430,7 @@ export class TwinSeatSession {
       const ws = new WebSocket(toWs(url), {
         handshakeTimeout: 8000,
         perMessageDeflate: false,
-        headers: { "User-Agent": "SharedWingsX/0.4.54" },
+        headers: { "User-Agent": "SharedWingsX/0.4.55" },
       });
       this.signal = ws;
       const timer = setTimeout(() => {
@@ -663,6 +663,7 @@ export class TwinSeatSession {
       if (this.iAmPoseSource()) return;
       const pose = decodeWorldPose(game);
       this.lastHostPose = pose;
+      this.sim.setFollowPose(pose);
       this.sim.applyWorldPose(pose);
       this.lastPoseApply = Date.now();
       return;
@@ -712,14 +713,15 @@ export class TwinSeatSession {
       for (const [id, value] of this.lastRemote) {
         applyRemoteVar(this.sim, this.pack, id, value);
       }
-      if (this.lastHostPose) {
-        const gap = this.lastHostPose.onGround ? 120 : 40;
-        if (now - this.lastPoseApply >= gap) {
-          this.sim.applyWorldPose(this.lastHostPose);
-          this.lastPoseApply = now;
-        }
-      }
     }
+    this.sim.setFollowPose(hold && this.lastHostPose ? this.lastHostPose : null);
+    const pins: Seat[] = [];
+    for (const p of this.roster) {
+      if (p.id === this.selfId || p.name === this.displayName) continue;
+      const seat = (p.seat || "") as Seat;
+      if (seat && seat !== this.seat && !pins.includes(seat)) pins.push(seat);
+    }
+    this.sim.syncCrewPins(this.room && this.hasCrew() ? pins : []);
     if (hold && (enteredWorld || now - this.lastFreezePulse > 8000)) {
       this.sim.setPhysicsHold(true, true);
       this.lastFreezePulse = now;

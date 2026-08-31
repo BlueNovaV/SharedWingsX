@@ -6,7 +6,7 @@
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test dist/pack.test.js dist/sim-mock.test.js dist/airports.test.js"
+    "test": "npm run build && node --test dist/pack.test.js dist/sim-mock.test.js dist/airports.test.js dist/presence.test.js"
   },
   "dependencies": {
     "@twinseat/protocol": "0.1.0",

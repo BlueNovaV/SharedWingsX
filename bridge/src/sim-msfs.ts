@@ -1,8 +1,11 @@
 import type { SimConnectConnection } from "node-simconnect";
+import type { Seat } from "@twinseat/protocol";
 import type { AircraftPack, PackVar } from "./pack.js";
+import { seatOffset } from "./pack.js";
 import { MockSim, type SimBackend, type SimIdentity, type WorldPose } from "./sim.js";
 import { nearestAirport } from "./airports.js";
 import { discreteEventsForVar, inputEventPriority, skipInputEventName } from "./sim-events.js";
+import { bodyOffsetToWorld } from "./presence.js";
 
 type SimConnectMod = typeof import("node-simconnect");
 let sc: SimConnectMod;
@@ -42,7 +45,10 @@ const CAM_DEF = 9;
 const CAM_REQ = 9;
 const GROUND_POSE_WRITE = 10;
 const INIT_POSE_WRITE = 11;
+const AVATAR_POSE_DEF = 12;
 const INPUT_LIST_REQ = 41;
+const AVATAR_REQ: Record<Seat, number> = { left: 61, right: 62, jumpLeft: 63, jumpRight: 64 };
+const AVATAR_TITLE = "TwinSeat Avatar";
 const EVENT_GROUP = 1;
 const WRITE_BASE = 1000;
 const EVENT_BASE = 2000;
@@ -107,6 +113,12 @@ class MsfsSim implements SimBackend {
   private muteEvent = new Map<number, number>();
   private eventByClient = new Map<number, string>();
   private lastWarpAt = 0;
+  private followPose: WorldPose | null = null;
+  private pinSeats = new Set<Seat>();
+  private avatarIds = new Map<Seat, number>();
+  private avatarPending = new Set<Seat>();
+  private avatarSpawnAt = new Map<Seat, number>();
+  private placing = false;
 
   constructor(pack: AircraftPack, handle: SimConnectConnection, recvOpen: {
     applicationName?: string;
@@ -179,6 +191,12 @@ class MsfsSim implements SimBackend {
     handle.addToDataDefinition(POSE_WRITE, "PLANE PITCH DEGREES", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(POSE_WRITE, "PLANE BANK DEGREES", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(POSE_WRITE, "PLANE HEADING DEGREES TRUE", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(AVATAR_POSE_DEF, "PLANE LATITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(AVATAR_POSE_DEF, "PLANE LONGITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(AVATAR_POSE_DEF, "PLANE ALTITUDE", "feet", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(AVATAR_POSE_DEF, "PLANE PITCH DEGREES", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(AVATAR_POSE_DEF, "PLANE BANK DEGREES", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(AVATAR_POSE_DEF, "PLANE HEADING DEGREES TRUE", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE LATITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE LONGITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE ALTITUDE", "feet", sc.SimConnectDataType.FLOAT64);
@@ -222,6 +240,7 @@ class MsfsSim implements SimBackend {
             this.headingDeg = recv.data.readFloat64();
             this.onGround = recv.data.readFloat64() > 0.5;
           }
+          this.pinAfterPose();
           return;
         }
         if (recv.defineID === CAM_DEF || recv.requestID === CAM_REQ) {
@@ -300,15 +319,26 @@ class MsfsSim implements SimBackend {
       if (Date.now() < until) return;
       this.outbound.push({ name, data: ev.data >>> 0 });
     });
+    handle.on("assignedObjectID", (recv) => {
+      for (const [seat, req] of Object.entries(AVATAR_REQ) as [Seat, number][]) {
+        if (recv.requestID !== req) continue;
+        this.avatarPending.delete(seat);
+        this.avatarIds.set(seat, recv.objectID);
+        this.freezeAvatar(recv.objectID);
+        this.placeAvatar(seat, recv.objectID);
+      }
+    });
     handle.on("exception", (ex) => {
       console.warn("[twinseat] SimConnect", ex.exception, ex.sendId);
     });
     handle.on("quit", () => {
       this.closed = true;
+      this.dropAvatars();
       console.warn("[twinseat] SimConnect quit");
     });
     handle.on("close", () => {
       this.closed = true;
+      this.dropAvatars();
     });
   }
 
@@ -471,6 +501,18 @@ class MsfsSim implements SimBackend {
     }
   }
 
+  setFollowPose(pose: WorldPose | null): void {
+    this.followPose = pose;
+  }
+
+  syncCrewPins(seats: Seat[]): void {
+    this.pinSeats = new Set(seats);
+    for (const seat of [...this.avatarIds.keys()]) {
+      if (!this.pinSeats.has(seat)) this.removeAvatar(seat);
+    }
+    this.spawnMissingAvatars();
+  }
+
   setPhysicsHold(on: boolean, force = false): void {
     if (!force && this.physicsHold === on) return;
     this.physicsHold = on;
@@ -506,7 +548,151 @@ class MsfsSim implements SimBackend {
     return { yaw: this.yaw, pitch: this.pitch, roll: this.roll };
   }
 
-  tick(): void {}
+  tick(): void {
+    this.spawnMissingAvatars();
+  }
+
+  private pinAfterPose(): void {
+    if (this.placing) return;
+    this.placing = true;
+    try {
+      if (this.followPose) this.applyWorldPose(this.followPose);
+      this.spawnMissingAvatars();
+      for (const [seat, id] of this.avatarIds) this.placeAvatar(seat, id);
+    } finally {
+      this.placing = false;
+    }
+  }
+
+  private pinSource(): {
+    lat: number;
+    lon: number;
+    alt: number;
+    pitch: number;
+    bank: number;
+    heading: number;
+  } | null {
+    if (this.followPose) {
+      return {
+        lat: this.followPose.lat,
+        lon: this.followPose.lon,
+        alt: this.followPose.alt,
+        pitch: this.followPose.onGround ? 0 : this.followPose.pitch,
+        bank: this.followPose.onGround ? 0 : this.followPose.bank,
+        heading: this.followPose.heading,
+      };
+    }
+    if (!this.hasPosition()) return null;
+    return {
+      lat: this.lat,
+      lon: this.lon,
+      alt: this.alt,
+      pitch: this.pitchDeg,
+      bank: this.bankDeg,
+      heading: this.headingDeg,
+    };
+  }
+
+  private spawnMissingAvatars(): void {
+    if (this.closed) return;
+    const src = this.pinSource();
+    if (!src) return;
+    const now = Date.now();
+    for (const seat of this.pinSeats) {
+      if (this.avatarIds.has(seat) || this.avatarPending.has(seat)) continue;
+      if (now - (this.avatarSpawnAt.get(seat) ?? 0) < 8000) continue;
+      this.avatarSpawnAt.set(seat, now);
+      this.avatarPending.add(seat);
+      try {
+        const off = seatOffset(this.pack, seat);
+        const world = bodyOffsetToWorld(src.lat, src.lon, src.alt, src.pitch, src.bank, src.heading, off.x, off.y, off.z);
+        const init = new sc.InitPosition();
+        init.latitude = world.lat;
+        init.longitude = world.lon;
+        init.altitude = world.alt;
+        init.pitch = world.pitch;
+        init.bank = world.bank;
+        init.heading = world.heading;
+        init.onGround = false;
+        init.airspeed = 0;
+        this.handle.aICreateSimulatedObject(AVATAR_TITLE, init, AVATAR_REQ[seat]);
+      } catch (err) {
+        this.avatarPending.delete(seat);
+        console.warn("[twinseat] avatar spawn skipped", err instanceof Error ? err.message : err);
+      }
+    }
+  }
+
+  private placeAvatar(seat: Seat, objectId: number): void {
+    const src = this.pinSource();
+    if (!src) return;
+    const off = seatOffset(this.pack, seat);
+    const world = bodyOffsetToWorld(src.lat, src.lon, src.alt, src.pitch, src.bank, src.heading, off.x, off.y, off.z);
+    try {
+      const buf = new sc.RawBuffer(48);
+      buf.writeFloat64(world.lat);
+      buf.writeFloat64(world.lon);
+      buf.writeFloat64(world.alt);
+      buf.writeFloat64(world.pitch);
+      buf.writeFloat64(world.bank);
+      buf.writeFloat64(world.heading);
+      this.handle.setDataOnSimObject(AVATAR_POSE_DEF, objectId, {
+        buffer: buf,
+        arrayCount: 0,
+        tagged: false,
+      });
+    } catch {
+      /* object gone */
+    }
+  }
+
+  private freezeAvatar(objectId: number): void {
+    try {
+      this.handle.aIReleaseControl(objectId, 80);
+    } catch {
+      /* ignore */
+    }
+    this.fireOn(objectId, "FREEZE_LATITUDE_LONGITUDE_SET", 1);
+    this.fireOn(objectId, "FREEZE_ALTITUDE_SET", 1);
+    this.fireOn(objectId, "FREEZE_ATTITUDE_SET", 1);
+  }
+
+  private removeAvatar(seat: Seat): void {
+    const id = this.avatarIds.get(seat);
+    this.avatarIds.delete(seat);
+    this.avatarPending.delete(seat);
+    if (id == null) return;
+    try {
+      this.handle.aIRemoveObject(id, 90 + AVATAR_REQ[seat]);
+    } catch {
+      /* already gone */
+    }
+  }
+
+  private dropAvatars(): void {
+    for (const seat of [...this.avatarIds.keys()]) this.removeAvatar(seat);
+    this.avatarPending.clear();
+  }
+
+  private fireOn(objectId: number, name: string, data: number): void {
+    let id = this.fireIds.get(name);
+    if (id == null) {
+      id = this.nextFireId++;
+      this.fireIds.set(name, id);
+      this.handle.mapClientEventToSimEvent(id, name);
+    }
+    try {
+      this.handle.transmitClientEvent(
+        objectId,
+        id,
+        data >>> 0,
+        sc.NotificationPriority.HIGHEST,
+        sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
+      );
+    } catch {
+      /* ignore */
+    }
+  }
 
   private fire(name: string, data: number): void {
     let id = this.fireIds.get(name);
