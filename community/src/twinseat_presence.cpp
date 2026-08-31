@@ -52,6 +52,11 @@ static void apply_cmd(const TwinSeatCmd *cmd) {
   std::snprintf(rpn, sizeof(rpn), "%u (>K:%s)", static_cast<unsigned int>(cmd->data), safe);
 #ifdef TWINSEAT_HAS_CALC
   execute_calculator_code(rpn, nullptr, nullptr, nullptr);
+  if (std::strstr(safe, "_SET")) {
+    char rpn2[112];
+    std::snprintf(rpn2, sizeof(rpn2), "1 %u (>K:2:%s)", static_cast<unsigned int>(cmd->data), safe);
+    execute_calculator_code(rpn2, nullptr, nullptr, nullptr);
+  }
 #else
   (void)rpn;
 #endif

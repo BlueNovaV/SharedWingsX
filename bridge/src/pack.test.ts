@@ -27,6 +27,8 @@ describe("packs", () => {
     assert.equal(discreteEventsForVar("AUTOPILOT HEADING LOCK DIR", 270)[0]?.data, 270);
     const { calculatorEvent } = await import("./sim-events.js");
     assert.equal(calculatorEvent("THROTTLE1_SET", 3600), "3600 (>K:THROTTLE1_SET)");
+    const { calculatorEventK2 } = await import("./sim-events.js");
+    assert.equal(calculatorEventK2("THROTTLE1_SET", 3600, 1), "1 3600 (>K:2:THROTTLE1_SET)");
   });
 
   it("uses universal pack for PMDG and unknown titles", () => {

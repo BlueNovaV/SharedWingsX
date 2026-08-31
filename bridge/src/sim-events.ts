@@ -9,6 +9,14 @@ export const COCKPIT_SIM_EVENTS = [
   "THROTTLE2_SET",
   "THROTTLE3_SET",
   "THROTTLE4_SET",
+  "AXIS_MIXTURE1_SET",
+  "AXIS_MIXTURE2_SET",
+  "MIXTURE1_SET",
+  "MIXTURE2_SET",
+  "AXIS_PROPELLER1_SET",
+  "AXIS_PROPELLER2_SET",
+  "PROP_PITCH1_SET",
+  "PROP_PITCH2_SET",
   "AXIS_ELEVATOR_SET",
   "AXIS_AILERONS_SET",
   "AXIS_RUDDER_SET",
@@ -178,6 +186,12 @@ export function discreteEventsForVar(
 export function calculatorEvent(name: string, data: number): string {
   const safe = name.replace(/[^A-Z0-9_]/gi, "");
   return `${data >>> 0} (>K:${safe})`;
+}
+
+/** Public MSFS RPN for two-parameter K events (index then value). */
+export function calculatorEventK2(name: string, data: number, index = 1): string {
+  const safe = name.replace(/[^A-Z0-9_]/gi, "");
+  return `${index} ${data >>> 0} (>K:2:${safe})`;
 }
 
 export function skipInputEventName(name: string): boolean {

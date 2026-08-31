@@ -849,6 +849,22 @@ class MsfsSim implements SimBackend {
         pairs.push({ name: "AXIS_THROTTLE4_SET", data: throttle(value) });
         pairs.push({ name: "THROTTLE4_SET", data: throttle(value) });
         break;
+      case "GENERAL ENG MIXTURE LEVER POSITION:1":
+        pairs.push({ name: "AXIS_MIXTURE1_SET", data: throttle(value) });
+        pairs.push({ name: "MIXTURE1_SET", data: throttle(value) });
+        break;
+      case "GENERAL ENG MIXTURE LEVER POSITION:2":
+        pairs.push({ name: "AXIS_MIXTURE2_SET", data: throttle(value) });
+        pairs.push({ name: "MIXTURE2_SET", data: throttle(value) });
+        break;
+      case "GENERAL ENG PROPELLER LEVER POSITION:1":
+        pairs.push({ name: "AXIS_PROPELLER1_SET", data: throttle(value) });
+        pairs.push({ name: "PROP_PITCH1_SET", data: throttle(value) });
+        break;
+      case "GENERAL ENG PROPELLER LEVER POSITION:2":
+        pairs.push({ name: "AXIS_PROPELLER2_SET", data: throttle(value) });
+        pairs.push({ name: "PROP_PITCH2_SET", data: throttle(value) });
+        break;
       default:
         return;
     }
