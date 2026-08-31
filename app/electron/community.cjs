@@ -146,6 +146,11 @@ function copyDir(src, dest) {
   }
 }
 
+function replaceDir(src, dest) {
+  fs.rmSync(dest, { recursive: true, force: true });
+  copyDir(src, dest);
+}
+
 function uniqueExisting(paths, options = {}) {
   const createMissing = options.createMissing === true;
   const seen = new Set();
@@ -226,7 +231,7 @@ function installCommunity(sourceRoot, options = {}) {
   }
   for (const folder of found) {
     const dest = path.join(folder, "twinseat-presence");
-    copyDir(sourceRoot, dest);
+    replaceDir(sourceRoot, dest);
     copied.push(dest);
   }
   if (!found.length) {

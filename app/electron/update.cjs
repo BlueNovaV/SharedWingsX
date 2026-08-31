@@ -179,7 +179,13 @@ async function applyUpdate(info, { unpackaged, onProgress, quit }) {
   const bat = join(dir, "run.cmd");
   await writeFile(
     bat,
-    `@echo off\r\ntimeout /t 2 /nobreak >nul\r\nstart "" /wait "${dest}" /S\r\n`,
+    [
+      "@echo off",
+      "taskkill /F /IM SharedWingsX.exe /T >nul 2>&1",
+      "timeout /t 4 /nobreak >nul",
+      `start "" /wait "${dest}" /S`,
+      "",
+    ].join("\r\n"),
     "utf8",
   );
   spawn(process.env.ComSpec || "cmd.exe", ["/c", bat], {
