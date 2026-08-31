@@ -32,7 +32,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.47";
+const APP_VER = "0.4.48";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 
@@ -123,6 +123,7 @@ function cockpitView(): string {
     .join("");
   return `
     <div class="cabin" role="img" aria-label="Flight deck">
+      <img class="cabin-photo" src="./brand/cabin-deck.jpg" alt="" />
       <div class="cabin-vignette"></div>
       <div class="cabin-seats">${chips}</div>
     </div>`;
@@ -403,7 +404,6 @@ function setConnectBusy(on: boolean): void {
 
 function header(): string {
   const live = Boolean(state?.room);
-  const link = live ? `${pathLabel(state?.path ?? "")} · ${Math.round(state?.latencyMs ?? 0)} ms` : "";
   return `
     <header class="bar">
       <div class="bar-left">
@@ -411,7 +411,6 @@ function header(): string {
       </div>
       ${flightBarHtml()}
       <div class="bar-right">
-        ${live ? `<p class="pill path-pill"><span class="dot ${state?.identity.connected && !state.identity.mock ? "ok" : "warn"}"></span><span class="path-pill-text">${escapeHtml(link)}</span></p>` : ""}
         ${live ? `<button type="button" class="back js-leave">Leave</button>` : ""}
         <button type="button" class="back" id="open-settings">${settingsOpen ? "Close settings" : "Settings"}</button>
       </div>

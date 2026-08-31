@@ -148,13 +148,13 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
 
 .bar {
   position: relative;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   height: 40px;
   min-height: 40px;
-  padding: 0 168px 0 16px;
+  padding: 0 138px 0 12px;
   overflow: hidden;
   border-bottom: 1px solid var(--line);
   background: rgba(11, 13, 18, 0.96);
@@ -173,6 +173,7 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   font-size: 15px;
   font-weight: 600;
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 .brand img {
   width: 22px;
@@ -191,25 +192,22 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
 .bar-left {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
   min-width: 0;
+  overflow: hidden;
   z-index: 1;
 }
 .bar-right {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 10px;
-  min-width: 0;
-  overflow: hidden;
-  z-index: 1;
+  gap: 8px;
+  flex: none;
+  overflow: visible;
+  z-index: 2;
 }
 .bar-mid {
-  position: absolute;
-  left: 16px;
-  right: 168px;
-  top: 0;
-  bottom: 0;
+  position: static;
   min-width: 0;
   display: flex;
   align-items: center;
@@ -227,11 +225,11 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   line-height: 1.15;
 }
 .flight-ac {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 650;
   color: #fff;
-  max-width: 55%;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.75);
+  max-width: 100%;
+  min-width: 0;
 }
 .flight-apt {
   font-size: 13px;
@@ -282,10 +280,8 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   line-height: 1;
 }
 .lamp-lab,
-.path-pill-text,
-.status-item > span:not(.dot):not(.lamp):not(.sim-lamps) {
+.path-pill-text {
   line-height: 1;
-  display: block;
 }
 .lamp.on { color: #f6f1e8; }
 .pill {
@@ -305,12 +301,14 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   background: #2c333c;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
   border: 0;
-  display: block;
+  display: inline-block;
   flex: none;
   margin: 0;
   padding: 0;
   align-self: center;
   transform: none;
+  position: relative;
+  top: 0;
 }
 .dot.ok {
   background: var(--amber);
@@ -609,10 +607,21 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   background: #0a0d12;
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
 }
-.cabin-photo { display: none; }
+.cabin-photo {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  z-index: 0;
+  pointer-events: none;
+}
 .cabin-vignette {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background:
     linear-gradient(180deg, rgba(6, 8, 12, 0.18) 0%, transparent 28%, rgba(6, 8, 12, 0.72) 100%),
     linear-gradient(90deg, rgba(6, 8, 12, 0.2), transparent 18%, transparent 82%, rgba(6, 8, 12, 0.2));
@@ -628,7 +637,7 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr auto;
   gap: 8px 12px;
-  z-index: 1;
+  z-index: 2;
 }
 .seat-3d {
   position: relative;
@@ -708,12 +717,12 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
 .card .quiet li:last-child { border-bottom: 0; }
 .status {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 8px 14px;
+  gap: 8px 16px;
   flex: none;
-  min-height: 44px;
-  padding: 10px 18px 16px;
+  min-height: 40px;
+  padding: 8px 16px;
   border-top: 1px solid var(--line);
   background: #0a0c10;
   font-size: 12px;
@@ -730,12 +739,16 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
 }
 .status-item {
   display: inline-flex;
+  flex-direction: row;
   align-items: center;
   gap: 6px;
-  min-width: max-content;
-  max-width: 100%;
+  min-width: 0;
   line-height: 1;
   white-space: nowrap;
+}
+.status-item > span:not(.dot) {
+  display: inline;
+  line-height: 1;
 }
 .status-chip {
   display: inline-flex;
