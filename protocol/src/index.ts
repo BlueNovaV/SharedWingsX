@@ -14,6 +14,7 @@ export type {
   PresenceSupport,
   MessageTypeId,
   SimEventPayload,
+  InputEventPayload,
   WorldPose,
 } from "./codec.js";
 
@@ -46,6 +47,8 @@ export {
   encodePunchPing,
   encodeSimEvent,
   decodeSimEvent,
+  encodeInputEvent,
+  decodeInputEvent,
   encodeWorldPose,
   decodeWorldPose,
 } from "./codec.js";

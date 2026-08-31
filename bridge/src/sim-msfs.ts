@@ -2,6 +2,7 @@ import type { SimConnectConnection } from "node-simconnect";
 import type { AircraftPack, PackVar } from "./pack.js";
 import { MockSim, type SimBackend, type SimIdentity, type WorldPose } from "./sim.js";
 import { nearestAirport } from "./airports.js";
+import { discreteEventForVar, skipInputEventName } from "./sim-events.js";
 
 type SimConnectMod = typeof import("node-simconnect");
 let sc: SimConnectMod;
@@ -29,6 +30,9 @@ const ATC_DEF = 8;
 const ATC_REQ = 8;
 const CAM_DEF = 9;
 const CAM_REQ = 9;
+const GROUND_POSE_WRITE = 10;
+const INPUT_LIST_REQ = 41;
+const EVENT_GROUP = 1;
 const WRITE_BASE = 1000;
 const EVENT_BASE = 2000;
 const FIRE_BASE = 4000;
@@ -86,6 +90,11 @@ class MsfsSim implements SimBackend {
   private fireIds = new Map<string, number>();
   private nextFireId = FIRE_BASE;
   private lastAxis = new Map<string, number>();
+  private lastDiscrete = new Map<string, number>();
+  private outboundInput: { hash: bigint; value: number }[] = [];
+  private muteInput = new Map<string, number>();
+  private muteEvent = new Map<number, number>();
+  private eventByClient = new Map<number, string>();
 
   constructor(pack: AircraftPack, handle: SimConnectConnection, recvOpen: {
     applicationName?: string;
@@ -158,6 +167,10 @@ class MsfsSim implements SimBackend {
     handle.addToDataDefinition(POSE_WRITE, "PLANE PITCH DEGREES", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(POSE_WRITE, "PLANE BANK DEGREES", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(POSE_WRITE, "PLANE HEADING DEGREES TRUE", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE LATITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE LONGITUDE", "degrees", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE ALTITUDE", "feet", sc.SimConnectDataType.FLOAT64);
+    handle.addToDataDefinition(GROUND_POSE_WRITE, "PLANE HEADING DEGREES TRUE", "degrees", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(VEL_WRITE, "VELOCITY BODY X", "feet per second", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(VEL_WRITE, "VELOCITY BODY Y", "feet per second", sc.SimConnectDataType.FLOAT64);
     handle.addToDataDefinition(VEL_WRITE, "VELOCITY BODY Z", "feet per second", sc.SimConnectDataType.FLOAT64);
@@ -235,6 +248,43 @@ class MsfsSim implements SimBackend {
         console.warn("[twinseat] SimConnect packet skipped", err instanceof Error ? err.message : err);
       }
     });
+    this.subscribeCockpitEvents();
+    try {
+      handle.enumerateInputEvents(INPUT_LIST_REQ);
+    } catch (err) {
+      console.warn("[twinseat] input event list skipped", err instanceof Error ? err.message : err);
+    }
+    handle.on("inputEventsList", (list) => {
+      const rows = list.inputEventDescriptors ?? [];
+      let n = 0;
+      for (const row of rows) {
+        const name = String(row.name ?? "");
+        if (skipInputEventName(name)) continue;
+        if (Number(row.type) !== 0) continue;
+        if (n++ > 800) break;
+        try {
+          handle.subscribeInputEvent(row.inputEventIdHash);
+        } catch {
+          /* aircraft without this event */
+        }
+      }
+    });
+    handle.on("subscribeInputEvent", (ev) => {
+      const hash = BigInt(ev.inputEventIdHash);
+      const key = hash.toString();
+      const until = this.muteInput.get(key) ?? 0;
+      if (Date.now() < until) return;
+      const value = typeof ev.value === "number" ? ev.value : Number(ev.value);
+      if (!Number.isFinite(value)) return;
+      this.outboundInput.push({ hash, value });
+    });
+    handle.on("event", (ev) => {
+      const name = this.eventByClient.get(ev.clientEventId);
+      if (!name) return;
+      const until = this.muteEvent.get(ev.clientEventId) ?? 0;
+      if (Date.now() < until) return;
+      this.outbound.push({ name, data: ev.data >>> 0 });
+    });
     handle.on("exception", (ex) => {
       console.warn("[twinseat] SimConnect", ex.exception, ex.sendId);
     });
@@ -245,6 +295,27 @@ class MsfsSim implements SimBackend {
     handle.on("close", () => {
       this.closed = true;
     });
+  }
+
+  private subscribeCockpitEvents(): void {
+    const events = this.pack.events ?? [];
+    for (let i = 0; i < events.length; i++) {
+      const name = events[i].sim;
+      const id = EVENT_BASE + i;
+      try {
+        this.handle.mapClientEventToSimEvent(id, name);
+        this.handle.addClientEventToNotificationGroup(EVENT_GROUP, id, false);
+        this.eventsMapped.add(name);
+        this.eventByClient.set(id, name);
+      } catch {
+        /* event not on this sim */
+      }
+    }
+    try {
+      this.handle.setNotificationGroupPriority(EVENT_GROUP, sc.NotificationPriority.HIGHEST);
+    } catch {
+      /* ignore */
+    }
   }
 
   private hasPosition(): boolean {
@@ -317,31 +388,44 @@ class MsfsSim implements SimBackend {
 
   applyWorldPose(pose: WorldPose): void {
     try {
-      const poseBuf = new sc.RawBuffer(48);
-      poseBuf.writeFloat64(pose.lat);
-      poseBuf.writeFloat64(pose.lon);
-      poseBuf.writeFloat64(pose.alt);
-      poseBuf.writeFloat64(pose.pitch);
-      poseBuf.writeFloat64(pose.bank);
-      poseBuf.writeFloat64(pose.heading);
-      this.handle.setDataOnSimObject(POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
-        buffer: poseBuf,
-        arrayCount: 0,
-        tagged: false,
-      });
+      if (pose.onGround) {
+        const ground = new sc.RawBuffer(32);
+        ground.writeFloat64(pose.lat);
+        ground.writeFloat64(pose.lon);
+        ground.writeFloat64(pose.alt);
+        ground.writeFloat64(pose.heading);
+        this.handle.setDataOnSimObject(GROUND_POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
+          buffer: ground,
+          arrayCount: 0,
+          tagged: false,
+        });
+      } else {
+        const poseBuf = new sc.RawBuffer(48);
+        poseBuf.writeFloat64(pose.lat);
+        poseBuf.writeFloat64(pose.lon);
+        poseBuf.writeFloat64(pose.alt);
+        poseBuf.writeFloat64(pose.pitch);
+        poseBuf.writeFloat64(pose.bank);
+        poseBuf.writeFloat64(pose.heading);
+        this.handle.setDataOnSimObject(POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
+          buffer: poseBuf,
+          arrayCount: 0,
+          tagged: false,
+        });
+      }
       const velBuf = new sc.RawBuffer(24);
-      velBuf.writeFloat64(pose.vx ?? 0);
-      velBuf.writeFloat64(pose.vy ?? 0);
-      velBuf.writeFloat64(pose.vz ?? 0);
+      velBuf.writeFloat64(pose.onGround ? 0 : (pose.vx ?? 0));
+      velBuf.writeFloat64(pose.onGround ? 0 : (pose.vy ?? 0));
+      velBuf.writeFloat64(pose.onGround ? 0 : (pose.vz ?? 0));
       this.handle.setDataOnSimObject(VEL_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
         buffer: velBuf,
         arrayCount: 0,
         tagged: false,
       });
       const rotBuf = new sc.RawBuffer(24);
-      rotBuf.writeFloat64(pose.rx ?? 0);
-      rotBuf.writeFloat64(pose.ry ?? 0);
-      rotBuf.writeFloat64(pose.rz ?? 0);
+      rotBuf.writeFloat64(pose.onGround ? 0 : (pose.rx ?? 0));
+      rotBuf.writeFloat64(pose.onGround ? 0 : (pose.ry ?? 0));
+      rotBuf.writeFloat64(pose.onGround ? 0 : (pose.rz ?? 0));
       this.handle.setDataOnSimObject(ROT_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
         buffer: rotBuf,
         arrayCount: 0,
@@ -376,6 +460,14 @@ class MsfsSim implements SimBackend {
       tagged: false,
     });
     this.fireAxis(v.sim, value);
+    const discrete = discreteEventForVar(v.sim, value);
+    if (discrete) {
+      const prev = this.lastDiscrete.get(discrete.name);
+      if (prev !== discrete.data) {
+        this.lastDiscrete.set(discrete.name, discrete.data);
+        this.fire(discrete.name, discrete.data);
+      }
+    }
     setTimeout(() => this.writing.delete(v.id), 160);
   }
 
@@ -399,6 +491,9 @@ class MsfsSim implements SimBackend {
       sc.NotificationPriority.HIGHEST,
       sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
     );
+    for (const [cid, n] of this.eventByClient) {
+      if (n === name) this.muteEvent.set(cid, Date.now() + 180);
+    }
   }
 
   private fireAxis(sim: string, value: number): void {
@@ -462,12 +557,28 @@ class MsfsSim implements SimBackend {
       sc.NotificationPriority.HIGHEST,
       sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
     );
+    this.muteEvent.set(eventId, Date.now() + 180);
     if (!fromNetwork) this.outbound.push({ name, data });
   }
 
   drainEvents(): { name: string; data: number }[] {
     const out = this.outbound;
     this.outbound = [];
+    return out;
+  }
+
+  applyInputEvent(hash: bigint, value: number): void {
+    try {
+      this.muteInput.set(hash.toString(), Date.now() + 220);
+      this.handle.setInputEvent(hash, value);
+    } catch (err) {
+      console.warn("[twinseat] input event write skipped", err instanceof Error ? err.message : err);
+    }
+  }
+
+  drainInputEvents(): { hash: bigint; value: number }[] {
+    const out = this.outboundInput;
+    this.outboundInput = [];
     return out;
   }
 }

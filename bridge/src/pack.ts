@@ -2,6 +2,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Domain, PresenceSupport, Seat } from "@twinseat/protocol";
+import { COCKPIT_SIM_EVENTS } from "./sim-events.js";
 
 export type PackVar = {
   id: number;
@@ -35,6 +36,24 @@ export const DEFAULT_ATC_EVENTS: PackEvent[] = [
   { id: 112, name: "COM2_RADIO_SWAP", sim: "COM2_RADIO_SWAP", domain: "atc" },
   { id: 113, name: "XPNDR_IDENT", sim: "XPNDR_IDENT", domain: "atc" },
 ];
+
+export const DEFAULT_COCKPIT_EVENTS: PackEvent[] = COCKPIT_SIM_EVENTS.map((sim, i) => ({
+  id: 200 + i,
+  name: sim,
+  sim,
+  domain: "shared" as Domain,
+}));
+
+function mergeEvents(pack: AircraftPack): PackEvent[] {
+  const seen = new Set<string>();
+  const out: PackEvent[] = [];
+  for (const ev of [...DEFAULT_COCKPIT_EVENTS, ...DEFAULT_ATC_EVENTS, ...(pack.events ?? [])]) {
+    if (seen.has(ev.sim)) continue;
+    seen.add(ev.sim);
+    out.push(ev);
+  }
+  return out;
+}
 
 export type AircraftPack = {
   id: string;
@@ -81,7 +100,7 @@ export function loadPacks(dir = packsDir()): AircraftPack[] {
     .filter((f) => f.endsWith(".json") && f !== "schema.json")
     .map((f) => {
       const pack = JSON.parse(readFileSync(join(dir, f), "utf8")) as AircraftPack;
-      pack.events = pack.events ?? DEFAULT_ATC_EVENTS;
+      pack.events = mergeEvents(pack);
       return pack;
     });
 }

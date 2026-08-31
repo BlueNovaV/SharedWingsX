@@ -21,4 +21,7 @@ contextBridge.exposeInMainWorld("twinseat", {
   onUpdateProgress: (cb) => {
     ipcRenderer.on("twinseat:update-progress", (_event, info) => cb(info));
   },
+  winMin: () => ipcRenderer.send("twinseat:win-min"),
+  winMax: () => ipcRenderer.send("twinseat:win-max"),
+  winClose: () => ipcRenderer.send("twinseat:win-close"),
 });

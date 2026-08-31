@@ -11,13 +11,13 @@ export function toWs(url: string): string {
 }
 
 export function cloudRelayUrls(): string[] {
-  const out: string[] = [];
+  const pinned = "https://twinseat-relay.rune-innocent.workers.dev";
+  const out: string[] = [pinned];
   const env = process.env.TWINSEAT_CLOUD_RELAY?.trim();
-  if (env) out.push(toHttp(env));
+  if (env && !/127\.0\.0\.1|localhost/i.test(env)) out.push(toHttp(env));
   for (const extra of String(process.env.TWINSEAT_CLOUD_RELAYS ?? "").split(",")) {
     const u = extra.trim();
-    if (u) out.push(toHttp(u));
+    if (u && !/127\.0\.0\.1|localhost/i.test(u)) out.push(toHttp(u));
   }
-  out.push("https://twinseat-relay.rune-innocent.workers.dev");
   return [...new Set(out)];
 }

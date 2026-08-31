@@ -32,7 +32,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.50";
+const APP_VER = "0.4.51";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 
@@ -406,6 +406,7 @@ function header(): string {
   const live = Boolean(state?.room);
   return `
     <header class="bar">
+      <div class="chrome-drag" aria-hidden="true"></div>
       <div class="bar-left">
         <p class="brand"><img src="./brand/logo.png" alt="" /><span>SharedWingsX</span> <span class="ver">${escapeHtml(update?.current || APP_VER)}</span></p>
       </div>
@@ -413,6 +414,11 @@ function header(): string {
       <div class="bar-right">
         ${live ? `<button type="button" class="back js-leave">Leave</button>` : ""}
         <button type="button" class="back" id="open-settings">${settingsOpen ? "Close settings" : "Settings"}</button>
+        <div class="win-btns">
+          <button type="button" class="win-btn" id="win-min" aria-label="Minimize">–</button>
+          <button type="button" class="win-btn" id="win-max" aria-label="Maximize">□</button>
+          <button type="button" class="win-btn win-close" id="win-close" aria-label="Close">×</button>
+        </div>
       </div>
     </header>`;
 }
@@ -574,6 +580,10 @@ function bindBoard(): void {
     settingsOpen = !settingsOpen;
     renderBoard();
   });
+  root.querySelector("#win-min")?.addEventListener("click", () => app.winMin?.());
+  root.querySelector("#win-max")?.addEventListener("click", () => app.winMax?.());
+  root.querySelector("#win-close")?.addEventListener("click", () => app.winClose?.());
+  root.querySelector(".chrome-drag")?.addEventListener("dblclick", () => app.winMax?.());
   root.querySelector("#apply")?.addEventListener("click", () => {
     const next = root.querySelector<HTMLInputElement>("#name")?.value.trim() || "Pilot";
     name = next;
@@ -910,8 +920,9 @@ async function boot(): Promise<void> {
       root.querySelector<HTMLInputElement>("#code")?.focus();
       return;
     }
-    if (msg.type === "state") {
+      if (msg.type === "state") {
       state = msg.state;
+      if (state.room) error = "";
       if (!state.room) {
         const next = `lobby|${state.identity.inWorld ? "1" : "0"}|${state.identity.aircraftTitle}|${state.identity.airportIcao ?? ""}|${state.identity.mock ? "m" : "l"}|${state.identity.simProduct}`;
         const leftRoom = Boolean(lastLiveKey) && !lastLiveKey.startsWith("lobby");
@@ -923,7 +934,7 @@ async function boot(): Promise<void> {
           paintFlightBar();
           paintSimLamps();
         }
-        if (state.error) showJoinError(state.error);
+        if (state.error && !busy) showJoinError(state.error);
         return;
       }
       const key = [

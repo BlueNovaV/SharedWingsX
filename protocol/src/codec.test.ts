@@ -10,6 +10,8 @@ import {
   encodePresencePose,
   encodeSimEvent,
   decodeSimEvent,
+  encodeInputEvent,
+  decodeInputEvent,
   encodeWorldPose,
   decodeWorldPose,
   MessageType,
@@ -74,5 +76,13 @@ describe("codec", () => {
     const buf = encodeSimEvent(9, { eventId: 102, data: 0 });
     assert.equal(decodeHeader(buf)?.type, MessageType.SimEvent);
     assert.deepEqual(decodeSimEvent(buf), { eventId: 102, data: 0 });
+  });
+
+  it("roundtrips cockpit input events", () => {
+    const buf = encodeInputEvent(3, { hash: 0x1234abcdn, value: 0.75 });
+    assert.equal(decodeHeader(buf)?.type, MessageType.InputEvent);
+    const got = decodeInputEvent(buf);
+    assert.equal(got.hash, 0x1234abcdn);
+    assert.ok(Math.abs(got.value - 0.75) < 1e-9);
   });
 });

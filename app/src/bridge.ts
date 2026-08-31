@@ -77,6 +77,9 @@ export type TwinSeatDesktop = {
   onSim?: (cb: (info: { msfs2020: boolean; msfs2024: boolean }) => void) => void;
   onUpdate?: (cb: (info: UpdateInfo) => void) => void;
   onUpdateProgress?: (cb: (info: UpdateProgress) => void) => void;
+  winMin?: () => void;
+  winMax?: () => void;
+  winClose?: () => void;
 };
 
 export function desktop(): TwinSeatDesktop {

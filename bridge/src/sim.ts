@@ -43,6 +43,8 @@ export interface SimBackend {
   tick(dtMs: number): void;
   transmitEvent(name: string, data: number, fromNetwork?: boolean): void;
   drainEvents(): { name: string; data: number }[];
+  applyInputEvent(hash: bigint, value: number): void;
+  drainInputEvents(): { hash: bigint; value: number }[];
 }
 
 export class MockSim implements SimBackend {
@@ -52,6 +54,7 @@ export class MockSim implements SimBackend {
   roll = 0;
   aircraftTitle: string;
   private outbound: { name: string; data: number }[] = [];
+  private outboundInput: { hash: bigint; value: number }[] = [];
   constructor(pack: AircraftPack, aircraftTitle?: string) {
     this.aircraftTitle = aircraftTitle ?? pack.titleMatchers[0] ?? pack.name;
     for (const v of pack.variables) {
@@ -96,6 +99,12 @@ export class MockSim implements SimBackend {
   drainEvents(): { name: string; data: number }[] {
     const out = this.outbound;
     this.outbound = [];
+    return out;
+  }
+  applyInputEvent(): void {}
+  drainInputEvents(): { hash: bigint; value: number }[] {
+    const out = this.outboundInput;
+    this.outboundInput = [];
     return out;
   }
 }

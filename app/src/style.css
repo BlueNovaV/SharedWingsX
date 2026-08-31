@@ -154,10 +154,16 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   gap: 12px;
   height: 40px;
   min-height: 40px;
-  padding: 0 138px 0 12px;
-  overflow: hidden;
+  padding: 0 8px 0 12px;
+  overflow: visible;
   border-bottom: 1px solid var(--line);
   background: rgba(11, 13, 18, 0.96);
+  -webkit-app-region: drag;
+}
+.chrome-drag {
+  position: absolute;
+  inset: 0 118px 0 0;
+  z-index: 0;
   -webkit-app-region: drag;
 }
 .bar button,
@@ -196,6 +202,7 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   min-width: 0;
   overflow: hidden;
   z-index: 1;
+  -webkit-app-region: drag;
 }
 .bar-right {
   display: flex;
@@ -205,7 +212,28 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   flex: none;
   overflow: visible;
   z-index: 2;
+  -webkit-app-region: no-drag;
 }
+.win-btns {
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+  margin-left: 4px;
+  -webkit-app-region: no-drag;
+}
+.win-btn {
+  width: 36px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #d8d2c8;
+  font-size: 14px;
+  line-height: 1;
+}
+.win-btn:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.win-btn.win-close:hover { background: #c42b1c; color: #fff; }
 .bar-mid {
   position: static;
   min-width: 0;

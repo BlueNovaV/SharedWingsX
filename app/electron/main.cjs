@@ -4,6 +4,11 @@ const { bootEngine } = require("./engine.cjs");
 const { installCommunity, rememberCommunityFolder } = require("./community.cjs");
 const { checkUpdate, applyUpdate } = require("./update.cjs");
 const { detectSims } = require("./sim-status.cjs");
+const { relayUrl } = require("./site.cjs");
+
+if (relayUrl && !process.env.TWINSEAT_CLOUD_RELAY) {
+  process.env.TWINSEAT_CLOUD_RELAY = relayUrl;
+}
 
 process.on("uncaughtException", (err) => {
   console.error("[twinseat] uncaught", err);
@@ -136,6 +141,17 @@ ipcMain.handle("twinseat:open-download", async () => {
   return true;
 });
 ipcMain.handle("twinseat:sim", () => detectSims());
+ipcMain.on("twinseat:win-min", () => {
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.minimize();
+});
+ipcMain.on("twinseat:win-max", () => {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (mainWindow.isMaximized()) mainWindow.unmaximize();
+  else mainWindow.maximize();
+});
+ipcMain.on("twinseat:win-close", () => {
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
+});
 
 function sendSim() {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -170,12 +186,8 @@ async function createWindow() {
     title: "SharedWingsX",
     autoHideMenuBar: true,
     show: true,
+    frame: false,
     titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "#0b0d12",
-      symbolColor: "#e8e6df",
-      height: 40,
-    },
     webPreferences: {
       preload: path.join(__dirname, "preload.cjs"),
       contextIsolation: true,

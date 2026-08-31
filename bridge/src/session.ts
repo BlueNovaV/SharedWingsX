@@ -24,6 +24,8 @@ import {
   decodeSimEvent,
   encodeWorldPose,
   decodeWorldPose,
+  encodeInputEvent,
+  decodeInputEvent,
   type DesyncReportPayload,
   type HelloPayload,
   type PanelLock,
@@ -102,6 +104,7 @@ export class TwinSeatSession {
   private lastHostPose: WorldPose | null = null;
   private wasInWorld = false;
   private lastFreezePulse = 0;
+  private lastPoseApply = 0;
   private lastHelloAt = 0;
   private lastSnapAt = 0;
   private lastPresenceAt = 0;
@@ -170,16 +173,20 @@ export class TwinSeatSession {
   async host(): Promise<void> {
     const cloud = await this.connectAnyCloud();
     if (!cloud) {
-      throw new Error(
-        "Could not reach SharedWingsX internet. Both PCs need internet. Try again in a few seconds.",
-      );
+      try {
+        await this.connectSignal(this.homeRelayHttp);
+      } catch {
+        throw new Error(
+          "Could not reach the SharedWingsX cloud. Check https://twinseat-relay.rune-innocent.workers.dev/health then try again.",
+        );
+      }
     }
     await this.waitForRoom(() => {
       this.sendSignal({ type: "host", name: this.displayName, packId: this.pack.id });
     });
     this.role = "pf";
     this.flyingName = this.displayName;
-    this.path = "relay";
+    this.path = cloud ? "relay" : "direct";
     this.sendSignal({ type: "use_relay" });
   }
 
@@ -210,10 +217,12 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.50 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.51 open.",
       );
     }
-    throw new Error("Could not reach SharedWingsX internet. Both PCs need internet, then try Connect again.");
+    throw new Error(
+      "Could not reach the SharedWingsX cloud. Open https://twinseat-relay.rune-innocent.workers.dev/health on both PCs, then Connect again.",
+    );
   }
 
   private async connectAnyCloud(): Promise<boolean> {
@@ -409,9 +418,9 @@ export class TwinSeatSession {
       }
       this.relayHttp = url;
       const ws = new WebSocket(toWs(url), {
-        handshakeTimeout: 10000,
+        handshakeTimeout: 8000,
         perMessageDeflate: false,
-        origin: "https://sharedwingsx.app",
+        headers: { "User-Agent": "SharedWingsX/0.4.51" },
       });
       this.signal = ws;
       const timer = setTimeout(() => {
@@ -421,7 +430,7 @@ export class TwinSeatSession {
           /* ignore */
         }
         reject(new Error("Could not reach SharedWingsX internet relay."));
-      }, 10000);
+      }, 8000);
       ws.on("open", () => {
         clearTimeout(timer);
         resolve();
@@ -602,6 +611,7 @@ export class TwinSeatSession {
       const pose = decodeWorldPose(game);
       this.lastHostPose = pose;
       this.sim.applyWorldPose(pose);
+      this.lastPoseApply = Date.now();
       return;
     }
 
@@ -610,6 +620,11 @@ export class TwinSeatSession {
       const def = (this.pack.events ?? []).find((e) => e.id === ev.eventId);
       if (!def) return;
       this.sim.transmitEvent(def.sim, ev.data, true);
+    }
+
+    if (header.type === MessageType.InputEvent) {
+      const input = decodeInputEvent(game);
+      this.sim.applyInputEvent(input.hash, input.value);
     }
   }
 
@@ -644,9 +659,15 @@ export class TwinSeatSession {
       for (const [id, value] of this.lastRemote) {
         applyRemoteVar(this.sim, this.pack, id, value);
       }
-      if (this.lastHostPose) this.sim.applyWorldPose(this.lastHostPose);
+      if (this.lastHostPose) {
+        const gap = this.lastHostPose.onGround ? 120 : 40;
+        if (now - this.lastPoseApply >= gap) {
+          this.sim.applyWorldPose(this.lastHostPose);
+          this.lastPoseApply = now;
+        }
+      }
     }
-    if (hold && (enteredWorld || now - this.lastFreezePulse > 1000)) {
+    if (hold && (enteredWorld || now - this.lastFreezePulse > 8000)) {
       this.sim.setPhysicsHold(true, true);
       this.lastFreezePulse = now;
     } else if (!hold) {
@@ -654,17 +675,28 @@ export class TwinSeatSession {
     }
     this.wasInWorld = inWorld;
 
-    if (this.room && this.roster.length > 1 && pose && this.iAmPoseSource() && now - this.lastWorldSend > 50) {
-      this.lastWorldSend = now;
-      this.sendGame(encodeWorldPose(this.seq++, pose));
+    if (this.room && this.roster.length > 1 && pose && this.iAmPoseSource()) {
+      const worldGap = pose.onGround ? 100 : 50;
+      if (now - this.lastWorldSend > worldGap) {
+        this.lastWorldSend = now;
+        this.sendGame(encodeWorldPose(this.seq++, pose));
+      }
     }
 
     if (this.room && this.roster.length > 1) {
       for (const ev of this.sim.drainEvents()) {
         const def = (this.pack.events ?? []).find((e) => e.sim === ev.name);
         if (!def) continue;
+        if (this.role === "observer") continue;
         if (!canWrite(this.displayName, this.role, def.domain, def.id, now, this.locks)) continue;
         this.sendGame(encodeSimEvent(this.seq++, { eventId: def.id, data: ev.data }));
+      }
+      if (this.role !== "observer") {
+        for (const input of this.sim.drainInputEvents()) {
+          this.sendGame(encodeInputEvent(this.seq++, input));
+        }
+      } else {
+        this.sim.drainInputEvents();
       }
       const cam = this.sim.camera();
       if (now - this.lastPresenceAt > 100) {

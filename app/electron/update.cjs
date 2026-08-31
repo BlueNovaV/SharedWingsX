@@ -90,7 +90,10 @@ async function readFeed(url) {
     const data = await res.json();
     if (!data?.version || !data?.downloadUrl) return null;
     if (data.relayUrl && !process.env.TWINSEAT_CLOUD_RELAY) {
-      process.env.TWINSEAT_CLOUD_RELAY = String(data.relayUrl);
+      const relay = String(data.relayUrl);
+      if (/^https:\/\//i.test(relay) && !/127\.0\.0\.1|localhost/i.test(relay)) {
+        process.env.TWINSEAT_CLOUD_RELAY = relay;
+      }
     }
     return data;
   } catch {

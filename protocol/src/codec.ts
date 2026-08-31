@@ -17,6 +17,7 @@ export const MessageType = {
   PunchPing: 11,
   SimEvent: 12,
   WorldPose: 13,
+  InputEvent: 14,
 } as const;
 
 export type MessageTypeId = (typeof MessageType)[keyof typeof MessageType];
@@ -256,6 +257,22 @@ export function decodeSimEvent(buf: Buffer): SimEventPayload {
   return {
     eventId: buf.readUInt16LE(HEADER_SIZE),
     data: buf.readUInt32LE(HEADER_SIZE + 2),
+  };
+}
+
+export type InputEventPayload = { hash: bigint; value: number };
+
+export function encodeInputEvent(seq: number, payload: InputEventPayload): Buffer {
+  const body = Buffer.alloc(16);
+  body.writeBigUInt64LE(payload.hash, 0);
+  body.writeDoubleLE(payload.value, 8);
+  return Buffer.concat([writeHeader(MessageType.InputEvent, seq), body]);
+}
+
+export function decodeInputEvent(buf: Buffer): InputEventPayload {
+  return {
+    hash: buf.readBigUInt64LE(HEADER_SIZE),
+    value: buf.readDoubleLE(HEADER_SIZE + 8),
   };
 }
 
