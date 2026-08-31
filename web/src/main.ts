@@ -134,15 +134,20 @@ function apply(lang: "nl" | "en"): void {
 const localSite = location.hostname === "127.0.0.1" || location.hostname === "localhost";
 if (localSite) {
   document.querySelectorAll<HTMLAnchorElement>('a[href*="SharedWingsX-Setup"], a[href$=".AppImage"], a[href*="linux-x64"]').forEach((a) => {
-    fetch(a.href, { method: "HEAD" }).then((res) => {
-      if (!res.ok) {
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return;
+    void fetch(url.pathname + url.search, { method: "HEAD" })
+      .then((res) => {
+        if (res.ok) return;
         a.removeAttribute("download");
         a.addEventListener("click", (ev) => {
           ev.preventDefault();
           alert("Build the Windows app first with npm run dist:win, then npm run site.");
         });
-      }
-    });
+      })
+      .catch(() => {
+        /* missing local file or blocked request — keep the link */
+      });
   });
 }
 const hero = document.querySelector<HTMLVideoElement>(".hero-video");
