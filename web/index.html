@@ -8,7 +8,7 @@
       name="description"
       content="SharedWingsX is shared cockpit for MSFS 2020 and 2024. One Windows app, one code, two seats."
     />
-    <meta name="theme-color" content="#05070a" />
+    <meta name="theme-color" content="#101820" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="icon" href="./brand/logo.png?v=4" type="image/png" />
@@ -17,32 +17,25 @@
   </head>
   <body>
     <header class="top">
-      <div class="wrap top-bar">
-        <a class="brand" href="#top">
-          <img src="./brand/logo.png?v=4" width="36" height="36" alt="SharedWingsX" />
-          SharedWingsX
-        </a>
-        <nav>
-          <a href="#app" data-i="navApp">The app</a>
-          <a href="#aircraft" data-i="navAircraft">Aircraft</a>
-          <a href="#how" data-i="navHow">How it works</a>
-          <a href="#faq" data-i="navFaq">Questions</a>
-          <a href="https://discord.gg/bluenovav" target="_blank" rel="noopener">Discord</a>
-          <button type="button" class="lang" id="lang">NL</button>
-          <a class="btn" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
-            <img src="./brand/logo.png?v=4" width="18" height="18" alt="" />
-            <span data-i="cta">Download</span>
-            <svg class="btn-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 4v11m0 0 5-5m-5 5-5-5M5 19h14"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
+      <div class="wrap">
+        <div class="top-island">
+          <a class="brand" href="#top">
+            <img src="./brand/logo.png?v=4" width="36" height="36" alt="SharedWingsX" />
+            SharedWingsX
           </a>
-        </nav>
+          <nav>
+            <a href="#app" data-i="navApp">The app</a>
+            <a href="#aircraft" data-i="navAircraft">Aircraft</a>
+            <a href="#how" data-i="navHow">How it works</a>
+            <a href="#faq" data-i="navFaq">Questions</a>
+            <a href="https://discord.gg/bluenovav" target="_blank" rel="noopener">Discord</a>
+            <button type="button" class="lang" id="lang">NL</button>
+            <a class="btn" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
+              <img src="./brand/logo.png?v=4" width="18" height="18" alt="" />
+              <span data-i="cta">Download</span>
+            </a>
+          </nav>
+        </div>
       </div>
     </header>
 
@@ -62,41 +55,34 @@
         <img class="photo still night-pan hero-fallback" src="./brand/hero.png?v=4" alt="" />
       </div>
       <div class="shade"></div>
-      <div class="stage-inner">
-        <p class="eyebrow" data-i="eyebrow">Microsoft Flight Simulator 2020 &amp; 2024</p>
-        <h1 data-i="heroTitle">One cockpit.<br />Two people.</h1>
-        <p class="lede" data-i="heroLede">
-          Shared cockpit as a product, not a zip treasure hunt. One Windows app, one code, captain and first officer
-          in the same seats.
-        </p>
-        <div class="cta-row">
-          <a class="btn btn-lg" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
-            <span class="btn-mark">
-              <img src="./brand/logo.png?v=4" width="28" height="28" alt="" />
-            </span>
-            <span class="btn-copy">
-              <span data-i="cta2">Download SharedWingsX</span>
-              <small data-i="ctaSub">Windows installer · 0.4.44 · ~95 MB</small>
-            </span>
-            <svg class="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 4v11m0 0 5-5m-5 5-5-5M5 19h14"
-                stroke="currentColor"
-                stroke-width="1.8"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </a>
-          <span data-i="heroMeta">Windows and Linux, no account</span>
+      <div class="wrap stage-inner">
+        <div class="hero-plate">
+          <p class="eyebrow" data-i="eyebrow">Microsoft Flight Simulator 2020 &amp; 2024</p>
+          <h1 data-i="heroTitle">One cockpit.<br />Two people.</h1>
+          <p class="lede" data-i="heroLede">
+            Shared cockpit as a product, not a zip treasure hunt. One Windows app, one code, captain and first officer
+            in the same seats.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-lg" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
+              <span class="btn-mark">
+                <img src="./brand/logo.png?v=4" width="28" height="28" alt="" />
+              </span>
+              <span class="btn-copy">
+                <span data-i="cta2">Download SharedWingsX</span>
+                <small data-i="ctaSub">Windows installer · 0.4.44 · ~95 MB</small>
+              </span>
+            </a>
+            <span data-i="heroMeta">Windows and Linux, no account</span>
+          </div>
+          <p class="cta-linux">
+            <a href="./downloads/SharedWingsX-0.4.44-linux-x64.zip" download>Linux (x64 zip)</a>
+          </p>
         </div>
-        <p class="cta-linux">
-          <a href="./downloads/SharedWingsX-0.4.44-linux-x64.zip" download>Linux (x64 zip)</a>
-        </p>
       </div>
     </section>
 
-    <section class="block dim" id="app">
+    <section class="block dim" id="app" data-chap="01">
       <div class="wrap split app-intro">
         <h2 data-i="appTitle">The Windows app</h2>
         <p class="copy" data-i="appCopy">
@@ -104,7 +90,7 @@
           2024 lamps sit in the footer. Same version on every PC.
         </p>
       </div>
-      <div class="wrap">
+      <div class="wrap bezel">
         <div class="swx" role="img" aria-label="SharedWingsX window: Join, Host, Crew and Settings">
           <div class="frame board-frame">
             <header class="bar">
@@ -235,7 +221,7 @@
       </div>
     </section>
 
-    <section class="block" id="aircraft">
+    <section class="block" id="aircraft" data-chap="02">
       <div class="wrap split">
         <div>
           <h2 data-i="airTitle">Built to fly anything MSFS will load</h2>
@@ -255,12 +241,12 @@
       </div>
     </section>
 
-    <section class="block dim" id="how">
-      <div class="wrap split">
-        <div>
-          <h2 data-i="howTitle">Four steps. No installer theatre.</h2>
-          <p class="copy" data-i="sHint">No Visual C++, no WebView2. Pick the Community folder only if MSFS has never been launched.</p>
-        </div>
+    <section class="block dim how" id="how" data-chap="03">
+      <div class="wrap how-head">
+        <h2 data-i="howTitle">Four steps. No installer theatre.</h2>
+        <p class="copy" data-i="sHint">No Visual C++, no WebView2. Pick the Community folder only if MSFS has never been launched.</p>
+      </div>
+      <div class="wrap">
         <ol class="steps">
           <li>
             <span class="steps-n">01</span>
@@ -294,7 +280,7 @@
       </div>
     </section>
 
-    <section class="block" id="faq">
+    <section class="block" id="faq" data-chap="04">
       <div class="wrap split">
         <h2 data-i="faqTitle">Questions</h2>
         <div class="faq">
