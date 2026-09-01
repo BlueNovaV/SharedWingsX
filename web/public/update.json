@@ -1,7 +1,7 @@
 {
-  "version": "0.4.65",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.65/SharedWingsX-Setup-0.4.65.exe",
-  "notes": "Product-site restyle: serif type, scroll motion, quieter Host/Join loop.",
+  "version": "0.4.66",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.66/SharedWingsX-Setup-0.4.66.exe",
+  "notes": "Motion pass: ticker, button shine, scroll line, looping Host/Join.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

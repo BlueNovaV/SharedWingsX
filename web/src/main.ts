@@ -10,7 +10,7 @@ const en: Record<string, string> = {
   heroWhisper: "Zelfde stoel. Twee PCs.",
   cta: "Download",
   cta2: "Download SharedWingsX",
-  ctaSub: "Windows installer · 0.4.65 · ~95 MB",
+  ctaSub: "Windows installer · 0.4.66 · ~95 MB",
   heroMeta: "Windows and Linux, no account",
   strip1: "No Community drag-drop",
   strip2: "No port forwarding",
@@ -55,7 +55,7 @@ const en: Record<string, string> = {
   q1: "Is SharedWingsX free?",
   q1a: "Yes. Download the Windows Setup (~95 MB) or the Linux zip. No account, no subscription. MSFS itself is Windows-only; Linux can host or join a deck, but SimConnect needs Windows.",
   q2: "Does the other person need SharedWingsX too?",
-  q2a: "Yes. Everyone uses the same version (currently 0.4.65). The host starts a deck and shares the six-character session code.",
+  q2a: "Yes. Everyone uses the same version (currently 0.4.66). The host starts a deck and shares the six-character session code.",
   q3: "How does it work?",
   q3a: "SharedWingsX syncs the cockpit between both pilots. Captain left, first officer right. Radios and ATC for both; you hand over flying on the person.",
   q4: "Does it work on VATSIM or IVAO?",
@@ -86,7 +86,7 @@ const nl: Record<string, string> = {
     "Shared cockpit als product, niet als zip-avontuur. Eén Windows-app, één code, captain en first officer in dezelfde stoelen.",
   cta: "Download",
   cta2: "Download SharedWingsX",
-  ctaSub: "Windows-installer · 0.4.65 · ~95 MB",
+  ctaSub: "Windows-installer · 0.4.66 · ~95 MB",
   heroMeta: "Windows en Linux, geen account",
   strip1: "Geen Community-sleep",
   strip2: "Geen poorten openzetten",
@@ -131,7 +131,7 @@ const nl: Record<string, string> = {
   q1: "Is SharedWingsX gratis?",
   q1a: "Ja. Download de Windows-Setup (~95 MB) of de Linux-zip. Geen account. MSFS zelf is Windows-only; Linux kan een deck hosten of joinen, SimConnect heeft Windows nodig.",
   q2: "Moet de ander SharedWingsX ook hebben?",
-  q2a: "Ja. Iedereen dezelfde versie (nu 0.4.65). De host start een deck en deelt de sessiecode van zes tekens.",
+  q2a: "Ja. Iedereen dezelfde versie (nu 0.4.66). De host start een deck en deelt de sessiecode van zes tekens.",
   q3: "Hoe werkt het?",
   q3a: "SharedWingsX synct de cockpit. Captain links, first officer rechts. Radios en ATC voor beide; besturing geef je op de persoon.",
   q4: "VATSIM of IVAO?",
@@ -162,6 +162,18 @@ function apply(lang: "nl" | "en"): void {
   });
   const btn = document.getElementById("lang");
   if (btn) btn.textContent = lang === "nl" ? "EN" : "NL";
+  splitHeroTitle();
+}
+
+function splitHeroTitle(): void {
+  const h1 = document.querySelector<HTMLElement>("h1[data-i='heroTitle']");
+  if (!h1) return;
+  const text = (h1.textContent ?? "").replace(/\s+/g, " ").trim();
+  if (!text) return;
+  h1.innerHTML = text
+    .split(" ")
+    .map((word, i) => `<span class="h1w" style="--d:${0.16 + i * 0.1}s"><span>${word}</span></span>`)
+    .join("");
 }
 
 const localSite = location.hostname === "127.0.0.1" || location.hostname === "localhost";
@@ -216,13 +228,40 @@ document.getElementById("lang")?.addEventListener("click", () => {
 });
 
 const header = document.querySelector(".top");
+const line = document.getElementById("scroll-line");
+const heroBg = document.querySelector<HTMLElement>(".hero-bg");
 const onScroll = (): void => {
-  header?.classList.toggle("scrolled", window.scrollY > 12);
+  const y = window.scrollY;
+  header?.classList.toggle("scrolled", y > 12);
+  const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  if (line) line.style.width = `${(y / max) * 100}%`;
+  if (heroBg && motionOk) heroBg.style.transform = `translate3d(0, ${y * 0.22}px, 0)`;
 };
+const motionOk = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 onScroll();
 window.addEventListener("scroll", onScroll, { passive: true });
 
-const motionOk = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const stage = document.querySelector(".stage");
+const spot = document.getElementById("spot");
+stage?.addEventListener("pointermove", (ev) => {
+  if (!spot || !motionOk) return;
+  const r = stage.getBoundingClientRect();
+  spot.style.transform = `translate3d(${ev.clientX - r.left}px, ${ev.clientY - r.top}px, 0)`;
+});
+
+document.querySelectorAll<HTMLElement>(".tilt").forEach((el) => {
+  el.addEventListener("pointermove", (ev) => {
+    if (!motionOk) return;
+    const r = el.getBoundingClientRect();
+    const x = (ev.clientX - r.left) / r.width - 0.5;
+    const y = (ev.clientY - r.top) / r.height - 0.5;
+    el.style.transform = `rotateY(${x * 10}deg) rotateX(${-y * 10}deg) translateY(-6px)`;
+  });
+  el.addEventListener("pointerleave", () => {
+    el.style.transform = "";
+  });
+});
+
 document.querySelectorAll(".reveal").forEach((el) => {
   if (!motionOk) {
     el.classList.add("on");
@@ -236,7 +275,7 @@ document.querySelectorAll(".reveal").forEach((el) => {
         io.unobserve(entry.target);
       }
     },
-    { threshold: 0.18, rootMargin: "0px 0px -8% 0px" },
+    { threshold: 0.12, rootMargin: "0px 0px -6% 0px" },
   );
   io.observe(el);
 });

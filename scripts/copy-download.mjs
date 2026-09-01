@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "Product-site restyle: serif type, scroll motion, quieter Host/Join loop.",
+  notes: "Motion pass: ticker, button shine, scroll line, looping Host/Join.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };
