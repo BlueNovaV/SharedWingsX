@@ -476,7 +476,6 @@ h2 {
   letter-spacing: -0.02em;
 }
 .split,
-.how-head,
 .how-body,
 .app-intro {
   display: grid;
@@ -529,98 +528,51 @@ h2 {
 .lines span { color: var(--mute); text-align: right; }
 
 .how-head {
-  margin-bottom: 36px;
-  align-items: center;
+  margin-bottom: 40px;
+}
+.how-head .copy {
+  margin-top: 10px;
+  max-width: 34rem;
 }
 .how-body {
-  align-items: stretch;
-}
-.how-body > * {
-  min-height: 100%;
-}
-.seats-diagram {
-  margin: 0;
-  padding: 0;
-  border-radius: 6px;
-  background: #0b0d12;
-  border: 1px solid var(--line);
-  display: flex;
-  flex-direction: column;
-  min-height: 100%;
-  overflow: hidden;
-}
-.sd-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 1px;
-  background: var(--line);
-  flex: 1;
-  min-height: 220px;
-}
-.sd-seat {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 4px;
-  min-height: 88px;
-  padding: 16px;
-  border-radius: 0;
-  border: 0;
-  text-align: left;
-  background: #12151c;
-}
-.sd-seat span { font-weight: 600; font-size: 13px; }
-.sd-seat small { color: var(--mute); font-size: 12px; }
-.sd-seat.you { box-shadow: inset 3px 0 0 var(--gold); }
-.sd-seat.crew { box-shadow: inset 3px 0 0 #6fbfb4; }
-.sd-cap {
-  margin: 0;
-  padding: 12px 16px;
-  color: var(--mute);
-  font-size: 12px;
-  border-top: 1px solid var(--line);
+  grid-template-columns: minmax(0, 1.2fr) minmax(240px, 0.8fr);
+  gap: 48px var(--gutter);
+  align-items: start;
 }
 
 .steps {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  overflow: hidden;
-  min-height: 100%;
 }
 .steps li {
   display: grid;
-  grid-template-columns: 36px 1fr;
-  gap: 8px 12px;
-  align-content: center;
-  padding: 16px;
+  grid-template-columns: 2.25rem 1fr;
+  gap: 4px 14px;
   margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: #12151c;
-  transition: background 0.25s var(--ease);
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  background: none;
 }
-.steps li:last-child { border-bottom: 0; }
+.steps li:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+.steps li:last-child { padding-bottom: 0; }
 .steps li:hover {
   background: transparent;
   transform: none;
 }
 .steps-n {
-  font-size: 13px;
-  font-weight: 650;
-  letter-spacing: 0.08em;
+  padding-top: 2px;
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   color: var(--gold);
 }
 .steps h3 {
-  margin: 0 0 6px;
+  margin: 0 0 4px;
   font-size: 16px;
   font-weight: 600;
 }
@@ -629,6 +581,60 @@ h2 {
   color: var(--mute);
   font-size: 14px;
   line-height: 1.55;
+}
+
+.seats-diagram {
+  margin: 0;
+  padding: 18px;
+  border-radius: 6px;
+  background: #0b0d12;
+  border: 1px solid var(--line);
+}
+.sd-kicker {
+  margin: 0 0 12px;
+  color: var(--mute);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.sd-cockpit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sd-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.sd-seat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  min-height: 72px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  text-align: left;
+  background: #12151c;
+}
+.sd-row.jump .sd-seat {
+  min-height: 56px;
+  opacity: 0.72;
+}
+.sd-seat span { font-weight: 600; font-size: 13px; }
+.sd-seat small { color: var(--mute); font-size: 12px; }
+.sd-seat.you { border-color: rgba(224, 196, 138, 0.45); }
+.sd-seat.crew { border-color: rgba(111, 191, 180, 0.4); }
+.sd-cap {
+  margin: 12px 0 0;
+  padding: 0;
+  color: var(--mute);
+  font-size: 12px;
+  line-height: 1.45;
+  border: 0;
 }
 
 .faq-head {
@@ -734,7 +740,7 @@ h2 {
 
 @media (max-width: 960px) {
   .nav-links { display: none; }
-  .how-head, .how-body, .strip-row, .split, .app-intro, .ready-grid, .truth, .end-inner, .sd-grid, .steps {
+  .how-body, .strip-row, .split, .app-intro, .ready-grid, .truth, .end-inner {
     grid-template-columns: 1fr;
   }
   .truth-win.host { border-right: 0; border-bottom: 1px solid var(--line); }

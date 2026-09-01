@@ -236,7 +236,7 @@
         <p class="copy" data-i="sHint">Run Setup. Presence is copied into Community. No extra runtimes.</p>
       </div>
       <div class="wrap how-body">
-      <ol class="steps">
+        <ol class="steps">
           <li>
             <span class="steps-n">01</span>
             <div>
@@ -255,26 +255,31 @@
             <span class="steps-n">03</span>
             <div>
               <h3 data-i="s3t">Code</h3>
-              <p data-i="s3">Host clicks Start deck. A six-character session code appears. The other pilot pastes it and clicks Connect.</p>
+              <p data-i="s3">Host clicks Start deck. The other pilot pastes the six-character code and clicks Connect.</p>
             </div>
           </li>
           <li>
             <span class="steps-n">04</span>
             <div>
               <h3 data-i="s4t">Crew</h3>
-              <p data-i="s4">You see each other in the seat. You hand over flying on the person.</p>
+              <p data-i="s4">Captain left, FO right. Hand over flying on the person.</p>
             </div>
           </li>
         </ol>
-      <div class="seats-diagram" aria-hidden="true">
-        <div class="sd-grid">
-          <div class="sd-seat you"><span>Captain</span><small data-i="sdLeft">Left · flies</small></div>
-          <div class="sd-seat crew"><span>First officer</span><small data-i="sdRight">Right · radios</small></div>
-          <div class="sd-seat empty"><span>Jump L</span><small data-i="sdJump">Watch only</small></div>
-          <div class="sd-seat empty"><span>Jump R</span><small data-i="sdJump">Watch only</small></div>
-        </div>
-        <p class="sd-cap" data-i="sdHand">Give / take flying on the person.</p>
-      </div>
+        <aside class="seats-diagram" aria-hidden="true">
+          <p class="sd-kicker" data-i="sdDeck">Flight deck</p>
+          <div class="sd-cockpit">
+            <div class="sd-row">
+              <div class="sd-seat you"><span>Captain</span><small data-i="sdLeft">Left · flies</small></div>
+              <div class="sd-seat crew"><span>First officer</span><small data-i="sdRight">Right · radios</small></div>
+            </div>
+            <div class="sd-row jump">
+              <div class="sd-seat empty"><span>Jump L</span><small data-i="sdJump">Watch only</small></div>
+              <div class="sd-seat empty"><span>Jump R</span><small data-i="sdJump">Watch only</small></div>
+            </div>
+          </div>
+          <p class="sd-cap" data-i="sdHand">Give / take flying on the person.</p>
+        </aside>
       </div>
     </section>
 
