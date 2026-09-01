@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "Calmer marketing site: thin header, copy-first hero, quieter steps and FAQ.",
+  notes: "Product-site restyle: serif type, scroll motion, quieter Host/Join loop.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };

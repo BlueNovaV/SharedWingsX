@@ -1,7 +1,7 @@
 {
-  "version": "0.4.64",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.64/SharedWingsX-Setup-0.4.64.exe",
-  "notes": "Calmer marketing site: thin header, copy-first hero, quieter steps and FAQ.",
+  "version": "0.4.65",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.65/SharedWingsX-Setup-0.4.65.exe",
+  "notes": "Product-site restyle: serif type, scroll motion, quieter Host/Join loop.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

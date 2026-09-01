@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="./src/styles.css" />
   </head>
   <body>
+    <div class="grain" aria-hidden="true"></div>
     <header class="top">
       <div class="wrap">
         <div class="top-island">
@@ -58,7 +59,7 @@
       </div>
       <div class="shade"></div>
       <div class="wrap stage-inner">
-        <div class="stage-copy">
+        <div class="stage-copy hero-in">
           <p class="eyebrow" data-i="eyebrow">Microsoft Flight Simulator 2020 &amp; 2024</p>
           <h1 data-i="heroTitle">One cockpit. Two people.</h1>
           <p class="lede" data-i="heroLede">
@@ -73,13 +74,13 @@
               </span>
               <span class="btn-copy">
                 <span data-i="cta2">Download SharedWingsX</span>
-                <small data-i="ctaSub">Windows installer · 0.4.64 · ~95 MB</small>
+                <small data-i="ctaSub">Windows installer · 0.4.65 · ~95 MB</small>
               </span>
             </a>
             <span data-i="heroMeta">Windows and Linux, no account</span>
           </div>
           <p class="cta-linux">
-            <a href="./downloads/SharedWingsX-0.4.64-linux-x64.zip" download>Linux (x64 zip)</a>
+            <a href="./downloads/SharedWingsX-0.4.65-linux-x64.zip" download>Linux (x64 zip)</a>
           </p>
           <p class="change-notes" id="change-notes"></p>
           <a class="change-all" href="https://github.com/BlueNovaV/SharedWingsX/releases" data-i="changeAll">All releases</a>
@@ -87,7 +88,7 @@
       </div>
     </section>
 
-    <section class="ready" id="ready">
+    <section class="ready reveal" id="ready">
       <div class="wrap ready-grid">
         <article>
           <h3 data-i="ready1t">Same aircraft</h3>
@@ -106,19 +107,19 @@
     </section>
 
     <section class="block dim" id="app">
-      <div class="wrap split app-intro">
+      <div class="wrap split app-intro reveal">
         <h2 data-i="appTitle">The Windows app</h2>
         <p class="copy" data-i="appCopy">
             This is SharedWingsX. Host and join sit on one screen. Settings open from the header. Updates appear as a
             corner toast. Same version on every PC.
         </p>
       </div>
-      <div class="wrap bezel">
+      <div class="wrap bezel reveal">
         <div class="swx" role="img" aria-label="SharedWingsX window: host and join on one screen">
           <div class="frame board-frame">
             <header class="bar">
               <div class="bar-left">
-                <p class="brand"><img src="./brand/logo.png?v=4" alt="" /><span>SharedWingsX</span> <span class="ver" data-rel-ver>0.4.64</span></p>
+                <p class="brand"><img src="./brand/logo.png?v=4" alt="" /><span>SharedWingsX</span> <span class="ver" data-rel-ver>0.4.65</span></p>
               </div>
               <div class="bar-mid" data-flight-bar>
                 <span class="flight-ac">PMDG 737</span>
@@ -187,7 +188,7 @@
       </div>
       <div class="wrap">
         <p class="truth-kicker" data-i="loopHint">Host starts a deck. Guest types the code.</p>
-        <div class="truth" aria-hidden="true">
+        <div class="truth reveal" aria-hidden="true">
           <div class="truth-win host">
             <p class="truth-bar">Host</p>
             <span class="truth-start">Start deck</span>
@@ -202,7 +203,7 @@
       </div>
     </section>
 
-    <section class="strip">
+    <section class="strip reveal">
       <div class="wrap strip-row">
         <p data-i="strip1">No Community drag-drop</p>
         <p data-i="strip2">No port forwarding</p>
@@ -211,7 +212,7 @@
       </div>
     </section>
 
-    <section class="block" id="aircraft">
+    <section class="block reveal" id="aircraft">
       <div class="wrap split">
         <div>
           <h2 data-i="airTitle">Built to fly anything MSFS will load</h2>
@@ -231,7 +232,7 @@
       </div>
     </section>
 
-    <section class="block dim how" id="how">
+    <section class="block dim how reveal" id="how">
       <div class="wrap how-head">
         <h2 data-i="howTitle">Four steps. No installer theatre.</h2>
         <p class="copy" data-i="sHint">No Visual C++, no WebView2. Pick the Community folder only if MSFS has never been launched.</p>
@@ -281,7 +282,7 @@
       </div>
     </section>
 
-    <section class="block" id="faq">
+    <section class="block reveal" id="faq">
       <div class="wrap faq-head">
         <h2 data-i="faqTitle">Questions</h2>
       </div>
@@ -289,80 +290,98 @@
         <div class="faq">
           <details>
             <summary data-i="q1">Is SharedWingsX free?</summary>
-            <p data-i="q1a">Yes. Download the Windows build. No account, no subscription.</p>
+            <div class="faq-body"><p data-i="q1a">Yes. Download the Windows build. No account, no subscription.</p></div>
           </details>
           <details>
             <summary data-i="q2">Does the other person need SharedWingsX too?</summary>
-            <p data-i="q2a">Yes. Everyone uses the same EXE. Nobody picks extra definition files.</p>
+            <div class="faq-body"><p data-i="q2a">Yes. Everyone uses the same EXE. Nobody picks extra definition files.</p></div>
           </details>
           <details>
             <summary data-i="q3">How does it work?</summary>
-            <p data-i="q3a">
+            <div class="faq-body"><p data-i="q3a">
               SharedWingsX syncs the cockpit between both pilots. Captain left, first officer right. Radios and ATC for
               both; you hand over flying on the person.
-            </p>
+            </p></div>
           </details>
           <details>
             <summary data-i="q4">Does it work on VATSIM or IVAO?</summary>
-            <p data-i="q4a">
+            <div class="faq-body"><p data-i="q4a">
               Yes. SharedWingsX is not vPilot or Altitude. The captain logs into the network as usual. The first officer
               connects as observer (same callsign, extra letter, observer mode). Radios in the sim sync through
               SharedWingsX. Turn AI traffic off so you both see the same picture. One person files the plan: the host.
-            </p>
+            </p></div>
           </details>
           <details>
             <summary data-i="q6">Do I need to open ports?</summary>
-            <p data-i="q6a">
+            <div class="faq-body"><p data-i="q6a">
               No. No router, no port forwarding. SharedWingsX tries a direct link first. If that fails it falls back to the
               cloud on its own. You only share the code in the app.
-            </p>
+            </p></div>
           </details>
           <details>
             <summary data-i="q5">PMDG, Fenix, and the rest?</summary>
-            <p data-i="q5a">
+            <div class="faq-body"><p data-i="q5a">
               Yes through the universal layer: PMDG, Fenix, iFly, Asobo and the rest of MSFS. Yoke, thrust, gear, flaps,
               radios and ATC sync. The payware CDU, EFB and FMS are not a second identical box. On Fenix, let the
               captain set fuel and payload, use one transponder, and expect standby radios and some overhead clicks to
               drift. On PMDG, baro and some MCP keys follow whoever is flying. Dedicated packs (C172, 787-10) cover more
               of those aircraft.
-            </p>
+            </p></div>
           </details>
           <details>
             <summary data-i="q7">Why other shared cockpits make the aircraft fight?</summary>
-            <p data-i="q7a">
+            <div class="faq-body"><p data-i="q7a">
               SharedWingsX is not Microsoft Flight Simulator multiplayer. Keep MSFS multiplayer off so you do not get two
               airframes in one world. Only the captain writes flying controls. The first officer has radios, MCP and
               overhead. Shared switches use a short last-mover lock so both sims do not pull the same lever. Fuel,
               payload and time stay with the captain when the FO is not flying, so autothrottle does not fight. We do
               not stack a second physics engine on MSFS. Jump seats watch only. Same aircraft, spawn, weather and time
               remain required.
-            </p>
+            </p></div>
           </details>
           <details>
             <summary data-i="q8">Flight plan, VATSIM, smartCARS, Volanta?</summary>
-            <p data-i="q8a">
+            <div class="faq-body"><p data-i="q8a">
               Load the same flight plan in both FMCs (SimBrief on both PCs). SharedWingsX does not clone the whole payware
               CDU or tablet keyboard. The first officer sees the same radios, squawk and MCP as they move. VATSIM/IVAO:
               captain runs vPilot or Altitude; first officer is observer. smartCARS, Volanta and similar trackers run on
               the captain’s sim (one flight). SharedWingsX does not replace those apps; they sit next to it.
-            </p>
+            </p></div>
           </details>
           <details>
             <summary data-i="q10">MSFS 2024 as well as 2020?</summary>
-            <p data-i="q10a">
+            <div class="faq-body"><p data-i="q10a">
               Yes. The footer lamps show which sim is running. Both PCs need the same sim. A 2020 title loaded in 2024
               can miss lights, trim or touchscreens. If the guest stops moving, reconnect: only the captain writes world
               pose.
-            </p>
+            </p></div>
           </details>
           <details>
             <summary data-i="q9">Windows says the download is unsafe?</summary>
-            <p data-i="q9a">
+            <div class="faq-body"><p data-i="q9a">
               SharedWingsX is made by BluNova Virtual Airlines. SmartScreen shows Unknown publisher until Setup is signed
               with a Windows code-signing certificate in that company name. Until then: More info, then Run anyway.
-            </p>
+            </p></div>
           </details>
         </div>
+      </div>
+    </section>
+
+    <section class="end reveal">
+      <div class="wrap end-inner">
+        <div>
+          <h2 data-i="endTitle">Ready when you are.</h2>
+          <p class="copy" data-i="endCopy">Same installer on both PCs. No account.</p>
+        </div>
+        <a class="btn btn-lg" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
+          <span class="btn-mark">
+            <img src="./brand/logo.png?v=4" width="28" height="28" alt="" />
+          </span>
+          <span class="btn-copy">
+            <span data-i="cta2">Download SharedWingsX</span>
+            <small data-i="ctaSub">Windows installer · 0.4.65 · ~95 MB</small>
+          </span>
+        </a>
       </div>
     </section>
 

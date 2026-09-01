@@ -10,7 +10,7 @@ const en: Record<string, string> = {
   heroWhisper: "Zelfde stoel. Twee PCs.",
   cta: "Download",
   cta2: "Download SharedWingsX",
-  ctaSub: "Windows installer · 0.4.64 · ~95 MB",
+  ctaSub: "Windows installer · 0.4.65 · ~95 MB",
   heroMeta: "Windows and Linux, no account",
   strip1: "No Community drag-drop",
   strip2: "No port forwarding",
@@ -50,10 +50,12 @@ const en: Record<string, string> = {
   appCopy:
     "This is SharedWingsX. Host and join sit on one screen. Settings open from the header. Updates appear as a corner toast. Same version on every PC.",
   faqTitle: "Questions",
+  endTitle: "Ready when you are.",
+  endCopy: "Same installer on both PCs. No account.",
   q1: "Is SharedWingsX free?",
   q1a: "Yes. Download the Windows Setup (~95 MB) or the Linux zip. No account, no subscription. MSFS itself is Windows-only; Linux can host or join a deck, but SimConnect needs Windows.",
   q2: "Does the other person need SharedWingsX too?",
-  q2a: "Yes. Everyone uses the same version (currently 0.4.64). The host starts a deck and shares the six-character session code.",
+  q2a: "Yes. Everyone uses the same version (currently 0.4.65). The host starts a deck and shares the six-character session code.",
   q3: "How does it work?",
   q3a: "SharedWingsX syncs the cockpit between both pilots. Captain left, first officer right. Radios and ATC for both; you hand over flying on the person.",
   q4: "Does it work on VATSIM or IVAO?",
@@ -84,7 +86,7 @@ const nl: Record<string, string> = {
     "Shared cockpit als product, niet als zip-avontuur. Eén Windows-app, één code, captain en first officer in dezelfde stoelen.",
   cta: "Download",
   cta2: "Download SharedWingsX",
-  ctaSub: "Windows-installer · 0.4.64 · ~95 MB",
+  ctaSub: "Windows-installer · 0.4.65 · ~95 MB",
   heroMeta: "Windows en Linux, geen account",
   strip1: "Geen Community-sleep",
   strip2: "Geen poorten openzetten",
@@ -124,10 +126,12 @@ const nl: Record<string, string> = {
   appCopy:
     "Dit is SharedWingsX. Host en join op één scherm. Settings via de header. Updates als hoektorst. Iedereen dezelfde versie.",
   faqTitle: "Vragen",
+  endTitle: "Klaar wanneer jij het bent.",
+  endCopy: "Zelfde installer op beide pc’s. Geen account.",
   q1: "Is SharedWingsX gratis?",
   q1a: "Ja. Download de Windows-Setup (~95 MB) of de Linux-zip. Geen account. MSFS zelf is Windows-only; Linux kan een deck hosten of joinen, SimConnect heeft Windows nodig.",
   q2: "Moet de ander SharedWingsX ook hebben?",
-  q2a: "Ja. Iedereen dezelfde versie (nu 0.4.64). De host start een deck en deelt de sessiecode van zes tekens.",
+  q2a: "Ja. Iedereen dezelfde versie (nu 0.4.65). De host start een deck en deelt de sessiecode van zes tekens.",
   q3: "Hoe werkt het?",
   q3a: "SharedWingsX synct de cockpit. Captain links, first officer rechts. Radios en ATC voor beide; besturing geef je op de persoon.",
   q4: "VATSIM of IVAO?",
@@ -209,6 +213,32 @@ document.getElementById("lang")?.addEventListener("click", () => {
     whisper.hidden = lang !== "en" || !/^nl\b/i.test(navigator.language);
     if (!whisper.hidden) whisper.textContent = en.heroWhisper;
   }
+});
+
+const header = document.querySelector(".top");
+const onScroll = (): void => {
+  header?.classList.toggle("scrolled", window.scrollY > 12);
+};
+onScroll();
+window.addEventListener("scroll", onScroll, { passive: true });
+
+const motionOk = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+document.querySelectorAll(".reveal").forEach((el) => {
+  if (!motionOk) {
+    el.classList.add("on");
+    return;
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add("on");
+        io.unobserve(entry.target);
+      }
+    },
+    { threshold: 0.18, rootMargin: "0px 0px -8% 0px" },
+  );
+  io.observe(el);
 });
 
 void fetch("./update.json")
