@@ -314,22 +314,31 @@ h1 {
 .truth {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 0;
   margin: 0 auto 8px;
   max-width: var(--page);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg);
 }
 .truth-win {
-  padding: 16px 18px;
-  border-radius: 12px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px 22px 22px;
+  min-height: 128px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
 }
+.truth-win.host { border-right: 1px solid var(--line); }
 .truth-bar {
-  margin: 0 0 14px;
+  margin: 0;
   font-size: 11px;
   font-weight: 650;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--mute);
 }
@@ -345,58 +354,44 @@ h1 {
 .truth-start {
   background: var(--cream);
   color: var(--ink-on-cream);
-  opacity: 0.45;
-  animation: truth-host 8s ease-in-out infinite;
 }
-.truth-code {
-  margin: 14px 0 0;
-  font-size: 20px;
-  font-weight: 650;
-  letter-spacing: 0.2em;
-  color: var(--gold-hi);
-  opacity: 0;
-  animation: truth-code 8s ease-in-out infinite;
-}
+.truth-code,
 .truth-type {
   margin: 0;
-  font-size: 20px;
-  font-weight: 650;
-  letter-spacing: 0.18em;
-  color: var(--gold-hi);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  color: var(--cream);
+  font-variant-numeric: tabular-nums;
+}
+.truth-type {
+  display: flex;
+  gap: 0;
 }
 .truth-type span {
-  opacity: 0.15;
-  animation: truth-letter 8s ease-in-out infinite;
+  color: var(--cream);
+  opacity: 0.22;
+  animation: truth-letter 0.35s ease forwards;
 }
-.truth-type span:nth-child(2) { animation-delay: 0.12s; }
-.truth-type span:nth-child(3) { animation-delay: 0.24s; }
-.truth-type span:nth-child(4) { animation-delay: 0.36s; }
-.truth-type span:nth-child(5) { animation-delay: 0.48s; }
-.truth-type span:nth-child(6) { animation-delay: 0.6s; }
+.truth-type span:nth-child(1) { animation-delay: 0.6s; }
+.truth-type span:nth-child(2) { animation-delay: 0.85s; }
+.truth-type span:nth-child(3) { animation-delay: 1.1s; }
+.truth-type span:nth-child(4) { animation-delay: 1.35s; }
+.truth-type span:nth-child(5) { animation-delay: 1.6s; }
+.truth-type span:nth-child(6) { animation-delay: 1.85s; }
 .truth-ok {
-  margin-top: 14px;
+  margin: 0;
   background: transparent;
-  color: var(--gold-hi);
+  color: var(--mute);
   border: 1px solid var(--line);
   opacity: 0;
-  animation: truth-ok 8s ease-in-out infinite;
-}
-@keyframes truth-host {
-  0%, 12% { opacity: 0.4; }
-  16%, 28% { opacity: 1; }
-  36%, 100% { opacity: 0.4; }
-}
-@keyframes truth-code {
-  0%, 22% { opacity: 0; }
-  30%, 100% { opacity: 1; }
+  animation: truth-ok 0.4s ease 2.2s forwards;
 }
 @keyframes truth-letter {
-  0%, 38% { opacity: 0.12; }
-  48%, 100% { opacity: 1; }
+  to { opacity: 1; }
 }
 @keyframes truth-ok {
-  0%, 70% { opacity: 0; }
-  78%, 100% { opacity: 1; }
+  to { opacity: 1; }
 }
 
 .strip {
@@ -666,6 +661,7 @@ h2 {
 @media (max-width: 960px) {
   .nav-links { display: none; }
   .steps, .how-head, .how-body, .strip-row, .split, .foot, .ready-grid, .sd-row.front, .truth { grid-template-columns: 1fr; }
+  .truth-win.host { border-right: 0; border-bottom: 1px solid var(--line); }
   .ready-grid article,
   .ready-grid article:not(:first-child),
   .ready-grid article:last-child {
