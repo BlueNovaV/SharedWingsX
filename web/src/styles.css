@@ -411,10 +411,37 @@ h1 {
   margin: 0;
   font-size: 22px;
   font-weight: 600;
-  letter-spacing: 0.2em;
-  color: var(--cream);
+  letter-spacing: 0.22em;
+  color: var(--gold-hi);
+  animation: code-glow 2.6s ease-in-out infinite;
 }
 .truth-type { display: flex; }
+.truth-type span {
+  animation: code-letter 2.6s ease-in-out infinite;
+}
+.truth-type span:nth-child(1) { animation-delay: 0s; }
+.truth-type span:nth-child(2) { animation-delay: 0.08s; }
+.truth-type span:nth-child(3) { animation-delay: 0.16s; }
+.truth-type span:nth-child(4) { animation-delay: 0.24s; }
+.truth-type span:nth-child(5) { animation-delay: 0.32s; }
+.truth-type span:nth-child(6) { animation-delay: 0.4s; }
+@keyframes code-glow {
+  0%, 100% {
+    text-shadow: 0 0 6px rgba(203, 180, 138, 0.2);
+    filter: brightness(0.95);
+  }
+  50% {
+    text-shadow: 0 0 18px rgba(234, 220, 195, 0.85), 0 0 36px rgba(203, 180, 138, 0.35);
+    filter: brightness(1.12);
+  }
+}
+@keyframes code-letter {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+.swx .code-one {
+  animation: code-glow 2.6s ease-in-out infinite;
+}
 .truth-ok {
   background: transparent;
   color: var(--mute);
@@ -685,7 +712,13 @@ h2 {
     animation: none !important;
     transition: none !important;
   }
-  .reveal, .hero-in > * { opacity: 1 !important; transform: none !important; }
+  .reveal, .hero-in > *, .truth-code, .truth-type, .swx .code-one {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+  }
 }
 
 @media (max-width: 960px) {
