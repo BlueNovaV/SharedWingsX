@@ -683,6 +683,21 @@ button, input, select, a, label, option { -webkit-app-region: no-drag; }
   border: 1px solid rgba(232, 230, 223, 0.12);
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
   backdrop-filter: blur(6px);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+.seat-3d.pick {
+  border-color: rgba(61, 126, 201, 0.7);
+  box-shadow: 0 0 0 1px rgba(61, 126, 201, 0.35);
+}
+.seat-act {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--teal);
 }
 .seat-3d.jumpLeft,
 .seat-3d.jumpRight {
@@ -1190,14 +1205,14 @@ button {
 
 .code-one {
   width: 100%;
-  height: 42px;
+  height: 56px;
   margin: 0;
-  padding: 0 12px;
+  padding: 0 10px;
   text-align: center;
   text-transform: uppercase;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
   background: rgba(7, 9, 12, 0.7);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -1391,14 +1406,48 @@ button {
   gap: 8px;
   margin: 0 0 12px;
 }
-.live-head { flex: none; }
-.live-code {
+.deck-home.in-flight .deck-split { display: none; }
+.session-strip {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  margin: 0 0 8px;
+  gap: 10px 14px;
+  margin: 0 0 12px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(8, 10, 14, 0.7);
 }
-.live-code .room { margin: 0; font-size: 22px; }
+.sess-code {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--amber);
+}
+.card-err.hard {
+  padding: 8px 10px;
+  border: 1px solid rgba(232, 160, 144, 0.45);
+  border-radius: 8px;
+  background: rgba(80, 28, 24, 0.35);
+}
+.settings-deck .deck-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.deck-kicker {
+  width: 92px;
+  flex: none;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
 .update-toast {
   position: fixed;
   right: 14px;

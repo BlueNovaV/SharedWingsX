@@ -7,14 +7,27 @@ const en: Record<string, string> = {
   heroTitle: "One cockpit. Two people.",
   heroLede:
     "Shared cockpit as a product, not a zip treasure hunt. One app, one session code, captain and first officer in the same seats.",
+  heroWhisper: "Zelfde stoel. Twee PCs.",
   cta: "Download",
   cta2: "Download SharedWingsX",
-  ctaSub: "Windows installer · 0.4.62 · ~95 MB",
+  ctaSub: "Windows installer · 0.4.63 · ~95 MB",
   heroMeta: "Windows and Linux, no account",
   strip1: "No Community drag-drop",
   strip2: "No port forwarding",
   strip3: "PMDG to stock, same app",
   strip4: "Presence in the other seat",
+  ready1t: "Same aircraft",
+  ready1: "Load the same title on both PCs. Packs follow the sim name.",
+  ready2t: "Same spawn",
+  ready2: "Same parking, weather and time. One world, two seats.",
+  ready3t: "Multiplayer off",
+  ready3: "MSFS multiplayer on means two airframes. SharedWingsX is not that.",
+  readyFail: "If those three are wrong, the guest will not follow. Fix spawn first, then throttles.",
+  changeAll: "All releases",
+  sdLeft: "Left seat · flies",
+  sdRight: "Right seat · radios",
+  sdJump: "Watch only",
+  sdHand: "Give / Take",
   airTitle: "Built to fly anything MSFS will load",
   airCopy:
     "Universal SimConnect layer for every MSFS aircraft: PMDG 737, 777, 747, Fenix, iFly, Asobo. Dedicated packs for C172 and 787-10. Aircraft files stay untouched. Payware CDU, EFB and FMS are not a second identical box. Flight controls, thrust, gear, flaps, radios and ATC sync.",
@@ -39,7 +52,7 @@ const en: Record<string, string> = {
   q1: "Is SharedWingsX free?",
   q1a: "Yes. Download the Windows Setup (~95 MB) or the Linux zip. No account, no subscription. MSFS itself is Windows-only; Linux can host or join a deck, but SimConnect needs Windows.",
   q2: "Does the other person need SharedWingsX too?",
-  q2a: "Yes. Everyone uses the same version (currently 0.4.62). The host starts a deck and shares the six-character session code.",
+  q2a: "Yes. Everyone uses the same version (currently 0.4.63). The host starts a deck and shares the six-character session code.",
   q3: "How does it work?",
   q3a: "SharedWingsX syncs the cockpit between both pilots. Captain left, first officer right. Radios and ATC for both; you hand over flying on the person.",
   q4: "Does it work on VATSIM or IVAO?",
@@ -70,12 +83,24 @@ const nl: Record<string, string> = {
     "Shared cockpit als product, niet als zip-avontuur. Eén Windows-app, één code, captain en first officer in dezelfde stoelen.",
   cta: "Download",
   cta2: "Download SharedWingsX",
-  ctaSub: "Windows-installer · 0.4.62 · ~95 MB",
+  ctaSub: "Windows-installer · 0.4.63 · ~95 MB",
   heroMeta: "Windows en Linux, geen account",
   strip1: "Geen Community-sleep",
   strip2: "Geen poorten openzetten",
   strip3: "PMDG tot stock, dezelfde app",
   strip4: "Presence in de andere stoel",
+  ready1t: "Zelfde toestel",
+  ready1: "Zelfde titel op beide pc’s. Packs volgen de sim-naam.",
+  ready2t: "Zelfde spawn",
+  ready2: "Zelfde parkeerplaats, weer en tijd. Eén wereld, twee stoelen.",
+  ready3t: "Multiplayer uit",
+  ready3: "MSFS-multiplayer aan betekent twee kisten. SharedWingsX is dat niet.",
+  readyFail: "Kloppen die drie niet, dan volgt de guest niet. Eerst spawn, dan throttles.",
+  changeAll: "Alle releases",
+  sdLeft: "Linkerstoel · vliegt",
+  sdRight: "Rechterstoel · radio’s",
+  sdJump: "Alleen meekijken",
+  sdHand: "Give / Take",
   airTitle: "Gebouwd om overal mee te vliegen",
   airCopy:
     "Universele SimConnect-laag voor elk MSFS-toestel: PMDG 737, 777, 747, Fenix, iFly, Asobo. Dedicated packs voor C172 en 787-10. Aircraft-bestanden blijven onaangeroerd. Payware-CDU, EFB en FMS zijn geen tweede identiek scherm. Stuurvlakken, gassen, gear, flaps, radio’s en ATC synchen.",
@@ -100,7 +125,7 @@ const nl: Record<string, string> = {
   q1: "Is SharedWingsX gratis?",
   q1a: "Ja. Download de Windows-Setup (~95 MB) of de Linux-zip. Geen account. MSFS zelf is Windows-only; Linux kan een deck hosten of joinen, SimConnect heeft Windows nodig.",
   q2: "Moet de ander SharedWingsX ook hebben?",
-  q2a: "Ja. Iedereen dezelfde versie (nu 0.4.62). De host start een deck en deelt de sessiecode van zes tekens.",
+  q2a: "Ja. Iedereen dezelfde versie (nu 0.4.63). De host start een deck en deelt de sessiecode van zes tekens.",
   q3: "Hoe werkt het?",
   q3a: "SharedWingsX synct de cockpit. Captain links, first officer rechts. Radios en ATC voor beide; besturing geef je op de persoon.",
   q4: "VATSIM of IVAO?",
@@ -170,23 +195,39 @@ hero?.addEventListener("playing", () => fallback?.classList.remove("show"));
 if (hero) startBgVideo(hero, () => fallback?.classList.add("show"));
 let lang: "nl" | "en" = "en";
 apply("en");
+const whisper = document.getElementById("hero-whisper");
+if (whisper && /^nl\b/i.test(navigator.language) && lang === "en") {
+  whisper.hidden = false;
+  whisper.textContent = en.heroWhisper;
+}
 document.getElementById("lang")?.addEventListener("click", () => {
   lang = lang === "nl" ? "en" : "nl";
   apply(lang);
+  if (whisper) {
+    whisper.hidden = lang !== "en" || !/^nl\b/i.test(navigator.language);
+    if (!whisper.hidden) whisper.textContent = en.heroWhisper;
+  }
 });
 
 void fetch("./update.json")
   .then((res) => (res.ok ? res.json() : null))
-  .then((info: { version?: string } | null) => {
+  .then((info: { version?: string; notes?: string } | null) => {
     const version = String(info?.version ?? "").trim();
-    if (!version) return;
-    en.ctaSub = `Windows installer · ${version} · ~95 MB`;
-    nl.ctaSub = `Windows-installer · ${version} · ~95 MB`;
-    en.q2a = `Yes. Everyone uses the same version (currently ${version}). The host starts a deck and shares the six-character session code.`;
-    nl.q2a = `Ja. Iedereen dezelfde versie (nu ${version}). De host start een deck en deelt de sessiecode van zes tekens.`;
-    document.querySelectorAll("[data-rel-ver]").forEach((el) => {
-      el.textContent = version;
-    });
+    const notes = String(info?.notes ?? "").trim();
+    if (version) {
+      en.ctaSub = `Windows installer · ${version} · ~95 MB`;
+      nl.ctaSub = `Windows-installer · ${version} · ~95 MB`;
+      en.q2a = `Yes. Everyone uses the same version (currently ${version}). The host starts a deck and shares the six-character session code.`;
+      nl.q2a = `Ja. Iedereen dezelfde versie (nu ${version}). De host start een deck en deelt de sessiecode van zes tekens.`;
+      document.querySelectorAll("[data-rel-ver]").forEach((el) => {
+        el.textContent = version;
+      });
+      document.querySelectorAll<HTMLAnchorElement>('a[href*="linux-x64.zip"]').forEach((a) => {
+        a.href = `./downloads/SharedWingsX-${version}-linux-x64.zip`;
+      });
+    }
+    const notesEl = document.getElementById("change-notes");
+    if (notesEl && notes) notesEl.textContent = notes;
     apply(lang);
   })
   .catch(() => {

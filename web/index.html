@@ -56,12 +56,14 @@
       </div>
       <div class="shade"></div>
       <div class="wrap stage-inner">
+        <div class="stage-copy">
           <p class="eyebrow" data-i="eyebrow">Microsoft Flight Simulator 2020 &amp; 2024</p>
           <h1 data-i="heroTitle">One cockpit. Two people.</h1>
           <p class="lede" data-i="heroLede">
             Shared cockpit as a product, not a zip treasure hunt. One Windows app, one code, captain and first officer
             in the same seats.
           </p>
+          <p class="hero-whisper" id="hero-whisper" hidden></p>
           <div class="cta-row">
             <a class="btn btn-lg" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
               <span class="btn-mark">
@@ -69,15 +71,48 @@
               </span>
               <span class="btn-copy">
                 <span data-i="cta2">Download SharedWingsX</span>
-                <small data-i="ctaSub">Windows installer · 0.4.62 · ~95 MB</small>
+                <small data-i="ctaSub">Windows installer · 0.4.63 · ~95 MB</small>
               </span>
             </a>
             <span data-i="heroMeta">Windows and Linux, no account</span>
           </div>
           <p class="cta-linux">
-            <a href="./downloads/SharedWingsX-0.4.62-linux-x64.zip" download>Linux (x64 zip)</a>
+            <a href="./downloads/SharedWingsX-0.4.63-linux-x64.zip" download>Linux (x64 zip)</a>
           </p>
+          <p class="change-notes" id="change-notes"></p>
+          <a class="change-all" href="https://github.com/BlueNovaV/SharedWingsX/releases" data-i="changeAll">All releases</a>
+        </div>
+        <div class="truth" aria-hidden="true">
+          <div class="truth-win host">
+            <p class="truth-bar">Host</p>
+            <span class="truth-start">Start deck</span>
+            <p class="truth-code">K7MP2Q</p>
+          </div>
+          <div class="truth-win guest">
+            <p class="truth-bar">Join</p>
+            <p class="truth-type"><span>K</span><span>7</span><span>M</span><span>P</span><span>2</span><span>Q</span></p>
+            <span class="truth-ok">Connected</span>
+          </div>
+        </div>
       </div>
+    </section>
+
+    <section class="ready" id="ready">
+      <div class="wrap ready-grid">
+        <article>
+          <h3 data-i="ready1t">Same aircraft</h3>
+          <p data-i="ready1">Load the same title on both PCs. Packs follow the sim name.</p>
+        </article>
+        <article>
+          <h3 data-i="ready2t">Same spawn</h3>
+          <p data-i="ready2">Same parking, weather and time. One world, two seats.</p>
+        </article>
+        <article>
+          <h3 data-i="ready3t">Multiplayer off</h3>
+          <p data-i="ready3">MSFS multiplayer on means two airframes. SharedWingsX is not that.</p>
+        </article>
+      </div>
+      <p class="wrap ready-fail" data-i="readyFail">If those three are wrong, the guest will not follow. Fix spawn first, then throttles.</p>
     </section>
 
     <section class="block dim" id="app" data-chap="01">
@@ -93,7 +128,7 @@
           <div class="frame board-frame">
             <header class="bar">
               <div class="bar-left">
-                <p class="brand"><img src="./brand/logo.png?v=4" alt="" /><span>SharedWingsX</span> <span class="ver" data-rel-ver>0.4.62</span></p>
+                <p class="brand"><img src="./brand/logo.png?v=4" alt="" /><span>SharedWingsX</span> <span class="ver" data-rel-ver>0.4.63</span></p>
               </div>
               <div class="bar-mid" data-flight-bar>
                 <span class="flight-ac">PMDG 737</span>
@@ -195,6 +230,17 @@
       <div class="wrap how-head">
         <h2 data-i="howTitle">Four steps. No installer theatre.</h2>
         <p class="copy" data-i="sHint">No Visual C++, no WebView2. Pick the Community folder only if MSFS has never been launched.</p>
+      </div>
+      <div class="wrap seats-diagram" aria-hidden="true">
+        <div class="sd-row front">
+          <div class="sd-seat you"><span>Captain</span><small data-i="sdLeft">Left seat · flies</small></div>
+          <div class="sd-arrow" data-i="sdHand">Give / Take</div>
+          <div class="sd-seat crew"><span>First officer</span><small data-i="sdRight">Right seat · radios</small></div>
+        </div>
+        <div class="sd-row jump">
+          <div class="sd-seat empty"><span>Jump L</span><small data-i="sdJump">Watch only</small></div>
+          <div class="sd-seat empty"><span>Jump R</span><small data-i="sdJump">Watch only</small></div>
+        </div>
       </div>
       <div class="wrap">
         <ol class="steps">

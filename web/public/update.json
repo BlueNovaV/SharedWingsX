@@ -1,7 +1,7 @@
 {
-  "version": "0.4.44",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.44/SharedWingsX-Setup-0.4.44.exe",
-  "notes": "Guest follows the host aircraft. MSFS 2024 lamp uses the running sim, not the 2020 name.",
+  "version": "0.4.63",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.63/SharedWingsX-Setup-0.4.63.exe",
+  "notes": "Seat map, in-flight session bar, same-aircraft checklist on the site.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

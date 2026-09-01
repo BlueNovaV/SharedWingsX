@@ -33,7 +33,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.62";
+const APP_VER = "0.4.63";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 
@@ -106,7 +106,7 @@ function iAmHost(): boolean {
   return state.roster.some((p) => p.host && p.id === me);
 }
 
-function cockpitView(): string {
+function cockpitView(opts: { live: boolean; canGive: boolean; canTake: boolean; iFly: boolean }): string {
   const seats = [
     { id: "left", label: "Captain", title: "Captain" },
     { id: "right", label: "First Officer", title: "First Officer" },
@@ -118,12 +118,19 @@ function cockpitView(): string {
       const you = (state?.seat ?? "") === s.id && Boolean(state?.room);
       const who = nameAt(s.id);
       const empty = who === "Empty";
-      const cls = you ? "you" : empty ? "empty" : "crew";
-      return `<div class="seat-3d ${s.id} ${cls}" title="${s.title}"><span class="seat-code">${s.label}</span><span class="seat-who">${escapeHtml(who)}</span></div>`;
+      const pick = !opts.live && s.id !== "left" && joinSeat === s.id;
+      const cls = `${you ? "you" : empty ? "empty" : "crew"}${pick ? " pick" : ""}`;
+      const action =
+        opts.live && s.id === "right" && (opts.canGive || opts.canTake)
+          ? opts.iFly
+            ? "Give"
+            : "Take"
+          : "";
+      return `<button type="button" class="seat-3d ${s.id} ${cls}" data-seat="${s.id}" title="${s.title}"><span class="seat-code">${s.label}</span><span class="seat-who">${escapeHtml(who)}</span>${action ? `<span class="seat-act">${action}</span>` : ""}</button>`;
     })
     .join("");
   return `
-    <div class="cabin" role="img" aria-label="Flight deck">
+    <div class="cabin" role="group" aria-label="Flight deck">
       <img class="cabin-photo" src="./brand/cabin-deck.jpg" alt="" />
       <div class="cabin-vignette"></div>
       <div class="cabin-seats">${chips}</div>
@@ -223,7 +230,7 @@ function communitySelectHtml(live: boolean): string {
     </div>`;
   };
   return `<div class="field">
-    <span class="field-head"><span class="field-title">Community folders</span><span class="field-note">Auto-detected for 2020 and 2024. Presence is copied into every folder we find.</span></span>
+    <span class="field-head"><span class="field-title">Community folders</span></span>
     <p class="choice-lab">Which sim do you fly?</p>
     <div class="choice choice-dots" id="sim-choice">
       <label><input type="radio" name="sim" value="MSFS2020" ${simYear === "MSFS2020" ? "checked" : ""} ${live ? "disabled" : ""} /> MSFS 2020</label>
@@ -426,34 +433,43 @@ function header(): string {
 
 function settingsPanel(): string {
   const live = Boolean(state?.room);
-  return `<section class="card settings-card" data-card="settings">
+  const commOk = install.ok;
+  return `<section class="card settings-card settings-deck" data-card="settings">
       <h2>Settings</h2>
+      <div class="deck-row">
+        <span class="deck-kicker">Sim</span>
+        <span class="sim-lamps">${simLampsHtml()}</span>
+      </div>
+      <div class="deck-row">
+        <span class="deck-kicker">Community</span>
+        <span class="lamp${commOk ? " on" : ""}"><span class="dot${commOk ? " live" : " warn"}"></span><span class="lamp-lab">${commOk ? "Copied" : "Missing"}</span></span>
+        <button type="button" class="ghost-sm" id="pick" ${live ? "disabled" : ""}>Test Community</button>
+      </div>
+      ${communitySelectHtml(live)}
       ${live ? `<label class="field">Name
         <input id="name" value="${escapeHtml(name)}" maxlength="24" />
       </label>` : ""}
       <div class="field">
-        <span class="field-head"><span class="field-title">Sync pack</span><span class="field-note">Universal SimConnect or a dedicated pack</span></span>
+        <span class="field-head"><span class="field-title">Sync pack</span></span>
         ${packPickerHtml(live)}
       </div>
       <div class="field">
-        <span class="field-head"><span class="field-title">Aircraft</span><span class="field-note">Asobo, PMDG, Fenix, iFly, iniBuilds</span></span>
+        <span class="field-head"><span class="field-title">Aircraft</span></span>
         ${aircraftPickerHtml(live)}
       </div>
-      ${communitySelectHtml(live)}
-      <div class="setup ${install.ok ? "" : "bad"}">
-        <p><span class="dot ${install.ok ? "ok" : ""}"></span><span class="setup-msg">${escapeHtml(install.message)}</span></p>
-        <button type="button" id="pick">Find again</button>
-      </div>
       ${missing2020Community() ? `<p class="hint">MSFS 2020 Community was not found. Browse on the 2020 row.</p>` : ""}
-      <p class="hint">Version ${escapeHtml(update?.current || APP_VER)}${
-        !update
-          ? " · checking…"
-          : update.outdated
-            ? ` · latest ${escapeHtml(update.latest)}`
-            : update.checked === false
-              ? " · check failed"
-              : " · up to date"
-      }</p>
+      <div class="deck-row">
+        <span class="deck-kicker">App</span>
+        <span class="lamp-lab">Version ${escapeHtml(update?.current || APP_VER)}${
+          !update
+            ? " · checking"
+            : update.outdated
+              ? ` · ${escapeHtml(update.latest)} ready`
+              : update.checked === false
+                ? " · check failed"
+                : " · current"
+        }</span>
+      </div>
       <div class="card-foot">
         <button type="button" class="btn-secondary" id="check-update">Check for updates</button>
       </div>
@@ -552,6 +568,9 @@ function bindCode(): void {
       input.setSelectionRange(next, next);
     }
     window.clearTimeout(joinTimer);
+    if (joinCode.length === 6) {
+      joinTimer = window.setTimeout(() => tryJoin(), 280);
+    }
   });
   input.addEventListener("keydown", (ev) => {
     if (ev.key === "Enter") {
@@ -568,10 +587,18 @@ function bindCode(): void {
     joinCode = rememberCode(chars);
     input.value = joinCode;
     window.clearTimeout(joinTimer);
+    if (joinCode.length === 6) tryJoin();
   });
 }
 
 function bindBoard(): void {
+  const live = Boolean(state?.room);
+  const fo = otherFront();
+  const iFly = state?.role === "pf";
+  const observer = state?.role === "observer";
+  const host = iAmHost();
+  const canGive = Boolean(live && iFly && fo && !observer);
+  const canTake = Boolean(live && !iFly && host && fo && (state?.seat === "left" || state?.seat === "right"));
   const nameInput = root.querySelector<HTMLInputElement>("#name");
   nameInput?.addEventListener("input", () => {
     name = nameInput.value.trim() || "Pilot";
@@ -620,6 +647,18 @@ function bindBoard(): void {
     void startDeck();
   });
   root.querySelector("#connect")?.addEventListener("click", () => tryJoin());
+  root.querySelectorAll<HTMLButtonElement>("[data-seat]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const seat = el.dataset.seat ?? "";
+      if (!state?.room) {
+        if (seat === "left") return;
+        joinSeat = seat === "jumpLeft" || seat === "jumpRight" ? seat : "right";
+        renderBoard();
+        return;
+      }
+      if (seat === "right" && (canGive || canTake) && ws) send(ws, { type: "swap-command" });
+    });
+  });
   root.querySelectorAll<HTMLInputElement>('input[name="seat"]').forEach((el) => {
     el.addEventListener("change", () => {
       const value = el.value;
@@ -639,8 +678,6 @@ function bindBoard(): void {
       if (again) again.textContent = "Copy";
     }, 1600);
   });
-  const fo = otherFront();
-  const iFly = state?.role === "pf";
   root.querySelector("#hand")?.addEventListener("click", () => {
     if (!ws) return;
     send(ws, { type: "swap-command" });
@@ -694,13 +731,6 @@ function renderBoard(): void {
   const host = iAmHost();
   const canGive = Boolean(live && iFly && fo && !observer);
   const canTake = Boolean(live && !iFly && host && fo && (state?.seat === "left" || state?.seat === "right"));
-  const roleLine = !live
-    ? "No deck yet."
-    : iFly
-      ? "You are captain. You fly."
-      : observer
-        ? "You are on a jump seat."
-        : "You are first officer. Radios and overhead.";
 
   Array.from(root.querySelectorAll<HTMLElement>("[data-card]")).forEach((el) => {
     const key = el.dataset.card || "";
@@ -714,23 +744,17 @@ function renderBoard(): void {
       : null;
 
   const home = `
-        <section class="card deck-home" data-card="deck">
-          ${error ? `<p class="card-err">${escapeHtml(error)}</p>` : ""}
+        <section class="card deck-home${live ? " in-flight" : ""}" data-card="deck">
+          ${error ? `<p class="card-err${/version/i.test(error) ? " hard" : ""}">${escapeHtml(error)}</p>` : ""}
           ${
             live
-              ? `<div class="live-head">
-                   <h2>${host ? "Your deck" : "Connected"}</h2>
-                   <p class="hint">${escapeHtml(roleLine)}</p>
-                   ${
-                     host
-                       ? `<div class="live-code"><div class="room" aria-label="Session code">${escapeHtml(state?.room ?? "")}</div>
-                          <button type="button" class="ghost-sm" id="copy">${copied ? "Copied" : "Copy"}</button></div>`
-                       : `<p class="hint">Seat: ${escapeHtml(seatTitle(state?.seat ?? ""))}. Leave flying axes idle unless you take command.</p>`
-                   }
-                   <div class="card-actions">
-                     ${canGive || canTake ? `<button type="button" class="ghost-sm" id="hand">${iFly ? "FO becomes captain" : "Take command back"}</button>` : ""}
-                     ${fo && !observer ? `<button type="button" class="ghost-sm" id="obs">FO observer</button>` : ""}
-                   </div>
+              ? `<div class="session-strip">
+                   <span class="sess-code" aria-label="Session code">${escapeHtml(state?.room ?? "")}</span>
+                   ${host ? `<button type="button" class="ghost-sm" id="copy">${copied ? "Copied" : "Copy"}</button>` : ""}
+                   <span class="lamp"><span class="dot ${state?.path === "direct" ? "ok" : "warn"}"></span><span class="lamp-lab">${escapeHtml(pathLabel(state?.path ?? ""))}</span></span>
+                   <span class="lamp-lab">${escapeHtml(aircraftLabel(state?.identity) || "Aircraft")}</span>
+                   ${canGive || canTake ? `<button type="button" class="ghost-sm" id="hand">${iFly ? "Give" : "Take"}</button>` : ""}
+                   ${fo && !observer ? `<button type="button" class="ghost-sm" id="obs">FO observer</button>` : ""}
                  </div>`
               : `<div class="name-row">
                    <label for="name">Name</label>
@@ -746,20 +770,14 @@ function renderBoard(): void {
                    </div>
                    <div class="deck-pane">
                      <h2>Join</h2>
-                     <input id="code" class="code-one" maxlength="8" autocomplete="off" spellcheck="false" inputmode="text" aria-label="Session code" value="${escapeHtml(joinCode)}" />
-                     <div class="choice seats">
-                       <label><input type="radio" name="seat" value="right" ${joinSeat === "right" ? "checked" : ""} /> FO</label>
-                       <label><input type="radio" name="seat" value="jumpLeft" ${joinSeat === "jumpLeft" ? "checked" : ""} /> Jump L</label>
-                       <label><input type="radio" name="seat" value="jumpRight" ${joinSeat === "jumpRight" ? "checked" : ""} /> Jump R</label>
-                     </div>
+                     <input id="code" class="code-one" maxlength="6" autocomplete="off" spellcheck="false" inputmode="text" aria-label="Session code" value="${escapeHtml(joinCode)}" />
                      <div class="card-foot">
                        <button type="button" class="btn-join" id="connect" ${busy ? "disabled" : ""}>${busy ? "Connecting..." : "Connect"}</button>
                      </div>
                    </div>
                  </div>`
           }
-          <h2 class="crew-title">Crew</h2>
-          ${cockpitView()}
+          ${cockpitView({ live, canGive, canTake, iFly })}
         </section>`;
 
   root.innerHTML = `
@@ -771,7 +789,8 @@ function renderBoard(): void {
       </div>
       <footer class="status">
         <span class="sim-lamps status-item" data-sim-lamps>${simLampsHtml()}</span>
-        <span class="status-item"><span class="dot ${live && state?.path === "direct" ? "ok" : live ? "warn" : ""}"></span><span class="lamp-lab">${live ? escapeHtml(pathLabel(state?.path ?? "")) : "Path automatic"}</span></span>
+        <span class="status-item"><span class="lamp${install.ok ? " on" : ""}"><span class="dot${install.ok ? " live" : " warn"}"></span><span class="lamp-lab">Community</span></span></span>
+        <span class="status-item"><span class="dot ${live && state?.path === "direct" ? "ok" : live ? "warn" : ""}"></span><span class="lamp-lab">${live ? escapeHtml(pathLabel(state?.path ?? "")) : "Path"}</span></span>
         <span class="status-copy">© BluNova Virtual Airlines by Jordy</span>
       </footer>
     </div>`;
