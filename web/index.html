@@ -61,10 +61,9 @@
       <div class="wrap stage-inner">
         <div class="stage-copy hero-in">
           <p class="eyebrow" data-i="eyebrow">Microsoft Flight Simulator 2020 &amp; 2024</p>
-          <h1 data-i="heroTitle">One cockpit. Two people.</h1>
+          <h1 data-i="heroTitle">Shared cockpit for MSFS</h1>
           <p class="lede" data-i="heroLede">
-            Shared cockpit as a product, not a zip treasure hunt. One Windows app, one code, captain and first officer
-            in the same seats.
+            Captain on one PC, first officer on the other. Same aircraft, same parking. Host starts a deck and sends the six-character code.
           </p>
           <p class="hero-whisper" id="hero-whisper" hidden></p>
           <div class="cta-row">
@@ -110,8 +109,7 @@
       <div class="wrap split app-intro reveal">
         <h2 data-i="appTitle">The Windows app</h2>
         <p class="copy" data-i="appCopy">
-            This is SharedWingsX. Host and join sit on one screen. Settings open from the header. Updates appear as a
-            corner toast. Same version on every PC.
+            Host and join on one window. Same build on every PC.
         </p>
       </div>
       <div class="wrap bezel reveal">
@@ -215,7 +213,7 @@
     <section class="block reveal" id="aircraft">
       <div class="wrap split">
         <div>
-          <h2 data-i="airTitle">Built to fly anything MSFS will load</h2>
+          <h2 data-i="airTitle">PMDG, Fenix, Asobo, stock</h2>
         </div>
         <div>
           <p class="copy" data-i="airCopy">
@@ -234,8 +232,8 @@
 
     <section class="block dim how reveal" id="how">
       <div class="wrap how-head">
-        <h2 data-i="howTitle">Four steps. No installer theatre.</h2>
-        <p class="copy" data-i="sHint">No Visual C++, no WebView2. Pick the Community folder only if MSFS has never been launched.</p>
+        <h2 data-i="howTitle">Setup</h2>
+        <p class="copy" data-i="sHint">Run Setup. Presence is copied into Community. No extra runtimes.</p>
       </div>
       <div class="wrap how-body">
       <ol class="steps">
@@ -243,7 +241,7 @@
             <span class="steps-n">01</span>
             <div>
               <h3 data-i="s1t">App</h3>
-              <p data-i="s1">SharedWingsX-Setup.exe. Presence is copied into Community for you.</p>
+              <p data-i="s1">Run SharedWingsX-Setup.exe. Presence is copied into Community.</p>
             </div>
           </li>
           <li>
@@ -269,16 +267,13 @@
           </li>
         </ol>
       <div class="seats-diagram" aria-hidden="true">
-        <div class="sd-row front">
-          <div class="sd-seat you"><span>Captain</span><small data-i="sdLeft">Left seat · flies</small></div>
-          <div class="sd-arrow" data-i="sdHand">Give / Take</div>
-          <div class="sd-seat crew"><span>First officer</span><small data-i="sdRight">Right seat · radios</small></div>
-        </div>
-        <div class="sd-row jump">
+        <div class="sd-grid">
+          <div class="sd-seat you"><span>Captain</span><small data-i="sdLeft">Left · flies</small></div>
+          <div class="sd-seat crew"><span>First officer</span><small data-i="sdRight">Right · radios</small></div>
           <div class="sd-seat empty"><span>Jump L</span><small data-i="sdJump">Watch only</small></div>
-          <div class="sd-gap" aria-hidden="true"></div>
           <div class="sd-seat empty"><span>Jump R</span><small data-i="sdJump">Watch only</small></div>
         </div>
+        <p class="sd-cap" data-i="sdHand">Give / take flying on the person.</p>
       </div>
       </div>
     </section>
@@ -369,7 +364,7 @@
     <section class="end reveal">
       <div class="wrap end-inner">
         <div>
-          <h2 data-i="endTitle">Ready when you are.</h2>
+          <h2 data-i="endTitle">Get the installer</h2>
           <p class="copy" data-i="endCopy">Same installer on both PCs. No account.</p>
         </div>
         <a class="btn btn-lg" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
