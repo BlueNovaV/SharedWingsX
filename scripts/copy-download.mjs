@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "Seat map, in-flight session bar, same-aircraft checklist on the site.",
+  notes: "Calmer marketing site: thin header, copy-first hero, quieter steps and FAQ.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };

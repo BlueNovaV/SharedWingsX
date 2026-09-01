@@ -24,11 +24,13 @@
             SharedWingsX
           </a>
           <nav>
-            <a href="#app" data-i="navApp">The app</a>
-            <a href="#aircraft" data-i="navAircraft">Aircraft</a>
-            <a href="#how" data-i="navHow">How it works</a>
-            <a href="#faq" data-i="navFaq">Questions</a>
-            <a href="https://discord.gg/bluenovav" target="_blank" rel="noopener">Discord</a>
+            <span class="nav-links">
+              <a href="#app" data-i="navApp">The app</a>
+              <a href="#aircraft" data-i="navAircraft">Aircraft</a>
+              <a href="#how" data-i="navHow">How it works</a>
+              <a href="#faq" data-i="navFaq">Questions</a>
+              <a href="https://discord.gg/bluenovav" target="_blank" rel="noopener">Discord</a>
+            </span>
             <button type="button" class="lang" id="lang">NL</button>
             <a class="btn" href="https://github.com/BlueNovaV/sharedwingsx/releases/latest/download/SharedWingsX-Setup.exe">
               <img src="./brand/logo.png?v=4" width="18" height="18" alt="" />
@@ -71,28 +73,16 @@
               </span>
               <span class="btn-copy">
                 <span data-i="cta2">Download SharedWingsX</span>
-                <small data-i="ctaSub">Windows installer · 0.4.63 · ~95 MB</small>
+                <small data-i="ctaSub">Windows installer · 0.4.64 · ~95 MB</small>
               </span>
             </a>
             <span data-i="heroMeta">Windows and Linux, no account</span>
           </div>
           <p class="cta-linux">
-            <a href="./downloads/SharedWingsX-0.4.63-linux-x64.zip" download>Linux (x64 zip)</a>
+            <a href="./downloads/SharedWingsX-0.4.64-linux-x64.zip" download>Linux (x64 zip)</a>
           </p>
           <p class="change-notes" id="change-notes"></p>
           <a class="change-all" href="https://github.com/BlueNovaV/SharedWingsX/releases" data-i="changeAll">All releases</a>
-        </div>
-        <div class="truth" aria-hidden="true">
-          <div class="truth-win host">
-            <p class="truth-bar">Host</p>
-            <span class="truth-start">Start deck</span>
-            <p class="truth-code">K7MP2Q</p>
-          </div>
-          <div class="truth-win guest">
-            <p class="truth-bar">Join</p>
-            <p class="truth-type"><span>K</span><span>7</span><span>M</span><span>P</span><span>2</span><span>Q</span></p>
-            <span class="truth-ok">Connected</span>
-          </div>
         </div>
       </div>
     </section>
@@ -115,7 +105,7 @@
       <p class="wrap ready-fail" data-i="readyFail">If those three are wrong, the guest will not follow. Fix spawn first, then throttles.</p>
     </section>
 
-    <section class="block dim" id="app" data-chap="01">
+    <section class="block dim" id="app">
       <div class="wrap split app-intro">
         <h2 data-i="appTitle">The Windows app</h2>
         <p class="copy" data-i="appCopy">
@@ -128,7 +118,7 @@
           <div class="frame board-frame">
             <header class="bar">
               <div class="bar-left">
-                <p class="brand"><img src="./brand/logo.png?v=4" alt="" /><span>SharedWingsX</span> <span class="ver" data-rel-ver>0.4.63</span></p>
+                <p class="brand"><img src="./brand/logo.png?v=4" alt="" /><span>SharedWingsX</span> <span class="ver" data-rel-ver>0.4.64</span></p>
               </div>
               <div class="bar-mid" data-flight-bar>
                 <span class="flight-ac">PMDG 737</span>
@@ -195,6 +185,21 @@
           </div>
         </div>
       </div>
+      <div class="wrap">
+        <p class="truth-kicker" data-i="loopHint">Host starts a deck. Guest types the code.</p>
+        <div class="truth" aria-hidden="true">
+          <div class="truth-win host">
+            <p class="truth-bar">Host</p>
+            <span class="truth-start">Start deck</span>
+            <p class="truth-code">K7MP2Q</p>
+          </div>
+          <div class="truth-win guest">
+            <p class="truth-bar">Join</p>
+            <p class="truth-type"><span>K</span><span>7</span><span>M</span><span>P</span><span>2</span><span>Q</span></p>
+            <span class="truth-ok">Connected</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="strip">
@@ -206,7 +211,7 @@
       </div>
     </section>
 
-    <section class="block" id="aircraft" data-chap="02">
+    <section class="block" id="aircraft">
       <div class="wrap split">
         <div>
           <h2 data-i="airTitle">Built to fly anything MSFS will load</h2>
@@ -226,24 +231,13 @@
       </div>
     </section>
 
-    <section class="block dim how" id="how" data-chap="03">
+    <section class="block dim how" id="how">
       <div class="wrap how-head">
         <h2 data-i="howTitle">Four steps. No installer theatre.</h2>
         <p class="copy" data-i="sHint">No Visual C++, no WebView2. Pick the Community folder only if MSFS has never been launched.</p>
       </div>
-      <div class="wrap seats-diagram" aria-hidden="true">
-        <div class="sd-row front">
-          <div class="sd-seat you"><span>Captain</span><small data-i="sdLeft">Left seat · flies</small></div>
-          <div class="sd-arrow" data-i="sdHand">Give / Take</div>
-          <div class="sd-seat crew"><span>First officer</span><small data-i="sdRight">Right seat · radios</small></div>
-        </div>
-        <div class="sd-row jump">
-          <div class="sd-seat empty"><span>Jump L</span><small data-i="sdJump">Watch only</small></div>
-          <div class="sd-seat empty"><span>Jump R</span><small data-i="sdJump">Watch only</small></div>
-        </div>
-      </div>
-      <div class="wrap">
-        <ol class="steps">
+      <div class="wrap how-body">
+      <ol class="steps">
           <li>
             <span class="steps-n">01</span>
             <div>
@@ -273,16 +267,27 @@
             </div>
           </li>
         </ol>
+      <div class="seats-diagram" aria-hidden="true">
+        <div class="sd-row front">
+          <div class="sd-seat you"><span>Captain</span><small data-i="sdLeft">Left seat · flies</small></div>
+          <div class="sd-arrow" data-i="sdHand">Give / Take</div>
+          <div class="sd-seat crew"><span>First officer</span><small data-i="sdRight">Right seat · radios</small></div>
+        </div>
+        <div class="sd-row jump">
+          <div class="sd-seat empty"><span>Jump L</span><small data-i="sdJump">Watch only</small></div>
+          <div class="sd-seat empty"><span>Jump R</span><small data-i="sdJump">Watch only</small></div>
+        </div>
+      </div>
       </div>
     </section>
 
-    <section class="block dim" id="faq" data-chap="04">
+    <section class="block" id="faq">
       <div class="wrap faq-head">
         <h2 data-i="faqTitle">Questions</h2>
       </div>
       <div class="wrap">
         <div class="faq">
-          <details open>
+          <details>
             <summary data-i="q1">Is SharedWingsX free?</summary>
             <p data-i="q1a">Yes. Download the Windows build. No account, no subscription.</p>
           </details>
