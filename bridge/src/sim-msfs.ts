@@ -502,18 +502,17 @@ class MsfsSim implements SimBackend {
 
   applyWorldPose(pose: WorldPose): void {
     try {
-      this.fire("FREEZE_LATITUDE_LONGITUDE_SET", 0);
       const far =
-        !this.hasPosition() || metersBetween(this.lat, this.lon, pose.lat, pose.lon) > 25;
+        !this.hasPosition() || metersBetween(this.lat, this.lon, pose.lat, pose.lon) > (pose.onGround ? 0.6 : 4);
       const now = Date.now();
-      if (far && now - this.lastWarpAt > 400) {
+      if (far && now - this.lastWarpAt > 80) {
         this.lastWarpAt = now;
         const init = new sc.RawBuffer(56);
         init.writeFloat64(pose.lat);
         init.writeFloat64(pose.lon);
         init.writeFloat64(pose.alt);
-        init.writeFloat64(pose.onGround ? 0 : pose.pitch);
-        init.writeFloat64(pose.onGround ? 0 : pose.bank);
+        init.writeFloat64(pose.pitch);
+        init.writeFloat64(pose.bank);
         init.writeFloat64(pose.heading);
         init.writeInt32(pose.onGround ? 1 : 0);
         init.writeInt32(pose.onGround ? 0 : Math.max(0, Math.round(Math.hypot(pose.vx ?? 0, pose.vz ?? 0) * 0.592484)));
@@ -533,19 +532,22 @@ class MsfsSim implements SimBackend {
         arrayCount: 0,
         tagged: false,
       });
-      if (!pose.onGround) {
-        const poseBuf = new sc.RawBuffer(48);
-        poseBuf.writeFloat64(pose.lat);
-        poseBuf.writeFloat64(pose.lon);
-        poseBuf.writeFloat64(pose.alt);
-        poseBuf.writeFloat64(pose.pitch);
-        poseBuf.writeFloat64(pose.bank);
-        poseBuf.writeFloat64(pose.heading);
-        this.handle.setDataOnSimObject(POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
-          buffer: poseBuf,
-          arrayCount: 0,
-          tagged: false,
-        });
+      const poseBuf = new sc.RawBuffer(48);
+      poseBuf.writeFloat64(pose.lat);
+      poseBuf.writeFloat64(pose.lon);
+      poseBuf.writeFloat64(pose.alt);
+      poseBuf.writeFloat64(pose.pitch);
+      poseBuf.writeFloat64(pose.bank);
+      poseBuf.writeFloat64(pose.heading);
+      this.handle.setDataOnSimObject(POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
+        buffer: poseBuf,
+        arrayCount: 0,
+        tagged: false,
+      });
+      if (this.physicsHold) {
+        this.fire("FREEZE_LATITUDE_LONGITUDE_SET", 1);
+        this.fire("FREEZE_ALTITUDE_SET", 1);
+        this.fire("FREEZE_ATTITUDE_SET", 1);
       }
       const velBuf = new sc.RawBuffer(24);
       velBuf.writeFloat64(pose.vx ?? 0);
@@ -589,12 +591,10 @@ class MsfsSim implements SimBackend {
   }
 
   private enforceFreeze(force = false): void {
-    const wantLat = 0;
-    const wantAlt = this.physicsHold ? 1 : 0;
-    const wantAtt = this.physicsHold ? 1 : 0;
-    if (force || this.freezeLat > 0.5) this.fire("FREEZE_LATITUDE_LONGITUDE_SET", wantLat);
-    if (force || (this.freezeAlt > 0.5) !== (wantAlt === 1)) this.fire("FREEZE_ALTITUDE_SET", wantAlt);
-    if (force || (this.freezeAtt > 0.5) !== (wantAtt === 1)) this.fire("FREEZE_ATTITUDE_SET", wantAtt);
+    const want = this.physicsHold ? 1 : 0;
+    if (force || (this.freezeLat > 0.5) !== (want === 1)) this.fire("FREEZE_LATITUDE_LONGITUDE_SET", want);
+    if (force || (this.freezeAlt > 0.5) !== (want === 1)) this.fire("FREEZE_ALTITUDE_SET", want);
+    if (force || (this.freezeAtt > 0.5) !== (want === 1)) this.fire("FREEZE_ATTITUDE_SET", want);
   }
 
   private pumpCmd(name: string, data: number): void {
@@ -645,7 +645,8 @@ class MsfsSim implements SimBackend {
       if (rpn) this.pumpCalc(rpn);
     } else {
       for (const discrete of discreteEventsForVar(v.sim, value)) {
-        if (this.lastDiscrete.get(discrete.name) === discrete.data) continue;
+        const prev = this.lastDiscrete.get(discrete.name);
+        if (!this.followPose && prev === discrete.data) continue;
         this.lastDiscrete.set(discrete.name, discrete.data);
         this.fire(discrete.name, discrete.data);
       }
@@ -686,8 +687,8 @@ class MsfsSim implements SimBackend {
         lat: this.followPose.lat,
         lon: this.followPose.lon,
         alt: this.followPose.alt,
-        pitch: this.followPose.onGround ? 0 : this.followPose.pitch,
-        bank: this.followPose.onGround ? 0 : this.followPose.bank,
+        pitch: this.followPose.pitch,
+        bank: this.followPose.bank,
         heading: this.followPose.heading,
       };
     }
@@ -901,7 +902,7 @@ class MsfsSim implements SimBackend {
         return;
     }
     for (const pair of pairs) {
-      if (this.lastAxis.get(pair.name) === pair.data) continue;
+      if (!this.followPose && this.lastAxis.get(pair.name) === pair.data) continue;
       this.lastAxis.set(pair.name, pair.data);
       this.fire(pair.name, pair.data >>> 0);
     }

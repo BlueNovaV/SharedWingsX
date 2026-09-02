@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "Clean product site: card hover, scroll reveals, no gimmicks.",
+  notes: "Guest aircraft is frozen to the host pose. Captain taxi/flight moves the other PC. Battery, avionics and axis SET events keep repeating while following.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };

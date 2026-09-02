@@ -225,7 +225,7 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.67 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.68 open.",
       );
     }
     throw new Error(
@@ -439,7 +439,7 @@ export class TwinSeatSession {
       const ws = new WebSocket(toWs(url), {
         handshakeTimeout: 8000,
         perMessageDeflate: false,
-        headers: { "User-Agent": "SharedWingsX/0.4.67" },
+        headers: { "User-Agent": "SharedWingsX/0.4.68" },
       });
       this.signal = ws;
       const timer = setTimeout(() => {
@@ -642,7 +642,7 @@ export class TwinSeatSession {
         this.lastRemote.set(rec.id, rec.value);
         this.lastEmit.set(rec.id, { value: rec.value, at: now });
         this.remoteHeld.add(rec.id);
-        if (this.cockpitReady(now)) applyRemoteVar(this.sim, this.pack, rec.id, rec.value);
+        applyRemoteVar(this.sim, this.pack, rec.id, rec.value);
       }
       return;
     }
@@ -725,7 +725,7 @@ export class TwinSeatSession {
     const pose = this.sim.worldPose();
     const inWorld = Boolean(pose);
     if (inWorld) {
-      if (!this.syncReadyAt) this.syncReadyAt = now + 3000;
+      if (!this.syncReadyAt) this.syncReadyAt = now + 400;
     } else {
       this.syncReadyAt = 0;
       this.lastSyncReady = false;
@@ -754,16 +754,19 @@ export class TwinSeatSession {
       if (seat && seat !== this.seat && !pins.includes(seat)) pins.push(seat);
     }
     this.sim.syncCrewPins(this.room && this.hasCrew() ? pins : []);
-    if (hold && (enteredWorld || now - this.lastFreezePulse > 8000)) {
-      this.sim.setPhysicsHold(true, true);
-      this.lastFreezePulse = now;
-    } else if (!hold) {
+    if (hold) {
+      if (enteredWorld || now - this.lastFreezePulse > 700) {
+        this.sim.setPhysicsHold(true, true);
+        this.lastFreezePulse = now;
+      }
+      if (this.lastHostPose) this.sim.applyWorldPose(this.lastHostPose);
+    } else {
       this.sim.setPhysicsHold(false);
     }
     this.wasInWorld = inWorld;
 
-    if (this.room && this.hasCrew() && pose && this.iAmPoseSource() && ready) {
-      const worldGap = pose.onGround ? 100 : 50;
+    if (this.room && this.hasCrew() && pose && this.iAmPoseSource()) {
+      const worldGap = pose.onGround ? 40 : 33;
       if (now - this.lastWorldSend > worldGap) {
         this.lastWorldSend = now;
         this.sendGame(encodeWorldPose(this.seq++, pose));
@@ -778,7 +781,7 @@ export class TwinSeatSession {
         if (!canWrite(this.displayName, this.role, def.domain, def.id, now, this.locks)) continue;
         this.sendGame(encodeSimEvent(this.seq++, { eventId: def.id, data: ev.data }));
       }
-      if (this.role !== "observer") {
+      if (this.iAmPoseSource() && this.role !== "observer") {
         for (const input of this.sim.drainInputEvents()) {
           this.sendGame(encodeInputEvent(this.seq++, input));
         }
@@ -810,7 +813,7 @@ export class TwinSeatSession {
       this.sendGame(encodeDelta(this.seq++, delta));
     }
 
-    if (this.room && this.hasCrew() && this.iAmPoseSource() && ready && now - this.lastSnapAt > 200) {
+    if (this.room && this.hasCrew() && this.iAmPoseSource() && ready && now - this.lastSnapAt > 80) {
       this.lastSnapAt = now;
       this.sendGame(encodeSnapshot(this.seq++, this.snapshotVars()));
     }
@@ -866,9 +869,10 @@ export class TwinSeatSession {
 
   private collectOwnedDeltas(now: number) {
     const out: { id: number; value: number }[] = [];
+    if (!this.iAmPoseSource()) return out;
     for (const v of this.pack.variables) {
       if (!v.sync) continue;
-      if (!this.iAmPoseSource() && !canWrite(this.displayName, this.role, v.domain, v.id, now, this.locks)) continue;
+      if (!canWrite(this.displayName, this.role, v.domain, v.id, now, this.locks)) continue;
       const value = this.sim.read(v);
       const prev = this.lastEmit.get(v.id);
       if (!prev) {
