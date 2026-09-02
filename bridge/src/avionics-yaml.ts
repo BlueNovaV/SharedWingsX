@@ -244,6 +244,10 @@ export function modulesForTitle(aircraftTitle: string, packId?: string): string[
   const g1000 =
     packId === "asobo-c172" ||
     /g1000|\bnxi\b|garmin 1000|skyhawk|cessna 172|cessna 182|da40|da62|sr22|bonanza|baron|tbm 930|pc-12|pc12/.test(t);
+  if (!g1000) {
+    out.push("modules/fuel.yaml");
+    out.push("modules/payload.yaml");
+  }
   if (g1000) out.push("modules/AS_G1000_NXi.yaml");
   if (/gtn\s*750|gtn\s*650|pms50/.test(t)) out.push("modules/PMS50_GTN_650-750.yaml");
   if (/gns\s*530|as530/.test(t)) out.push("modules/AS_GNS530.yaml");

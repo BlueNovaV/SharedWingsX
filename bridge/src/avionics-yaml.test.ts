@@ -47,5 +47,6 @@ describe("avionics yaml", () => {
     assert.ok(sky.variables.some((v) => v.calc?.set?.includes("KOHLSMAN")));
     const pmdg = findPack(loadPacks(), "PMDG 737-800")!;
     assert.equal(pmdg.variables.some((v) => v.sim === "KOHLSMAN SETTING MB:0"), false);
+    assert.ok(pmdg.variables.some((v) => v.sim === "FUEL TANK LEFT MAIN LEVEL"));
   });
 });

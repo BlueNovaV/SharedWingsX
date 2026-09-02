@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "G1000/GNS H-events from MIT YAML fire through the in-sim calculator. No third-party aircraft patches.",
+  notes: "YAML K-events fire over SimConnect without WASM. Fuel/payload A-vars on airliners. H-events still need SDK WASM.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };

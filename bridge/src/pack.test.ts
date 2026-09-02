@@ -33,6 +33,11 @@ describe("packs", () => {
     assert.equal(calculatorEventK2("THROTTLE1_SET", 3600, 1), "1 3600 (>K:2:THROTTLE1_SET)");
     assert.equal(calculatorEventIndexed("KOHLSMAN_SET", 16256, 0), "16256 0 (>K:KOHLSMAN_SET)");
     assert.equal(calculatorEventIndexed("HEADING_BUG_SET", 180, 1), "180 1 (>K:HEADING_BUG_SET)");
+    const { kEventsFromRpn } = await import("./sim-events.js");
+    assert.deepEqual(kEventsFromRpn("40 (>K:NAV1_VOLUME_SET_EX1)"), [{ name: "NAV1_VOLUME_SET_EX1", data: 40 }]);
+    assert.deepEqual(kEventsFromRpn("16256 0 (>K:KOHLSMAN_SET)"), [{ name: "KOHLSMAN_SET", data: 16256, extra: 0 }]);
+    assert.deepEqual(kEventsFromRpn("1 3600 (>K:2:THROTTLE1_SET)"), [{ name: "THROTTLE1_SET", data: 1, extra: 3600 }]);
+    assert.deepEqual(kEventsFromRpn("1 (>H:AS1000_PFD_CLR)"), []);
   });
 
   it("uses universal pack for PMDG and unknown titles", () => {

@@ -333,6 +333,25 @@ export function calculatorEventIndexed(name: string, data: number, index: number
   return `${data >>> 0} ${index >>> 0} (>K:${safe})`;
 }
 
+/** Pull K: events out of calculator RPN so SimConnect can fire them without WASM. */
+export function kEventsFromRpn(rpn: string): { name: string; data: number; extra?: number }[] {
+  const out: { name: string; data: number; extra?: number }[] = [];
+  const re = /(?:((?:\d+\s+)+))?\(>K:(?:2:)?([A-Z0-9_]+)\)/gi;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(rpn))) {
+    const nums = (m[1] ?? "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((n) => Number(n) >>> 0);
+    const name = m[2];
+    if (!name) continue;
+    if (nums.length >= 2) out.push({ name, data: nums[0]!, extra: nums[1] });
+    else out.push({ name, data: nums[0] ?? 0 });
+  }
+  return out;
+}
+
 export function skipInputEventName(name: string): boolean {
   const n = name.toUpperCase();
   return /CAMERA|PAUSE|MENU|TOOLTIP|DEBUG|KNEEBOARD|MOUSE|WINDOW|VIEW_|ESC\b|ATC_PANEL|SIM_RATE|SAVE|LOAD|QUIT|SCREENSHOT/.test(

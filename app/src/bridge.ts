@@ -48,7 +48,7 @@ export type BridgeMsg =
   | { type: "state"; state: UiState }
   | { type: "error"; reason: string };
 
-export type InstallInfo = { ok: boolean; message: string; found?: string[]; copied?: string[]; labels?: string[] };
+export type InstallInfo = { ok: boolean; message: string; found?: string[]; copied?: string[]; labels?: string[]; wasm?: boolean };
 
 export type UpdateInfo = {
   current: string;

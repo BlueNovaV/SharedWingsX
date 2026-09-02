@@ -33,7 +33,7 @@ let joinCode = (localStorage.getItem("twinseat-code") || "").replace(/[^a-zA-Z0-
 let lastCopiedRoom = "";
 let joinTimer = 0;
 let simProc = { msfs2020: false, msfs2024: false };
-const APP_VER = "0.4.71";
+const APP_VER = "0.4.72";
 let settingsOpen = false;
 let cardScrollMem: Record<string, number> = {};
 
@@ -443,6 +443,7 @@ function settingsPanel(): string {
       <div class="deck-row">
         <span class="deck-kicker">Community</span>
         <span class="lamp${commOk ? " on" : ""}"><span class="dot${commOk ? " live" : " warn"}"></span><span class="lamp-lab">${commOk ? "Copied" : "Missing"}</span></span>
+        <span class="lamp${install.wasm ? " on" : ""}"><span class="dot${install.wasm ? " live" : " warn"}"></span><span class="lamp-lab">${install.wasm ? "WASM" : "K-events"}</span></span>
         <button type="button" class="ghost-sm" id="pick" ${live ? "disabled" : ""}>Test Community</button>
       </div>
       ${communitySelectHtml(live)}
@@ -790,6 +791,7 @@ function renderBoard(): void {
       <footer class="status">
         <span class="sim-lamps status-item" data-sim-lamps>${simLampsHtml()}</span>
         <span class="status-item"><span class="lamp${install.ok ? " on" : ""}"><span class="dot${install.ok ? " live" : " warn"}"></span><span class="lamp-lab">Community</span></span></span>
+        <span class="status-item"><span class="lamp${install.wasm ? " on" : ""}"><span class="dot${install.wasm ? " live" : " warn"}"></span><span class="lamp-lab">${install.wasm ? "WASM" : "K-events"}</span></span></span>
         <span class="status-item"><span class="dot ${live && state?.path === "direct" ? "ok" : live ? "warn" : ""}"></span><span class="lamp-lab">${live ? escapeHtml(pathLabel(state?.path ?? "")) : "Path"}</span></span>
         <span class="status-copy">© BluNova Virtual Airlines by Jordy</span>
       </footer>

@@ -5,7 +5,7 @@ import { seatOffset } from "./pack.js";
 import { MockSim, type SimBackend, type SimIdentity, type WorldPose } from "./sim.js";
 import { nearestAirport } from "./airports.js";
 import { evalCalcSet, sanitizeRpn } from "./avionics-yaml.js";
-import { discreteEventsForVar, inputEventPriority, skipInputEventName } from "./sim-events.js";
+import { discreteEventsForVar, inputEventPriority, kEventsFromRpn, skipInputEventName } from "./sim-events.js";
 import { bodyOffsetToWorld } from "./presence.js";
 
 type SimConnectMod = typeof import("node-simconnect");
@@ -584,6 +584,12 @@ class MsfsSim implements SimBackend {
     if (force || (this.freezeAtt > 0.5) !== (want === 1)) this.fire("FREEZE_ATTITUDE_SET", want);
   }
 
+  private applyCalc(rpn: string): void {
+    if (!rpn) return;
+    this.pumpCalc(rpn);
+    for (const ev of kEventsFromRpn(rpn)) this.fire(ev.name, ev.data, ev.extra);
+  }
+
   private pumpCmd(name: string, data: number): void {
     if (!this.cmdReady) return;
     const seq = this.cmdSeq++ >>> 0 || 1;
@@ -623,7 +629,7 @@ class MsfsSim implements SimBackend {
       const rpn = sanitizeRpn(
         v.calc ? evalCalcSet({ get: v.calc.get, set: v.calc.set }, value, current) : `1 (>${v.sim})`,
       );
-      if (rpn) this.pumpCalc(rpn);
+      this.applyCalc(rpn);
       setTimeout(() => this.writing.delete(v.id), 160);
       return;
     }
@@ -636,8 +642,7 @@ class MsfsSim implements SimBackend {
     });
     this.fireAxis(v.sim, value);
     if (v.calc) {
-      const rpn = sanitizeRpn(evalCalcSet({ get: v.calc.get, set: v.calc.set }, value, current));
-      if (rpn) this.pumpCalc(rpn);
+      this.applyCalc(sanitizeRpn(evalCalcSet({ get: v.calc.get, set: v.calc.set }, value, current)));
     } else {
       for (const discrete of discreteEventsForVar(v.sim, value)) {
         const prev = this.lastDiscrete.get(discrete.name);
@@ -800,7 +805,7 @@ class MsfsSim implements SimBackend {
     }
   }
 
-  private fire(name: string, data: number): void {
+  private fire(name: string, data: number, extra?: number): void {
     let id = this.fireIds.get(name);
     if (id == null) {
       id = this.nextFireId++;
@@ -827,6 +832,7 @@ class MsfsSim implements SimBackend {
           sc.NotificationPriority.HIGHEST,
           sc.EventFlag.EVENT_FLAG_GROUPID_IS_PRIORITY,
           data >>> 0,
+          extra !== undefined ? extra >>> 0 : 0,
         );
       } catch {
         /* older sim */

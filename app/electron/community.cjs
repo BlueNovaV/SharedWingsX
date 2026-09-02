@@ -227,7 +227,7 @@ function installCommunity(sourceRoot, options = {}) {
   const found = uniqueExisting([...picked, ...cfg, ...savedFolders, ...guessed]);
   const copied = [];
   if (!sourceRoot || !fs.existsSync(sourceRoot)) {
-    return { found, copied, ok: false, message: "Presence package is not bundled in this build." };
+    return { found, copied, ok: false, message: "Presence package is not bundled in this build.", wasm: false };
   }
   for (const folder of found) {
     const dest = path.join(folder, "twinseat-presence");
@@ -240,6 +240,7 @@ function installCommunity(sourceRoot, options = {}) {
       copied,
       ok: false,
       message: "Community folder not found. Launch MSFS once, or pick the folder yourself. No zip, no drag-drop.",
+      wasm: false,
     };
   }
   const yearSet = [...new Set(copied.map(communityLabel))];
@@ -249,10 +250,15 @@ function installCommunity(sourceRoot, options = {}) {
   } else if (copied.length > 1) {
     message = `Presence copied to ${copied.length} ${yearSet[0] || "Community"} folders.`;
   }
+  const wasm = copied.some((d) => fs.existsSync(path.join(d, "modules", "twinseat_presence.wasm")));
+  if (!wasm) {
+    message += " K-events go through SimConnect. Glass H-events need the MSFS SDK WASM.";
+  }
   return {
     found,
     copied,
     ok: true,
+    wasm,
     labels: found.map((folder) => communityLabel(folder)),
     message,
   };
