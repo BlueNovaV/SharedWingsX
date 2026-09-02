@@ -11,12 +11,20 @@ export const COCKPIT_SIM_EVENTS = [
   "THROTTLE4_SET",
   "AXIS_MIXTURE1_SET",
   "AXIS_MIXTURE2_SET",
+  "AXIS_MIXTURE3_SET",
+  "AXIS_MIXTURE4_SET",
   "MIXTURE1_SET",
   "MIXTURE2_SET",
+  "MIXTURE3_SET",
+  "MIXTURE4_SET",
   "AXIS_PROPELLER1_SET",
   "AXIS_PROPELLER2_SET",
+  "AXIS_PROPELLER3_SET",
+  "AXIS_PROPELLER4_SET",
   "PROP_PITCH1_SET",
   "PROP_PITCH2_SET",
+  "PROP_PITCH3_SET",
+  "PROP_PITCH4_SET",
   "AXIS_ELEVATOR_SET",
   "AXIS_AILERONS_SET",
   "AXIS_RUDDER_SET",
@@ -66,24 +74,91 @@ export const COCKPIT_SIM_EVENTS = [
   "LOGO_LIGHTS_SET",
   "TOGGLE_RECOGNITION_LIGHTS",
   "TOGGLE_WING_LIGHTS",
+  "WING_LIGHTS_SET",
+  "TOGGLE_RECOGNITION_LIGHTS",
+  "RECOGNITION_LIGHTS_SET",
   "PITOT_HEAT_TOGGLE",
   "PITOT_HEAT_SET",
   "ANTI_ICE_TOGGLE",
   "ANTI_ICE_SET",
+  "ANTI_ICE_ON",
+  "ANTI_ICE_OFF",
   "TOGGLE_PUSHBACK",
   "TOGGLE_JETWAY",
   "TOGGLE_RAMPTRUCK",
   "TOGGLE_EXTERNAL_POWER",
+  "SET_EXTERNAL_POWER",
   "APU_STARTER",
   "APU_OFF_SWITCH",
+  "APU_GENERATOR_SWITCH_SET",
   "ENGINE_AUTO_START",
   "ENGINE_AUTO_SHUTDOWN",
   "TOGGLE_STARTER1",
   "TOGGLE_STARTER2",
   "TOGGLE_STARTER3",
   "TOGGLE_STARTER4",
+  "STARTER1_SET",
+  "STARTER2_SET",
+  "STARTER3_SET",
+  "STARTER4_SET",
+  "TOGGLE_ALTERNATOR1",
+  "TOGGLE_ALTERNATOR2",
   "MAGNETO1_BOTH",
   "MAGNETO2_BOTH",
+  "AXIS_LEFT_BRAKE_SET",
+  "AXIS_RIGHT_BRAKE_SET",
+  "AXIS_ELEV_TRIM_SET",
+  "ELEVATOR_TRIM_SET",
+  "RUDDER_TRIM_SET",
+  "AILERON_TRIM_SET",
+  "WATER_RUDDER_SET",
+  "CANOPY_SET",
+  "COWLFLAP1_SET",
+  "COWLFLAP2_SET",
+  "SET_AUTOBRAKE_CONTROL",
+  "AP_MACH_VAR_SET",
+  "YAW_DAMPER_ON",
+  "YAW_DAMPER_OFF",
+  "YAW_DAMPER_TOGGLE",
+  "YAW_DAMPER_SET",
+  "AP_PANEL_HEADING_ON",
+  "AP_PANEL_HEADING_OFF",
+  "AP_PANEL_ALTITUDE_ON",
+  "AP_PANEL_ALTITUDE_OFF",
+  "AP_PANEL_VS_ON",
+  "AP_PANEL_VS_OFF",
+  "AP_MACH_HOLD_ON",
+  "AP_MACH_HOLD_OFF",
+  "AP_BC_HOLD_ON",
+  "AP_BC_HOLD_OFF",
+  "AP_LOC_HOLD",
+  "AP_ATT_HOLD_ON",
+  "AP_ATT_HOLD_OFF",
+  "AP_WING_LEVELER_ON",
+  "AP_WING_LEVELER_OFF",
+  "AP_FLIGHT_LEVEL_CHANGE_ON",
+  "AP_FLIGHT_LEVEL_CHANGE_OFF",
+  "AP_GPWS_HOLD",
+  "AP_MAX_BANK_SET",
+  "FLIGHT_DIRECTOR_ON",
+  "FLIGHT_DIRECTOR_OFF",
+  "TOGGLE_FLIGHT_DIRECTOR",
+  "SPOILERS_ARM_ON",
+  "SPOILERS_ARM_OFF",
+  "FUEL_PUMP",
+  "TOGGLE_ELECT_FUEL_PUMP1",
+  "TOGGLE_ELECT_FUEL_PUMP2",
+  "DECISION_HEIGHT_SET",
+  "NAV1_OBI_DEC",
+  "NAV1_OBI_INC",
+  "VOR1_SET",
+  "VOR2_SET",
+  "ADF_CARD_SET",
+  "XPNDR_SET",
+  "COM_RADIO_SET_HZ",
+  "COM_STBY_RADIO_SET_HZ",
+  "NAV1_RADIO_SET_HZ",
+  "NAV2_RADIO_SET_HZ",
   "AP_MASTER",
   "AUTOPILOT_ON",
   "AUTOPILOT_OFF",
@@ -154,13 +229,70 @@ export function discreteEventsForVar(
     case "LIGHT LOGO":
     case "LIGHT LOGO:1":
       return [{ name: "LOGO_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
+    case "LIGHT WING":
+      return [{ name: "WING_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
+    case "LIGHT RECOGNITION":
+      return [{ name: "RECOGNITION_LIGHTS_SET", data: on ? SET_TRUE : 0 }];
     case "PITOT HEAT":
       return [{ name: "PITOT_HEAT_SET", data: on ? SET_TRUE : 0 }];
     case "STRUCTURAL DEICE SWITCH":
     case "ENG ANTI ICE:1":
-      return [{ name: "ANTI_ICE_SET", data: on ? SET_TRUE : 0 }];
+    case "ENG ANTI ICE:2":
+    case "ENG ANTI ICE:3":
+    case "ENG ANTI ICE:4":
+      return [{ name: on ? "ANTI_ICE_ON" : "ANTI_ICE_OFF", data: 0 }];
     case "AUTOPILOT MASTER":
       return [{ name: on ? "AUTOPILOT_ON" : "AUTOPILOT_OFF", data: 0 }];
+    case "AUTOPILOT HEADING LOCK":
+      return [{ name: on ? "AP_PANEL_HEADING_ON" : "AP_PANEL_HEADING_OFF", data: 0 }];
+    case "AUTOPILOT ALTITUDE LOCK":
+      return [{ name: on ? "AP_PANEL_ALTITUDE_ON" : "AP_PANEL_ALTITUDE_OFF", data: 0 }];
+    case "AUTOPILOT VERTICAL HOLD":
+      return [{ name: on ? "AP_PANEL_VS_ON" : "AP_PANEL_VS_OFF", data: 0 }];
+    case "AUTOPILOT MACH HOLD":
+      return [{ name: on ? "AP_MACH_HOLD_ON" : "AP_MACH_HOLD_OFF", data: 0 }];
+    case "AUTOPILOT YAW DAMPER":
+      return [{ name: on ? "YAW_DAMPER_ON" : "YAW_DAMPER_OFF", data: 0 }];
+    case "AUTOPILOT BACKCOURSE HOLD":
+      return [{ name: on ? "AP_BC_HOLD_ON" : "AP_BC_HOLD_OFF", data: 0 }];
+    case "AUTOPILOT ATTITUDE HOLD":
+      return [{ name: on ? "AP_ATT_HOLD_ON" : "AP_ATT_HOLD_OFF", data: 0 }];
+    case "AUTOPILOT WING LEVELER":
+      return [{ name: on ? "AP_WING_LEVELER_ON" : "AP_WING_LEVELER_OFF", data: 0 }];
+    case "AUTOPILOT FLIGHT LEVEL CHANGE":
+      return [{ name: on ? "AP_FLIGHT_LEVEL_CHANGE_ON" : "AP_FLIGHT_LEVEL_CHANGE_OFF", data: 0 }];
+    case "AUTOPILOT FLIGHT DIRECTOR ACTIVE":
+      return [{ name: on ? "FLIGHT_DIRECTOR_ON" : "FLIGHT_DIRECTOR_OFF", data: 0 }];
+    case "SPOILERS ARMED":
+      return [{ name: "SPOILERS_ARM_SET", data: on ? SET_TRUE : 0 }];
+    case "GENERAL ENG STARTER:1":
+      return [{ name: "STARTER1_SET", data: on ? SET_TRUE : 0 }];
+    case "GENERAL ENG STARTER:2":
+      return [{ name: "STARTER2_SET", data: on ? SET_TRUE : 0 }];
+    case "GENERAL ENG STARTER:3":
+      return [{ name: "STARTER3_SET", data: on ? SET_TRUE : 0 }];
+    case "GENERAL ENG STARTER:4":
+      return [{ name: "STARTER4_SET", data: on ? SET_TRUE : 0 }];
+    case "APU GENERATOR SWITCH":
+      return [{ name: "APU_GENERATOR_SWITCH_SET", data: on ? SET_TRUE : 0 }];
+    case "EXTERNAL POWER ON":
+      return [{ name: "SET_EXTERNAL_POWER", data: on ? SET_TRUE : 0 }];
+    case "WATER RUDDER HANDLE POSITION":
+      return [{ name: "WATER_RUDDER_SET", data: AXIS(value * 16383) }];
+    case "CANOPY OPEN":
+      return [{ name: "CANOPY_SET", data: AXIS(value * 16383) }];
+    case "AUTO BRAKE SWITCH CB":
+      return [{ name: "SET_AUTOBRAKE_CONTROL", data: Math.max(0, Math.round(value)) }];
+    case "AUTOPILOT MACH HOLD VAR":
+      return [{ name: "AP_MACH_VAR_SET", data: Math.max(0, Math.round(value * 100)) }];
+    case "DECISION HEIGHT":
+      return [{ name: "DECISION_HEIGHT_SET", data: Math.max(0, Math.round(value)) }];
+    case "NAV OBS:1":
+      return [{ name: "VOR1_SET", data: heading }];
+    case "NAV OBS:2":
+      return [{ name: "VOR2_SET", data: heading }];
+    case "ADF CARD":
+      return [{ name: "ADF_CARD_SET", data: heading }];
     case "AUTOPILOT HEADING LOCK DIR":
     case "AUTOPILOT HEADING LOCK DIR:1":
       return [{ name: "HEADING_BUG_SET", data: heading }];
@@ -175,6 +307,7 @@ export function discreteEventsForVar(
     case "AUTOPILOT VERTICAL HOLD VAR:1":
       return [{ name: "AP_VS_VAR_SET_ENGLISH", data: Math.round(value) >>> 0 }];
     case "KOHLSMAN SETTING MB:1":
+    case "KOHLSMAN SETTING MB:2":
       return [{ name: "KOHLSMAN_SET", data: Math.max(0, Math.round(value * 16)) }];
     case "APU SWITCH":
       return [{ name: on ? "APU_STARTER" : "APU_OFF_SWITCH", data: 0 }];

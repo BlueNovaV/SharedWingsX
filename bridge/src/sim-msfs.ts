@@ -646,7 +646,8 @@ class MsfsSim implements SimBackend {
     } else {
       for (const discrete of discreteEventsForVar(v.sim, value)) {
         const prev = this.lastDiscrete.get(discrete.name);
-        if (!this.followPose && prev === discrete.data) continue;
+        const setLike = /(_SET|_ON|_OFF)$/.test(discrete.name);
+        if (prev === discrete.data && (!this.followPose || !setLike)) continue;
         this.lastDiscrete.set(discrete.name, discrete.data);
         this.fire(discrete.name, discrete.data);
       }
@@ -894,9 +895,27 @@ class MsfsSim implements SimBackend {
         pairs.push({ name: "AXIS_PROPELLER1_SET", data: throttle(value) });
         pairs.push({ name: "PROP_PITCH1_SET", data: throttle(value) });
         break;
-      case "GENERAL ENG PROPELLER LEVER POSITION:2":
-        pairs.push({ name: "AXIS_PROPELLER2_SET", data: throttle(value) });
-        pairs.push({ name: "PROP_PITCH2_SET", data: throttle(value) });
+      case "GENERAL ENG MIXTURE LEVER POSITION:3":
+        pairs.push({ name: "AXIS_MIXTURE3_SET", data: throttle(value) });
+        pairs.push({ name: "MIXTURE3_SET", data: throttle(value) });
+        break;
+      case "GENERAL ENG MIXTURE LEVER POSITION:4":
+        pairs.push({ name: "AXIS_MIXTURE4_SET", data: throttle(value) });
+        pairs.push({ name: "MIXTURE4_SET", data: throttle(value) });
+        break;
+      case "GENERAL ENG PROPELLER LEVER POSITION:3":
+        pairs.push({ name: "AXIS_PROPELLER3_SET", data: throttle(value) });
+        pairs.push({ name: "PROP_PITCH3_SET", data: throttle(value) });
+        break;
+      case "GENERAL ENG PROPELLER LEVER POSITION:4":
+        pairs.push({ name: "AXIS_PROPELLER4_SET", data: throttle(value) });
+        pairs.push({ name: "PROP_PITCH4_SET", data: throttle(value) });
+        break;
+      case "BRAKE LEFT POSITION":
+        pairs.push({ name: "AXIS_LEFT_BRAKE_SET", data: throttle(value * 100) });
+        break;
+      case "BRAKE RIGHT POSITION":
+        pairs.push({ name: "AXIS_RIGHT_BRAKE_SET", data: throttle(value * 100) });
         break;
       default:
         return;

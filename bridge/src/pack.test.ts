@@ -24,7 +24,9 @@ describe("packs", () => {
     const { discreteEventsForVar } = await import("./sim-events.js");
     assert.equal(discreteEventsForVar("AUTOPILOT MASTER", 1)[0]?.name, "AUTOPILOT_ON");
     assert.equal(discreteEventsForVar("ELECTRICAL MASTER BATTERY:1", 1)[0]?.name, "BATTERY1_SET");
-    assert.equal(discreteEventsForVar("AUTOPILOT HEADING LOCK DIR", 270)[0]?.data, 270);
+    assert.equal(discreteEventsForVar("LIGHT WING", 1)[0]?.name, "WING_LIGHTS_SET");
+    assert.equal(discreteEventsForVar("AUTOPILOT YAW DAMPER", 1)[0]?.name, "YAW_DAMPER_ON");
+    assert.equal(discreteEventsForVar("SPOILERS ARMED", 1)[0]?.name, "SPOILERS_ARM_SET");
     const { calculatorEvent } = await import("./sim-events.js");
     assert.equal(calculatorEvent("THROTTLE1_SET", 3600), "3600 (>K:THROTTLE1_SET)");
     const { calculatorEventK2, calculatorEventIndexed } = await import("./sim-events.js");
@@ -37,6 +39,16 @@ describe("packs", () => {
     assert.equal(findPack(packs, "PMDG 737-800")?.id, "generic-msfs");
     assert.equal(findPack(packs, "Fenix A320")?.id, "generic-msfs");
     assert.equal(findPack(packs, "")?.id, "generic-msfs");
+  });
+
+  it("ships SDK simvars on the universal pack", () => {
+    const generic = findPack(packs, "PMDG 737-800")!;
+    const sims = new Set(generic.variables.map((v) => v.sim));
+    assert.ok(generic.variables.filter((v) => v.sync).length >= 90);
+    assert.ok(sims.has("AUTOPILOT YAW DAMPER"));
+    assert.ok(sims.has("NAV ACTIVE FREQUENCY:2"));
+    assert.ok(sims.has("ENG ANTI ICE:1"));
+    assert.ok(sims.has("SPOILERS ARMED"));
   });
 
   it("matches skyhawk titles", () => {

@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "Guest aircraft is frozen to the host pose. Captain taxi/flight moves the other PC. Battery, avionics and axis SET events keep repeating while following.",
+  notes: "SDK SimVars on every airframe: radios, AP modes, lights, ice, brakes. Guest still follows host pose.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };
