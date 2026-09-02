@@ -150,7 +150,7 @@ class MsfsSim implements SimBackend {
     this.appMajor = Number(recvOpen.applicationVersionMajor) || 0;
     this.appMinor = Number(recvOpen.applicationVersionMinor) || 0;
     this.appBuild = Number(recvOpen.applicationBuildMajor) || 0;
-    this.synced = pack.variables.filter((v) => v.sync);
+    this.synced = pack.variables.filter((v) => v.sync && !v.sim.startsWith("H:"));
     for (const v of pack.variables) this.values.set(v.id, 0);
 
     handle.addToDataDefinition(TITLE_DEF, "TITLE", null, sc.SimConnectDataType.STRING256);
@@ -619,6 +619,14 @@ class MsfsSim implements SimBackend {
     const current = this.values.get(v.id) ?? 0;
     this.values.set(v.id, value);
     this.writing.add(v.id);
+    if (v.sim.startsWith("H:")) {
+      const rpn = sanitizeRpn(
+        v.calc ? evalCalcSet({ get: v.calc.get, set: v.calc.set }, value, current) : `1 (>${v.sim})`,
+      );
+      if (rpn) this.pumpCalc(rpn);
+      setTimeout(() => this.writing.delete(v.id), 160);
+      return;
+    }
     const buf = new sc.RawBuffer(16);
     buf.writeFloat64(value);
     this.handle.setDataOnSimObject(WRITE_BASE + v.id, sc.SimConnectConstants.OBJECT_ID_USER, {

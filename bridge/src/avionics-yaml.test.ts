@@ -39,8 +39,11 @@ describe("avionics yaml", () => {
     assert.equal(parsed?.sim, "KOHLSMAN SETTING MB:0");
     const yaml = parseAvionicsYaml("shared:\n  - get: L:PFD_CDI_Source # CDI\n    set: (>K:AP_NAV_SELECT_SET)\n");
     assert.equal(yaml.shared[0]?.get, "L:PFD_CDI_Source");
+    const hEvent = parseGet("H:AS1000_PFD_SOFTKEYS_1");
+    assert.equal(hEvent?.sim, "H:AS1000_PFD_SOFTKEYS_1");
+    assert.equal(evalCalcSet({ get: "H:AS1000_PFD_CLR" }, 1, 0), "1 (>H:AS1000_PFD_CLR)");
     const sky = findPack(loadPacks(), "Cessna Skyhawk G1000")!;
-    assert.ok(sky.variables.some((v) => v.sim === "KOHLSMAN SETTING MB:0"));
+    assert.ok(sky.variables.some((v) => v.sim.startsWith("H:AS1000")));
     assert.ok(sky.variables.some((v) => v.calc?.set?.includes("KOHLSMAN")));
     const pmdg = findPack(loadPacks(), "PMDG 737-800")!;
     assert.equal(pmdg.variables.some((v) => v.sim === "KOHLSMAN SETTING MB:0"), false);

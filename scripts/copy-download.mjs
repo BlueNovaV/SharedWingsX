@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "Guest follow uses freeze once then SimVar pose each frame. INITPOSITION only for a lost lock (Microsoft: do not taxi with INITPOSITION).",
+  notes: "G1000/GNS H-events from MIT YAML fire through the in-sim calculator. No third-party aircraft patches.",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };

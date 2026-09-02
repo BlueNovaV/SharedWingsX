@@ -167,6 +167,10 @@ export function parseGet(raw: string): { kind: string; sim: string; units: strin
   if (kind === "L") {
     return { kind, sim: `L:${name}`, units: units || "Number", get };
   }
+  if (kind === "H") {
+    const event = name.replace(/\s.*/, "");
+    return { kind, sim: `H:${event}`, units: "Number", get: `H:${event}` };
+  }
   return null;
 }
 
@@ -177,6 +181,7 @@ export function evalCalcSet(link: YamlLink, value: number, current: number): str
   const set = link.set?.trim();
   const valueStr = formatNum(value);
   if (!set) {
+    if (parsed?.kind === "H") return `1 (>${parsed.sim})`;
     return units ? `${valueStr} (>${get}, ${units})` : `${valueStr} (>${get})`;
   }
   if (BANNED.test(set)) return "";
@@ -210,6 +215,7 @@ export function sanitizeRpn(code: string): string {
       c === 44 ||
       c === 46 ||
       c === 58 ||
+      c === 61 ||
       c === 62 ||
       c === 95 ||
       c === 43 ||
@@ -235,9 +241,10 @@ export function loadAvionicsModuleFile(rel: string, root = avionicsYamlDir(), se
 export function modulesForTitle(aircraftTitle: string, packId?: string): string[] {
   const t = aircraftTitle.toLowerCase();
   const out: string[] = [];
-  if (packId === "asobo-c172" || /g1000|\bnxi\b|garmin 1000/.test(t)) {
-    out.push("modules/AS_G1000_NXi.yaml");
-  }
+  const g1000 =
+    packId === "asobo-c172" ||
+    /g1000|\bnxi\b|garmin 1000|skyhawk|cessna 172|cessna 182|da40|da62|sr22|bonanza|baron|tbm 930|pc-12|pc12/.test(t);
+  if (g1000) out.push("modules/AS_G1000_NXi.yaml");
   if (/gtn\s*750|gtn\s*650|pms50/.test(t)) out.push("modules/PMS50_GTN_650-750.yaml");
   if (/gns\s*530|as530/.test(t)) out.push("modules/AS_GNS530.yaml");
   if (/gns\s*430|as430/.test(t)) out.push("modules/AS_GNS430.yaml");
@@ -290,7 +297,7 @@ export function linksToVars(links: YamlLink[], startId: number): PackVar[] {
       epsilon: epsilonFor(parsed.units),
       calc,
     });
-    if (vars.length >= 160) break;
+    if (vars.length >= 280) break;
   }
   return vars;
 }

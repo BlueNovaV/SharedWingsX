@@ -46,7 +46,7 @@ static int rpn_ok(const char *s) {
     const unsigned char c = static_cast<unsigned char>(*p);
     if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) continue;
     if (c == ' ' || c == ':' || c == '_' || c == '(' || c == ')' || c == '>' || c == ',' || c == '.' ||
-        c == '+' || c == '-' || c == '*' || c == '/')
+        c == '+' || c == '-' || c == '*' || c == '/' || c == '=')
       continue;
     return 0;
   }

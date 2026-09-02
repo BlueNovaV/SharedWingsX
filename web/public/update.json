@@ -1,7 +1,7 @@
 {
-  "version": "0.4.70",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.70/SharedWingsX-Setup-0.4.70.exe",
-  "notes": "Guest follow uses freeze once then SimVar pose each frame. INITPOSITION only for a lost lock (Microsoft: do not taxi with INITPOSITION).",
+  "version": "0.4.71",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.71/SharedWingsX-Setup-0.4.71.exe",
+  "notes": "G1000/GNS H-events from MIT YAML fire through the in-sim calculator. No third-party aircraft patches.",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }
