@@ -1,7 +1,7 @@
 {
-  "version": "0.4.69",
-  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.69/SharedWingsX-Setup-0.4.69.exe",
-  "notes": "SDK SimVars on every airframe: radios, AP modes, lights, ice, brakes. Guest still follows host pose.",
+  "version": "0.4.70",
+  "downloadUrl": "https://github.com/BlueNovaV/sharedwingsx/releases/download/v0.4.70/SharedWingsX-Setup-0.4.70.exe",
+  "notes": "Guest follow uses freeze once then SimVar pose each frame. INITPOSITION only for a lost lock (Microsoft: do not taxi with INITPOSITION).",
   "sha256": "",
   "relayUrl": "https://twinseat-relay.rune-innocent.workers.dev"
 }

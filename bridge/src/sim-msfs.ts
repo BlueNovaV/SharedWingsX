@@ -502,10 +502,10 @@ class MsfsSim implements SimBackend {
 
   applyWorldPose(pose: WorldPose): void {
     try {
-      const far =
-        !this.hasPosition() || metersBetween(this.lat, this.lon, pose.lat, pose.lon) > (pose.onGround ? 0.6 : 4);
+      /* Microsoft: INITPOSITION on the user aircraft reloads scenery. Only warp when the guest is lost. */
+      const gapM = !this.hasPosition() ? 1e9 : metersBetween(this.lat, this.lon, pose.lat, pose.lon);
       const now = Date.now();
-      if (far && now - this.lastWarpAt > 80) {
+      if (gapM > 120 && now - this.lastWarpAt > 1500) {
         this.lastWarpAt = now;
         const init = new sc.RawBuffer(56);
         init.writeFloat64(pose.lat);
@@ -522,16 +522,6 @@ class MsfsSim implements SimBackend {
           tagged: false,
         });
       }
-      const ground = new sc.RawBuffer(32);
-      ground.writeFloat64(pose.lat);
-      ground.writeFloat64(pose.lon);
-      ground.writeFloat64(pose.alt);
-      ground.writeFloat64(pose.heading);
-      this.handle.setDataOnSimObject(GROUND_POSE_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
-        buffer: ground,
-        arrayCount: 0,
-        tagged: false,
-      });
       const poseBuf = new sc.RawBuffer(48);
       poseBuf.writeFloat64(pose.lat);
       poseBuf.writeFloat64(pose.lon);
@@ -544,29 +534,26 @@ class MsfsSim implements SimBackend {
         arrayCount: 0,
         tagged: false,
       });
-      if (this.physicsHold) {
-        this.fire("FREEZE_LATITUDE_LONGITUDE_SET", 1);
-        this.fire("FREEZE_ALTITUDE_SET", 1);
-        this.fire("FREEZE_ATTITUDE_SET", 1);
+      if (!pose.onGround) {
+        const velBuf = new sc.RawBuffer(24);
+        velBuf.writeFloat64(pose.vx ?? 0);
+        velBuf.writeFloat64(pose.vy ?? 0);
+        velBuf.writeFloat64(pose.vz ?? 0);
+        this.handle.setDataOnSimObject(VEL_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
+          buffer: velBuf,
+          arrayCount: 0,
+          tagged: false,
+        });
+        const rotBuf = new sc.RawBuffer(24);
+        rotBuf.writeFloat64(pose.rx ?? 0);
+        rotBuf.writeFloat64(pose.ry ?? 0);
+        rotBuf.writeFloat64(pose.rz ?? 0);
+        this.handle.setDataOnSimObject(ROT_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
+          buffer: rotBuf,
+          arrayCount: 0,
+          tagged: false,
+        });
       }
-      const velBuf = new sc.RawBuffer(24);
-      velBuf.writeFloat64(pose.vx ?? 0);
-      velBuf.writeFloat64(pose.onGround ? 0 : (pose.vy ?? 0));
-      velBuf.writeFloat64(pose.vz ?? 0);
-      this.handle.setDataOnSimObject(VEL_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
-        buffer: velBuf,
-        arrayCount: 0,
-        tagged: false,
-      });
-      const rotBuf = new sc.RawBuffer(24);
-      rotBuf.writeFloat64(pose.onGround ? 0 : (pose.rx ?? 0));
-      rotBuf.writeFloat64(pose.ry ?? 0);
-      rotBuf.writeFloat64(pose.onGround ? 0 : (pose.rz ?? 0));
-      this.handle.setDataOnSimObject(ROT_WRITE, sc.SimConnectConstants.OBJECT_ID_USER, {
-        buffer: rotBuf,
-        arrayCount: 0,
-        tagged: false,
-      });
     } catch (err) {
       console.warn("[twinseat] pose write skipped", err instanceof Error ? err.message : err);
     }

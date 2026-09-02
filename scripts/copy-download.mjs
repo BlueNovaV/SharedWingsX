@@ -101,7 +101,7 @@ const downloadUrl = `https://github.com/${githubRepo}/releases/download/v${versi
 const update = {
   version,
   downloadUrl,
-  notes: "SDK SimVars on every airframe: radios, AP modes, lights, ice, brakes. Guest still follows host pose.",
+  notes: "Guest follow uses freeze once then SimVar pose each frame. INITPOSITION only for a lost lock (Microsoft: do not taxi with INITPOSITION).",
   sha256,
   relayUrl: process.env.TWINSEAT_CLOUD_RELAY || relayUrl,
 };

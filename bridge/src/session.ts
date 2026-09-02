@@ -225,7 +225,7 @@ export class TwinSeatSession {
     }
     if (cloud) {
       throw new Error(
-        "The host must click Start deck and keep SharedWingsX 0.4.69 open.",
+        "The host must click Start deck and keep SharedWingsX 0.4.70 open.",
       );
     }
     throw new Error(
@@ -439,7 +439,7 @@ export class TwinSeatSession {
       const ws = new WebSocket(toWs(url), {
         handshakeTimeout: 8000,
         perMessageDeflate: false,
-        headers: { "User-Agent": "SharedWingsX/0.4.69" },
+        headers: { "User-Agent": "SharedWingsX/0.4.70" },
       });
       this.signal = ws;
       const timer = setTimeout(() => {
@@ -755,7 +755,8 @@ export class TwinSeatSession {
     }
     this.sim.syncCrewPins(this.room && this.hasCrew() ? pins : []);
     if (hold) {
-      if (enteredWorld || now - this.lastFreezePulse > 700) {
+      this.sim.setPhysicsHold(true);
+      if (enteredWorld || now - this.lastFreezePulse > 4000) {
         this.sim.setPhysicsHold(true, true);
         this.lastFreezePulse = now;
       }
